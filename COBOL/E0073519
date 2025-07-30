@@ -1,0 +1,468 @@
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID                          E0073519.
+       AUTHOR                              LUCAS L.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                        DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT FILE011 ASSIGN               TO UT-S-FILE011
+           FILE STATUS FS-FILE011
+           .
+           SELECT RELATO4 ASSIGN             TO UT-S-RELATO4
+           FILE STATUS FS-RELATO4
+           .
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       FILE                                SECTION.
+      *----------------------------------------------------------------*
+       FD  FILE011
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 392 CHARACTERS
+           DATA RECORD IS REG-FILE011
+           .
+       01  REG-FILE011.
+           COPY B135F011.
+      *
+       FD  RELATO4
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 160 CHARACTERS
+           DATA RECORD IS REG-RELATO4
+           .
+       01  REG-RELATO4                    PIC X(160).
+      *----------------------------------------------------------*
+       WORKING-STORAGE                  SECTION.
+      *----------------------------------------------------------*
+       01  WS-CABEC1                 PIC X(105)
+                                            VALUE ALL '*'.
+       01  WS-CABEC2.
+           05 FILLER                    PIC X(01)
+                                            VALUE "*".
+           05 FILLER                    PIC X(21)
+                                        VALUE ALL SPACES.
+           05 FILLER                    PIC X(39)
+                                        VALUE
+           'CENTRO DE FORMACAO MAINFRAME - TURMA 08'.
+           05 FILLER                    PIC X(43)
+                                        VALUE ALL SPACES.
+           05 FILLER                    PIC X(01)
+                                            VALUE "*".
+       01  WS-CABEC3.
+           05 FILLER                    PIC X(01)
+                                            VALUE "*".
+           05 FILLER                    PIC X(103)
+                                        VALUE ALL '-'.
+           05 FILLER                    PIC X(01)
+                                            VALUE "*".
+       01  WS-CABEC4.
+           05 FILLER                    PIC X(02)
+                                        VALUE '* '.
+           05 FILLER                    PIC X(35)
+                                        VALUE
+           'BANCO FOURBANK (FOLHA DE PAGAMENTO)'.
+           05 FILLER                    PIC X(46)
+                                        VALUE ALL SPACES.
+           05 WS-DATA-CABEC4            PIC X(10).
+           05 FILLER                    PIC X(03)
+                                        VALUE ' - '.
+           05 WS-HORA-CABEC4            PIC X(08).
+           05 FILLER                    PIC X(01)
+                                            VALUE '*'.
+       01  WS-CABEC5                    PIC X(105)
+                                            VALUE ALL '*'.
+       01  WS-CABEC6.
+           05 FILLER                    PIC X(14)
+                                        VALUE
+           '| CPF         '.
+           05 FILLER                    PIC X(23)
+                                        VALUE
+           '| NOME                 '.
+           05 FILLER                    PIC X(14)
+                                        VALUE
+           '| CARGO       '.
+           05 FILLER                    PIC X(17)
+                                        VALUE
+           '| HORA EXTRA     '.
+           05 FILLER                    PIC X(22)
+                                        VALUE
+           '| INSS           |'.
+           05 FILLER                    PIC X(19)
+                                        VALUE
+           '| IRRF           |'.
+           05 FILLER                    PIC X(26)
+                                        VALUE
+           '| CONTRIBUICAO SINDICAL  |'.
+       01  WS-CABEC7.
+           05 FILLER                    PIC X(42)
+                                            VALUE
+           '|             |                      |    '.
+           05 FILLER                    PIC X(44)
+                                            VALUE
+           '              |           |                |'.
+           05 FILLER                    PIC X(19)
+                                            VALUE
+           '              |           |                |'.
+           05 FILLER                    PIC X(27)
+                                            VALUE
+           '              |           '.
+       01  WS-CABEC8.
+           05 FILLER                    PIC X(42)
+                                            VALUE
+           '|-------------|----------------------|----'.
+           05 FILLER                    PIC X(44)
+                                            VALUE
+           '---------|----------------|----------------|'.
+           05 FILLER                    PIC X(19)
+                                            VALUE
+           '---------|--------'.
+           05 FILLER                    PIC X(27)
+                                            VALUE
+           '---------|----------------|'.
+
+       01  WS-LINDET.
+           05 FILLER                    PIC X(02)
+                                                VALUE '| '.
+           05 LD-CPF                    PIC X(11).
+           05 FILLER                    PIC X(03)
+                                                VALUE ' | '.
+           05 LD-NOME                   PIC X(20).
+           05 FILLER                    PIC X(03)
+                                                VALUE ' | '.
+           05 LD-CARGO                  PIC 9999.
+           05 FILLER                    PIC X(09)
+                                                VALUE '        |'.
+           05 FILLER                    PIC X(05)
+                                                VALUE ' R$  '.
+           05 LD-HORA-EXTRA             PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(03)
+                                                VALUE ' | '.
+           05 FILLER                    PIC X(04)
+                                                VALUE 'R$  '.
+           05 LD-INSS                   PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(02)
+                                                VALUE ' |'.
+           05 LD-IRRF                   PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(09)
+                                                VALUE
+                                        '         '.
+           05 LD-CONTRIB-SIND           PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(09)
+                                                VALUE
+                                        '         '.                            
+       01  WS-RODAPE1                   PIC X(105)
+                                        VALUE ALL '*'.
+       01  WS-RODAPE2.
+           05 FILLER                    PIC X(21)
+                                        VALUE
+           '*                    '.
+           05 FILLER                    PIC X(39)
+                                        VALUE
+           'CENTRO DE FORMACAO MAINFRAME - TURMA 08'.
+           05 FILLER                    PIC X(26)
+                                        VALUE
+           '                          '.
+           05 FILLER                    PIC X(19)
+                                        VALUE
+           '                   '.
+       01  WS-RODAPE3.
+           05 FILLER                    PIC X(01)
+                                        VALUE '*'.
+           05 FILLER                    PIC X(103)
+                                        VALUE ALL '-'.
+           05 FILLER                    PIC X(01)
+                                        VALUE '*'.
+       01  WS-RODAPE4.
+           05 FILLER                    PIC X(02)
+                                        VALUE '* '.
+           05 FILLER                    PIC X(35)
+                                        VALUE
+           'BANCO FOURBANK (FOLHA DE PAGAMENTO)'.
+           05 FILLER                    PIC X(46)
+                                        VALUE ALL SPACES.
+           05 WS-DATA-RODAPE4            PIC X(10).
+           05 FILLER                    PIC X(03)
+                                        VALUE ' - '.
+           05 WS-HORA-RODAPE4            PIC X(08).
+           05 FILLER                    PIC X(01)
+                                            VALUE '*'.
+       01  WS-RODAPE5                   PIC X(105)
+                                            VALUE ALL '*'.
+
+       77  FS-FILE011                       PIC X(02).
+       77  FS-RELATO4                       PIC X(02).
+       77  WS-CTLIN                         PIC 9(02).
+       77  WS-MSG                           PIC X(60).
+       77  WS-FS                            PIC X(02).
+
+       01  WS-DATE-SYS.
+           05 WS-ANO-SYS                   PIC 99.
+           05 WS-MES-SYS                   PIC 99.
+           05 WS-DIA-SYS                   PIC 99.
+
+       01  WS-TIME-SYS.
+           05 WS-HORA-SYS                  PIC 99.
+           05 WS-MIN-SYS                   PIC 99.
+           05 WS-SEG-SYS                   PIC 99.
+           05 FILLER                       PIC XX.
+
+       01  WS-DATE-FORMATADA.
+           05 WS-DIA-FORMATADA              PIC 99.
+           05 FILLER                        PIC X(01)
+                                            VALUE '/'.
+           05 WS-MES-FORMATADA              PIC 99.
+           05 FILLER                        PIC X(03)
+                                            VALUE '/20'.
+           05 WS-ANO-FORMATADA              PIC 99.
+
+       01  WS-TIME-FORMATADA.
+           05 WS-HORA-FORMATADA             PIC 99.
+           05 FILLER                        PIC X(01)
+                                            VALUE ':'.
+           05 WS-MIN-FORMATADA              PIC 99.
+           05 FILLER                        PIC X(01)
+                                            VALUE ':'.
+           05 WS-SEG-FORMATADA              PIC 99.
+
+      *----------------------------------------------------------------*
+       PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+       000-EX001P15.
+           PERFORM 010-INICIALIZAR
+           PERFORM 030-PROCESSAR
+                      UNTIL FS-FILE011 = "10"
+           PERFORM 070-TERMINO
+           STOP RUN
+           .
+       010-INICIALIZAR.
+           ACCEPT WS-TIME-SYS               FROM TIME
+           ACCEPT WS-DATE-SYS               FROM DATE
+           ADD 99                          TO WS-CTLIN
+           MOVE WS-HORA-SYS                TO WS-HORA-FORMATADA
+           MOVE WS-MIN-SYS                 TO WS-MIN-FORMATADA
+           MOVE WS-SEG-SYS                 TO WS-SEG-FORMATADA
+           MOVE WS-ANO-SYS                 TO WS-ANO-FORMATADA
+           MOVE WS-MES-SYS                 TO WS-MES-FORMATADA
+           MOVE WS-DIA-SYS                 TO WS-DIA-FORMATADA
+           MOVE WS-TIME-FORMATADA          TO WS-HORA-CABEC4
+           MOVE WS-DATE-FORMATADA          TO WS-DATA-CABEC4
+           MOVE WS-TIME-FORMATADA          TO WS-HORA-RODAPE4
+           MOVE WS-DATE-FORMATADA          TO WS-DATA-RODAPE4
+           OPEN INPUT FILE011
+
+           IF FS-FILE011 NOT = "00"
+
+              MOVE "ERRO ABERTURA FILE011" TO WS-MSG
+              MOVE FS-FILE011 TO WS-FS
+              GO TO 999-ERRO
+
+           END-IF
+
+           OPEN OUTPUT RELATO4
+
+           IF FS-RELATO4 NOT = "00"
+              MOVE "ERRO ABERTURA FILE011" TO WS-MSG
+              MOVE FS-RELATO4 TO WS-FS
+              GO TO 999-ERRO
+
+           END-IF
+
+           PERFORM 020-LER-FILE011
+           .
+
+       020-LER-FILE011.
+           READ FILE011
+
+           IF FS-FILE011 NOT EQUAL '00' AND
+              FS-FILE011 NOT EQUAL '10'
+
+                 MOVE "ERRO LEITURA FILE011" TO WS-MSG
+                 MOVE FS-FILE011 TO WS-FS
+
+                 GO TO 999-ERRO
+
+           END-IF
+           .
+
+       030-PROCESSAR.
+           IF WS-CTLIN >= 10
+             PERFORM 060-IMPRIME-CABECALHO
+           END-IF
+           PERFORM 050-IMPRIME-DETALHE
+           IF WS-CTLIN = 10
+              PERFORM 060-IMPRIME-RODAPE
+           END-IF
+           PERFORM 020-LER-FILE011
+           .
+
+       050-IMPRIME-DETALHE.
+           MOVE B135F011-CPF               TO LD-CPF
+           MOVE B135F011-NOME              TO LD-NOME
+           MOVE B135F011-ID-CARGO          TO LD-CARGO
+           MOVE B135F011-VALOR-HORA-EXTRA  TO LD-HORA-EXTRA
+           MOVE B135F011-INSS-CALCULADO    TO LD-INSS
+           MOVE B135F011-IRRF-CALCULADO    TO LD-IRRF
+           MOVE B135F011-CONTRIB-CALCULADO TO LD-CONTRIB-SIND
+      *
+           WRITE REG-RELATO4 FROM WS-LINDET
+      *
+           IF FS-RELATO4 NOT = "00"
+
+              MOVE "ERRO IMPRESSAO LINDET" TO WS-MSG
+              MOVE FS-RELATO4 TO WS-FS
+
+              GO TO 999-ERRO
+
+           END-IF
+           ADD 1 TO WS-CTLIN
+           .
+       060-IMPRIME-CABECALHO.
+           MOVE WS-CABEC1 TO REG-RELATO4
+           WRITE REG-RELATO4
+           IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC1" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+           END-IF
+
+           MOVE WS-CABEC2 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC2" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC3 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC3" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC4 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC4" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC5 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC5" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC6 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC6" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC7 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC7" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+
+           MOVE WS-CABEC8 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO CABEC8" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+            MOVE 0                            TO WS-CTLIN
+           .
+       060-IMPRIME-RODAPE.
+           MOVE WS-RODAPE1 TO REG-RELATO4
+           WRITE REG-RELATO4
+            IF FS-RELATO4 NOT = "00"
+               MOVE "ERRO DE GRAVACAO RODAPE1" TO WS-MSG
+               MOVE FS-RELATO4              TO WS-FS
+               GO TO 999-ERRO
+            END-IF
+           MOVE WS-RODAPE2 TO REG-RELATO4
+           WRITE REG-RELATO4
+           IF FS-RELATO4 NOT = "00"
+              MOVE "ERRO DE GRAVACAO RODAPE2" TO WS-MSG
+              MOVE FS-RELATO4              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           MOVE WS-RODAPE3 TO REG-RELATO4
+           WRITE REG-RELATO4
+           IF FS-RELATO4 NOT = "00"
+              MOVE "ERRO DE GRAVACAO RODAPE3" TO WS-MSG
+              MOVE FS-RELATO4              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           MOVE WS-RODAPE4 TO REG-RELATO4
+           WRITE REG-RELATO4
+           IF FS-RELATO4 NOT = "00"
+              MOVE "ERRO DE GRAVACAO RODAPE4" TO WS-MSG
+              MOVE FS-RELATO4              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           MOVE WS-RODAPE5 TO REG-RELATO4
+           WRITE REG-RELATO4
+           IF FS-RELATO4 NOT = "00"
+              MOVE "ERRO DE GRAVACAO RODAPE5" TO WS-MSG
+              MOVE FS-RELATO4              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           ADD 20                          TO WS-CTLIN
+           .
+       070-TERMINO.
+           IF WS-CTLIN < 20
+              PERFORM 060-IMPRIME-RODAPE
+           END-IF
+
+           CLOSE FILE011
+
+           IF FS-FILE011 NOT = "00"
+
+              MOVE "ERRO FECHAMENTO FILE011" TO WS-MSG
+              MOVE FS-FILE011 TO WS-FS
+
+              GO TO 999-ERRO
+
+           END-IF
+
+           CLOSE RELATO4
+
+           IF FS-RELATO4 NOT = "00"
+
+              MOVE "ERRO FECHAMENTO RELATO4" TO WS-MSG
+              MOVE FS-RELATO4                TO WS-FS
+
+              GO TO 999-ERRO
+
+           END-IF
+           .
+
+       999-ERRO.
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " MENSAGEM.....: " WS-MSG
+           DISPLAY " FILE STATUS..: " WS-FS
+           DISPLAY "*------------------------------------------*"
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " TERMINO ANORMAL DO PROGRAMA "
+           DISPLAY "*------------------------------------------*"
+           STOP RUN
+           .

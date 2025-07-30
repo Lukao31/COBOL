@@ -1,0 +1,275 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+      *                                                                 00060004
+       PROGRAM-ID.                         T5074603                     00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+      *                                                                 00060004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *                                                                 00060004
+       INPUT-OUTPUT                        SECTION.                     00110004
+      *                                                                 00060004
+       FILE-CONTROL.
+           SELECT FILE4601 ASSIGN TO UT-S-FILE4601
+           FILE STATUS IS FS-FILE4601
+           .
+      *
+           SELECT FILE4602 ASSIGN TO UT-S-FILE4602
+           FILE STATUS IS FS-FILE4602
+           .
+      *
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  FILE4601
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 69 CHARACTERS
+           DATA RECORD REG-FILE4601
+           .
+      *
+           COPY BK074610.
+      *
+       FD  FILE4602
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 69 CHARACTERS
+           DATA RECORD REG-FILE4602
+           .
+      *
+           COPY BK074611.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA CALCULO DO TEMPO                     *
+      *--------------------------------------------------------------*
+           COPY VARDATA.
+           COPY VARPROC.
+      *
+       01  WS-CONTADORES-COMP.
+           05 WS-CTLIDO                    PIC 9(05) COMP.
+           05 WS-CTEXC                     PIC 9(05) COMP.
+           05 WS-CTALT                     PIC 9(05) COMP.
+           05 WS-CTGRAV                    PIC 9(05) COMP.
+      *
+       01  WS-CONTADORES-FORMATADOS.
+           05 WS-CTLIDO-F                  PIC ZZ.ZZ9.
+           05 WS-CTEXC-F                   PIC ZZ.ZZ9.
+           05 WS-CTALT-F                   PIC ZZ.ZZ9.
+           05 WS-CTGRAV-F                  PIC ZZ.ZZ9.
+      *
+       01  FS-FILE4601                     PIC X(02).
+           88 SUCESSO-ARQ                          VALUE "00".
+           88 FIM-ARQ                              VALUE "10".
+      *
+       01  FS-FILE4602                     PIC X(02).
+           88 SUCESSO-ARQ1                         VALUE "00".
+           88 FIM-ARQ1                             VALUE "10".
+      *
+       77  WS-SQLCODE                      PIC +9(9).
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *
+      * AUXILIARES
+       77  SALARIO-AUX                     PIC S9(08)V99  COMP-3.
+       77  VALORDEP                        PIC S9(03)V99  COMP-3.
+       77  IRRF75                          PIC S9(01)V999 COMP-3.
+       77  IRRF15                          PIC S9(01)V999 COMP-3.
+       77  IRRF225                         PIC S9(01)V999 COMP-3.
+       77  IRRF275                         PIC S9(01)V999 COMP-3.
+       77  IRRFTOTAL                       PIC S9(04)V99  COMP-3.
+       77  IRRFTOT1                        PIC S9(04)V99  COMP-3.
+       77  IRRFTOT2                        PIC S9(04)V99  COMP-3.
+       77  IRRFTOT3                        PIC S9(04)V99  COMP-3.
+       77  IRRFTOT4                        PIC S9(04)V99  COMP-3.
+      *--------------------------------------------------------------*  00210008
+       PROCEDURE                           DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+      *0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FIM-ARQ
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL FROM TIME
+           INITIALIZE WS-CONTADORES-COMP
+      *
+           INITIALIZE IRRF75
+           INITIALIZE IRRF15
+           INITIALIZE IRRF225
+           INITIALIZE IRRF275
+           INITIALIZE VALORDEP
+      *
+           OPEN INPUT FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO DE ABERTURA FILE4601" TO WS-MSG
+              MOVE FS-FILE4601                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT FILE4602
+           IF NOT SUCESSO-ARQ1
+              MOVE "ERRO DE ABERTURA FILE4602" TO WS-MSG
+              MOVE FS-FILE4602                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           .
+      *
+       1100-LER-COMPRA.
+           READ FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO DE LEITURA FILE4601" TO WS-MSG
+              MOVE FS-FILE4601                TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           PERFORM 1100-LER-COMPRA
+           IF SUCESSO-ARQ
+           MOVE BK074610-CPF             TO BK074611-CPF
+           MOVE BK074610-NOME            TO BK074611-NOME
+           MOVE BK074610-DDD             TO BK074611-DDD
+           MOVE BK074610-TELEFONE        TO BK074611-TELEFONE
+           MOVE BK074610-SALARIOBASE     TO BK074611-SALARIOBASE
+           MOVE BK074610-INSS            TO BK074611-INSS
+           MOVE BK074610-IRRF            TO BK074611-IRRF
+           MOVE BK074610-DEPENDENTE      TO BK074611-DEPENDENTE
+      *
+           PERFORM 2100-TRATAMENTO-IRRF
+           PERFORM 2200-GRAVAR-VARIAVEIS
+           ELSE
+              IF NOT SUCESSO-ARQ
+              MOVE ' ERRO DE MOVIMENTACAO DE VARIAVEIS'
+                                                TO WS-MSG
+              MOVE FS-FILE4601                  TO WS-FS
+           END-IF
+           .
+      *
+       2100-TRATAMENTO-IRRF.
+           MOVE 0,075                           TO IRRF75
+           MOVE 0,150                           TO IRRF15
+           MOVE 0,225                           TO IRRF225
+           MOVE 0,275                           TO IRRF275
+           MOVE 189,59                          TO VALORDEP
+           INITIALIZE  IRRFTOTAL
+           INITIALIZE SALARIO-AUX
+           MOVE BK074611-SALARIOBASE            TO SALARIO-AUX
+           DISPLAY SALARIO-AUX
+           IF SALARIO-AUX > 0 AND SALARIO-AUX <= 2112,00
+      * ISENTO DE ALIQUOTA
+              COMPUTE VALORDEP = VALORDEP * BK074611-DEPENDENTE
+              DISPLAY VALORDEP
+              COMPUTE IRRFTOTAL = SALARIO-AUX * 0
+              DISPLAY IRRFTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX > 2112,00 AND SALARIO-AUX <= 2826,65
+      * ALIQUOTA DE 7,5%
+              COMPUTE VALORDEP = VALORDEP * BK074611-DEPENDENTE
+              DISPLAY VALORDEP
+              COMPUTE IRRFTOT1 = (SALARIO-AUX * IRRF75)
+              COMPUTE IRRFTOT2 = SALARIO-AUX - IRRFTOT1 - VALORDEP
+              COMPUTE IRRFTOTAL = (IRRFTOT2 * IRRF75) - 158,40
+              DISPLAY IRRFTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX > 2826,65 AND SALARIO-AUX <= 3751,05
+      * ALIQUOTA DE 15%
+              COMPUTE VALORDEP = VALORDEP * BK074611-DEPENDENTE
+              DISPLAY VALORDEP
+              COMPUTE IRRFTOT1 = (SALARIO-AUX * IRRF15)
+              COMPUTE IRRFTOT2 = SALARIO-AUX - IRRFTOT1 - VALORDEP
+              COMPUTE IRRFTOTAL = (IRRFTOT2 * IRRF15) - 370,40
+              DISPLAY IRRFTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX > 3751,05 AND SALARIO-AUX <= 4664,68
+      * ALIQUOTA DE 22,5%
+              COMPUTE VALORDEP = VALORDEP * BK074611-DEPENDENTE
+              DISPLAY VALORDEP
+              COMPUTE IRRFTOT1 = (SALARIO-AUX * IRRF225)
+              COMPUTE IRRFTOT2 = SALARIO-AUX - IRRFTOT1 - VALORDEP
+              COMPUTE IRRFTOTAL = (IRRFTOT2 * IRRF225) - 651,73
+              DISPLAY IRRFTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX > 4664,68
+      * ALIQUOTA DE 27,5%
+              COMPUTE VALORDEP = VALORDEP * BK074611-DEPENDENTE
+              DISPLAY VALORDEP
+              COMPUTE IRRFTOT1 = (SALARIO-AUX * IRRF275)
+              COMPUTE IRRFTOT2 = SALARIO-AUX - IRRFTOT1 - VALORDEP
+              COMPUTE IRRFTOTAL = (IRRFTOT2 * IRRF275) - 884,96
+              DISPLAY IRRFTOTAL
+           END-IF
+           MOVE IRRFTOTAL                     TO BK074611-IRRF
+           .
+      *
+       2200-GRAVAR-VARIAVEIS.
+           WRITE REG-FILE4602
+           IF NOT SUCESSO-ARQ
+              MOVE 'ERRO NA GRAVACAO FILE4602'
+                                       TO WS-MSG
+              MOVE FS-FILE4601         TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           ADD 1                       TO WS-CTGRAV
+           .
+      *
+       3000-TERMINO.
+           CLOSE FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO FECHAMENTO FILE4601"  TO WS-MSG
+              MOVE FS-FILE4601                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE FILE4602
+           IF NOT SUCESSO-ARQ1
+              MOVE "ERRO FECHAMENTO FILE4602"  TO WS-MSG
+              MOVE FS-FILE4602                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           ACCEPT WS-HORARIO-FINAL FROM TIME
+      *
+           PERFORM 9000-CALCULA-TEMPO-PROC
+      *
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTGRAV                  TO WS-CTGRAV-F
+      *
+           PERFORM 9000-IMPRIME-DATA
+      *
+           DISPLAY '   '
+           DISPLAY '   '
+           DISPLAY '=================================================='
+           DISPLAY '==  ESTATISTICA FINAL DE PROCESSAMENTO          =='
+           DISPLAY '=================================================='
+           DISPLAY 'QTDE. DE FUNC LIDOS............... : ' WS-CTLIDO-F
+           DISPLAY 'QTDE. DE FUNC GRAVADOS............ : ' WS-CTGRAV-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO TOTAL DE PROCESSSAMENTO........: '
+                                           WS-TEMPO-PROCESSAMENTO
+           DISPLAY '=================================================='
+           DISPLAY '==  TERMINO NORMAL DO PROGRAMA T5074603         =='
+           DISPLAY '=================================================='
+           .
+      *
+      *--------------------------------------------------------------*  00210008
+      * COPY BOOK DE ROTINAS                                            00210008
+      *--------------------------------------------------------------*  00210008
+           COPY ROTDATA.
+           COPY ROTERRO.
+           COPY ROTPROC.

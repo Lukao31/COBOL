@@ -1,0 +1,201 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+       PROGRAM-ID.                         P107NX01.                    00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *
+       INPUT-OUTPUT                        SECTION.                     00100004
+      *
+       FILE-CONTROL.
+           SELECT EXTTDO25 ASSIGN TO UT-S-EXTTDO25
+           FILE STATUS IS FS-EXTTDO25
+           .
+           SELECT EXTTAO25 ASSIGN TO UT-S-EXTTAO25
+           FILE STATUS IS FS-EXTTAO25
+           .
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00150004
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  EXTTDO25
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 44 CHARACTERS
+           DATA RECORD IS REG-EXTTDO25
+           .
+      *
+           COPY B107DO25.
+      *
+       FD  EXTTAO25
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 44 CHARACTERS
+           DATA RECORD IS REG-EXTTAO25
+           .
+      *
+           COPY B107AO25.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+      * FLAGS PARA O FILE STATUS DOS ARQUIVOS                        *
+      *--------------------------------------------------------------*  00210008
+       01  FS-EXTTDO25                     PIC X(02).                   00210108
+           88 SUCESSO-DO                           VALUE "00".
+           88 FIM-ARQ-DO                           VALUE "10".
+      *
+       01  FS-EXTTAO25                     PIC X(02).                   00210108
+           88 SUCESSO-AO                           VALUE "00".
+           88 FIM-ARQ-AO                           VALUE "10".
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS PARA A ROTINA DE ERRO                              *
+      *--------------------------------------------------------------*  00210008
+       77  WS-MSG                          PIC X(60).                   00210208
+       77  WS-FS                           PIC X(02).                   00210308
+      *--------------------------------------------------------------*
+      * CONTADORES NO FORMATO BINARIO                                *
+      *--------------------------------------------------------------*
+       77  WS-CTLIDO-DO                    PIC 9(04) COMP.              00210308
+       77  WS-CTLIDO-AO                    PIC 9(04) COMP.              00210308
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS COM MASCARA DE EDICAO (FORMATADAS)                 *
+      *--------------------------------------------------------------*  00210008
+       77  WS-CTLIDO-DO-F                  PIC ZZZ9.                    00210308
+       77  WS-CTLIDO-AO-F                  PIC ZZZ9.                    00210308
+      *--------------------------------------------------------------*
+       77  WS-B107DO25-CPFAUX              PIC X(11).
+       77  WS-B107DO25-NOMEAUX             PIC X(16).
+       77  WS-B107DO25-DATAAUX             PIC X(10).
+       77  WS-TOTSALD-USER                 PIC S9(11)V99 COMP-3.
+       77  WS-CTCPFIGUAIS                  PIC 9(2).
+      *--------------------------------------------------------------*  00211007
+           COPY VARDATA.
+           COPY VARPROC.
+      *--------------------------------------------------------------*  00211007
+       PROCEDURE                           DIVISION.                    00220004
+      *--------------------------------------------------------------*  00230004
+       0000-P107NX01.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                        UNTIL FS-EXTTDO25 = "10"
+           PERFORM 3000-TERMINO
+           GOBACK
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL       FROM TIME
+           MOVE 0                          TO WS-CTLIDO-DO
+                                              WS-CTLIDO-AO
+                                              WS-CTCPFIGUAIS
+      *                                       WS-B107DO25-CPFAUX
+                                              WS-B107DO25-NOMEAUX
+                                              WS-B107DO25-DATAAUX
+                                              WS-TOTSALD-USER
+
+           OPEN INPUT EXTTDO25
+      *
+           IF NOT SUCESSO-DO
+              MOVE "ERRO ABERTURA EXTTDO25"  TO WS-MSG
+              MOVE FS-EXTTDO25               TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT EXTTAO25
+      *
+           IF NOT SUCESSO-AO
+              MOVE "ERRO ABERTURA EXTTAO25"  TO WS-MSG
+              MOVE FS-EXTTAO25               TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1100-LER-EXTTDO25
+           MOVE B107DO25-CPF                 TO WS-B107DO25-CPFAUX
+           .
+      *
+       1100-LER-EXTTDO25.
+           READ EXTTDO25
+      *
+           IF SUCESSO-DO
+              ADD 1 TO WS-CTLIDO-DO
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+              IF B107DO25-CPF = WS-B107DO25-CPFAUX
+                 COMPUTE WS-TOTSALD-USER = B107DO25-SALDO +
+                                           WS-TOTSALD-USER
+              MOVE B107DO25-NOME          TO WS-B107DO25-NOMEAUX
+              MOVE B107DO25-DATA          TO WS-B107DO25-DATAAUX
+              PERFORM 1100-LER-EXTTDO25
+      *
+              ELSE
+                IF B107DO25-CPF NOT = WS-B107DO25-CPFAUX
+                PERFORM 2100-GRAVAR-EXTTAO25
+                MOVE 0                      TO WS-TOTSALD-USER
+                MOVE B107DO25-CPF           TO WS-B107DO25-CPFAUX
+                MOVE B107DO25-NOME          TO WS-B107DO25-NOMEAUX
+                MOVE B107DO25-DATA          TO WS-B107DO25-DATAAUX
+      *
+                END-IF
+              END-IF
+      *
+           .
+      *
+       2100-GRAVAR-EXTTAO25.
+           MOVE WS-TOTSALD-USER            TO B107AO25-SALDO
+           MOVE WS-B107DO25-CPFAUX         TO B107AO25-CPF
+           MOVE WS-B107DO25-NOMEAUX        TO B107AO25-NOME
+           MOVE WS-B107DO25-DATAAUX        TO B107AO25-DATA
+           WRITE REG-EXTTAO25
+      *
+           IF SUCESSO-AO
+              ADD 1 TO WS-CTLIDO-AO
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           PERFORM 9000-IMPRIME-DATA
+           PERFORM 2100-GRAVAR-EXTTAO25
+      *
+           CLOSE EXTTDO25
+           IF NOT SUCESSO-DO
+             MOVE "ERRO FECHAMENTO EXTTDO25"   TO WS-MSG
+             MOVE FS-EXTTDO25                    TO WS-FS
+             GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE EXTTAO25
+           IF NOT SUCESSO-AO
+             MOVE "ERRO FECHAMENTO EXTTAO25"   TO WS-MSG
+             MOVE FS-EXTTAO25                  TO WS-FS
+             GO TO 9000-ERRO
+           END-IF
+      *
+           ACCEPT WS-HORARIO-FINAL         FROM TIME
+           PERFORM 9000-CALCULA-TEMPO-PROC
+           MOVE WS-CTLIDO-DO               TO WS-CTLIDO-DO-F
+           MOVE WS-CTLIDO-AO               TO WS-CTLIDO-AO-F
+      *
+           DISPLAY '=================================================='
+           DISPLAY 'TOTAL DE REGISTROS LIDOS CPF DO25' WS-CTLIDO-DO-F
+           DISPLAY 'TOTAL DE REGISTROS GRAV. CPF AO25' WS-CTLIDO-AO-F
+           DISPLAY 'TOTAL DE REG. SALDO TOT..........' WS-TOTSALD-USER
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO DE PROCESSAMENTO.: ' WS-TEMPO-PROCESSAMENTO-F
+           DISPLAY '=================================================='
+           DISPLAY '             TERMINO NORMAL P107NX01              '
+           DISPLAY '=================================================='
+           .
+      *
+           COPY ROTDATA.
+           COPY ROTPROC2.
+           COPY ROTERRO.

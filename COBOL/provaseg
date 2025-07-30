@@ -1,0 +1,178 @@
+* ARQ1: registros da tabela sem regra de negócio.
+* ARQ2: os mesmos CPFs, mas com regras aplicadas (ex: saldo alterado).
+* MERGE: **um único registro por CPF**, **priorizando o do ARQ2** (porque ele t
+em regras aplicadas).
+
+
+* Os dois arquivos estão **ordenados por CPF**. SORT NO JCL
+* A leitura ocorre em paralelo: lê um do ARQ1 e um do ARQ2.
+* Você compara os CPFs e decide qual gravar:
+
+  * Se os CPFs forem iguais, grava **somente o de ARQ2** e avança os dois.
+  * Se o CPF de ARQ1 for menor, grava ele e avança só ARQ1.
+  * Se o CPF de ARQ2 for menor, grava ele e avança só ARQ2.
+
+---
+
+```cobol
+PROCEDURE DIVISION.
+
+0000-INICIO.
+    OPEN INPUT ARQ1-IN ARQ2-IN
+    OPEN OUTPUT ARQ-MERGE
+
+    PERFORM LER-ARQ1
+    PERFORM LER-ARQ2
+
+    PERFORM MERGE-LOOP
+
+    CLOSE ARQ1-IN ARQ2-IN ARQ-MERGE
+    STOP RUN.
+
+LER-ARQ1.
+    READ ARQ1-IN INTO REG-ARQ1
+        AT END MOVE 'S' TO WS-EOF1.
+
+LER-ARQ2.
+    READ ARQ2-IN INTO REG-ARQ2
+        AT END MOVE 'S' TO WS-EOF2.
+
+MERGE-LOOP.
+    PERFORM UNTIL WS-EOF1 = 'S' AND WS-EOF2 = 'S'
+
+        IF WS-EOF1 = 'S'
+            * só ARQ2 tem dados
+            MOVE REG-ARQ2 TO REG-MERGE
+            WRITE REG-MERGE
+            PERFORM LER-ARQ2
+
+        ELSE IF WS-EOF2 = 'S'
+            * só ARQ1 tem dados
+            MOVE REG-ARQ1 TO REG-MERGE
+            WRITE REG-MERGE
+            PERFORM LER-ARQ1
+
+        ELSE
+            * Ambos têm dados, comparar CPFs
+            IF CPF1 = CPF2
+                * Mesmo CPF nos dois → grava só ARQ2
+                MOVE REG-ARQ2 TO REG-MERGE
+                WRITE REG-MERGE
+                PERFORM LER-ARQ1
+                PERFORM LER-ARQ2
+
+            ELSE IF CPF1 < CPF2
+                * CPF do ARQ1 vem antes, só ele será gravado
+                MOVE REG-ARQ1 TO REG-MERGE
+                WRITE REG-MERGE
+                PERFORM LER-ARQ1
+
+            ELSE
+                * CPF do ARQ2 vem antes
+                MOVE REG-ARQ2 TO REG-MERGE
+                WRITE REG-MERGE
+                PERFORM LER-ARQ2
+
+            END-IF
+        END-IF
+
+    END-PERFORM.
+```
+
+
+* Se o CPF aparece nos dois arquivos: **grava só o do ARQ2**.
+* Se aparece só no ARQ1: grava.
+* Se aparece só no ARQ2: grava.
+
+OU SEJA, FAZER UM BALANCE LINE
+------------------------------------------------------------------------
+**agrupar por CPF** aplicando **uma lógica de agregação**, como:
+
+* Somar o saldo
+* Pegar o último nome/data (ou manter o primeiro)
+* Escrever **apenas um registro por CPF** no arquivo de saída
+
+---
+
+
+A ideia é:
+
+1. Arquivo está **ordenado por CPF**
+2. Quando o CPF mudar, grava o registro acumulado anterior
+3. Durante a repetição, **soma o saldo** e **atualiza a data se necessário**
+
+---
+ Exemplo de código COBOL:
+
+```cobol
+WORKING-STORAGE SECTION.
+
+77 WS-EOF             PIC X VALUE 'N'.
+77 WS-CPF-ATUAL       PIC X(11) VALUE SPACES.
+77 WS-NOME-ATUAL      PIC X(30) VALUE SPACES.
+77 WS-SALDO-ACUM      PIC 9(7)V99 VALUE 0.
+77 WS-DATA-ATUAL      PIC X(10) VALUE SPACES.
+77 WS-FS-IN           PIC XX.
+77 WS-FS-OUT          PIC XX.
+
+PROCEDURE DIVISION.
+
+0000-INICIO.
+    OPEN INPUT ARQ2-IN
+    OPEN OUTPUT ARQ-GRUPO
+
+    PERFORM LER-ARQ2
+
+    PERFORM UNTIL WS-EOF = 'S'
+        IF CPF2 = WS-CPF-ATUAL
+            ADD SALDO2 TO WS-SALDO-ACUM
+            MOVE DATA2 TO WS-DATA-ATUAL  *> Pode aplicar regra (última data, ma
+ior, etc.)
+        ELSE
+            IF WS-CPF-ATUAL NOT = SPACES
+                MOVE WS-CPF-ATUAL  TO CPF-GRAVAR
+                MOVE WS-NOME-ATUAL TO NOME-GRAVAR
+                MOVE WS-SALDO-ACUM TO SALDO-GRAVAR
+                MOVE WS-DATA-ATUAL TO DATA-GRAVAR
+                WRITE REG-GRAVAR
+            END-IF
+
+            MOVE CPF2        TO WS-CPF-ATUAL
+            MOVE NOME2       TO WS-NOME-ATUAL
+            MOVE SALDO2      TO WS-SALDO-ACUM
+            MOVE DATA2       TO WS-DATA-ATUAL
+        END-IF
+
+        PERFORM LER-ARQ2
+    END-PERFORM
+
+    * Grava o último CPF acumulado
+    IF WS-CPF-ATUAL NOT = SPACES
+        MOVE WS-CPF-ATUAL  TO CPF-GRAVAR
+        MOVE WS-NOME-ATUAL TO NOME-GRAVAR
+        MOVE WS-SALDO-ACUM TO SALDO-GRAVAR
+        MOVE WS-DATA-ATUAL TO DATA-GRAVAR
+        WRITE REG-GRAVAR
+    END-IF
+
+    CLOSE ARQ2-IN ARQ-GRUPO
+    STOP RUN.
+
+LER-ARQ2.
+    READ ARQ2-IN INTO REG-ARQ2
+        AT END MOVE 'S' TO WS-EOF.
+```
+
+---
+
+### Explicação da lógica:
+
+* Usa `WS-CPF-ATUAL` para guardar o CPF que está sendo agrupado.
+* Enquanto os CPFs forem iguais, soma os saldos.
+* Quando muda o CPF, grava o acumulado anterior e reinicia.
+* No fim, grava o último CPF.
+
+---
+
+
+MESMO REGISTRO NO MESMO ARQUIVO

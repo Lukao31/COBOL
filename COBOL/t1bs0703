@@ -1,0 +1,199 @@
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID                          EX007P18.
+       AUTHOR                              LUCAS.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                        DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT A1073104 ASSIGN             TO UT-S-A1073104
+           FILE STATUS FS-A1073104
+           .
+           SELECT A1073106 ASSIGN             TO UT-S-A1073106
+           FILE STATUS FS-A1073106
+           .
+           SELECT A1073107 ASSIGN             TO UT-S-A1073107
+           FILE STATUS FS-A1073107
+           .
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       FILE                                SECTION.
+      *----------------------------------------------------------------*
+       FD  A1073104
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 66 CHARACTERS
+           DATA RECORD IS REG-B1073104
+           .
+      *
+           COPY B1073104.
+      *
+
+       FD  A1073106
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 26 CHARACTERS
+           DATA RECORD IS REG-B1073106
+           .
+      *
+           COPY B1073106.
+      *
+       FD  A1073107
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 81 CHARACTERS
+           DATA RECORD IS REG-B1073107
+           .
+      *
+           COPY B1073107.
+      *----------------------------------------------------------*
+       WORKING-STORAGE                    SECTION.
+      *----------------------------------------------------------*
+       77  WS-VALOR-AUX                      PIC S9(11)V99 COMP-3.
+       77  WS-DATA-AUX                       PIC 9(08).
+      *
+       01  FS-A1073104                       PIC X(02).
+           88 SUCESSO-04                            VALUE "00".
+           88 FIM-ARQ-04                            VALUE "10".
+      *
+       01  FS-A1073106                       PIC X(02).
+           88 SUCESSO-06                            VALUE "00".
+           88 FIM-ARQ-06                            VALUE "10".
+      *
+       01  FS-A1073107                       PIC X(02).
+           88 SUCESSO-07                            VALUE "00".
+           88 FIM-ARQ-07                            VALUE "10".
+      *
+       77  WS-MSG                           PIC X(60).
+       77  WS-FS                            PIC X(02).
+           COPY VARDATA.
+           COPY VARPROC.
+      *----------------------------------------------------------------*
+       PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+       0000-T1BS0703.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+           PERFORM 3000-TERMINO
+           GOBACK
+           .
+       1000-INICIALIZAR.
+           OPEN INPUT A1073104
+           IF NOT SUCESSO-04
+              MOVE "ERRO DE ABERTURA A1073104" TO WS-MSG
+              MOVE FS-A1073104                 TO WS-FS
+           END-IF
+      *
+           OPEN INPUT A1073106
+           IF NOT SUCESSO-06
+              MOVE "ERRO DE ABERTURA A1073106" TO WS-MSG
+              MOVE FS-A1073106                 TO WS-FS
+           END-IF
+      *
+           OPEN OUTPUT A1073107
+           IF NOT SUCESSO-07
+              MOVE "ERRO DE ABERTURA A1073107" TO WS-MSG
+              MOVE FS-A1073107                 TO WS-FS
+           END-IF
+           .
+      *
+       1100-LER-A1073104.
+           READ A1073104
+           IF NOT SUCESSO-04
+                 MOVE "ERRO DE LEITURA"     TO WS-MSG
+                 MOVE FS-A1073104           TO WS-FS
+           END-IF
+           .
+      *
+       1200-LER-A1073106.
+           READ A1073106
+           MOVE B1073106-VALOR              TO WS-VALOR-AUX
+           IF NOT SUCESSO-06
+                 MOVE "ERRO DE LEITURA"     TO WS-MSG
+                 MOVE FS-A1073104           TO WS-FS
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           IF B1073106-DATA >= 05032025 AND B1073106-DATA <= 04042025
+              IF B1073104-CPF = B1073106-CPF
+                 COMPUTE B1073106-VALOR = B1073106-VALOR +
+                                            WS-VALOR-AUX
+              PERFORM 1100-LER-A1073104
+              PERFORM 1200-LER-A1073106
+              PERFORM 2100-TRATAR-CONTA-COM-MOVTO
+              END-IF
+           ELSE
+              MOVE 0                        TO B1073106-DATA
+              MOVE 0                        TO B1073106-VALOR
+              PERFORM 1100-LER-A1073104
+              PERFORM 1200-LER-A1073106
+              PERFORM 2200-TRATAR-CONTA-SEM-MOVTO
+           END-IF
+           PERFORM 2300-TRATAR-MOVTO-SEM-CONTA
+           .
+      *
+       2100-TRATAR-CONTA-COM-MOVTO.
+           WRITE REG-B1073107
+      *
+           IF NOT SUCESSO-07
+              MOVE "ERRO DE GRAVACAO"   TO WS-MSG
+              MOVE FS-A1073107          TO WS-FS
+           END-IF
+           .
+      *
+       2200-TRATAR-CONTA-SEM-MOVTO.
+           WRITE REG-B1073107
+      *
+           IF NOT SUCESSO-07
+              MOVE "ERRO DE GRAVACAO"   TO WS-MSG
+              MOVE FS-A1073107          TO WS-FS
+           END-IF
+           .
+      *
+       2300-TRATAR-MOVTO-SEM-CONTA.
+           MOVE 0                       TO B1073107-VALOR
+           MOVE 0                       TO B1073107-DATA
+           WRITE REG-B1073107
+      *
+           IF NOT SUCESSO-07
+              MOVE "ERRO DE GRAVACAO"   TO WS-MSG
+              MOVE FS-A1073107          TO WS-FS
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           CLOSE A1073104
+           IF NOT SUCESSO-04
+              MOVE "ERRO DE FECHAMENTO"    TO WS-MSG
+              MOVE FS-A1073104             TO WS-FS
+           END-IF
+      *
+           CLOSE A1073106
+           IF NOT SUCESSO-06
+              MOVE "ERRO DE FECHAMENTO"   TO WS-MSG
+              MOVE FS-A1073106            TO WS-FS
+           END-IF
+      *
+           CLOSE A1073107
+           IF NOT SUCESSO-07
+              MOVE "ERRO DE FECHAMENTO"   TO WS-MSG
+              MOVE FS-A1073107            TO WS-FS
+           END-IF
+      *
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " DEU CERTO!!!"
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " TERMINO NORMAL DO EX007P18"
+           DISPLAY "*------------------------------------------*"
+           .
+           COPY ROTPROC2.
+           COPY ROTERRO.
+           COPY ROTDATA.

@@ -1,0 +1,346 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+      *                                                                 00060004
+       PROGRAM-ID.                         T5074602                     00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+      *                                                                 00060004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *                                                                 00060004
+       INPUT-OUTPUT                        SECTION.                     00110004
+      *                                                                 00060004
+       FILE-CONTROL.
+           SELECT FILE4601 ASSIGN TO UT-S-FILE4601
+           FILE STATUS IS FS-FILE4601
+           .
+      *
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  FILE4601
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 69 CHARACTERS
+           DATA RECORD REG-FILE4601
+           .
+      *
+           COPY BK074610.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA CALCULO DO TEMPO                     *
+      *--------------------------------------------------------------*
+           COPY VARDATA.
+           COPY VARPROC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS HOSPEDEIRAS                               *
+      *--------------------------------------------------------------*
+           EXEC SQL
+              INCLUDE FUNCPROV
+           END-EXEC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA O SQL                                *
+      *--------------------------------------------------------------*
+           EXEC SQL
+             INCLUDE SQLCA
+           END-EXEC.
+      *
+       01  WS-CONTADORES-COMP.
+           05 WS-CTLIDO                    PIC 9(05) COMP.
+           05 WS-CTEXC                     PIC 9(05) COMP.
+           05 WS-CTALT                     PIC 9(05) COMP.
+           05 WS-CTGRAV                    PIC 9(05) COMP.
+      *
+       01  WS-CONTADORES-FORMATADOS.
+           05 WS-CTLIDO-F                  PIC ZZ.ZZ9.
+           05 WS-CTEXC-F                   PIC ZZ.ZZ9.
+           05 WS-CTALT-F                   PIC ZZ.ZZ9.
+           05 WS-CTGRAV-F                  PIC ZZ.ZZ9.
+      *
+       01  FS-FILE4601                     PIC X(02).
+           88 SUCESSO-ARQ                          VALUE "00".
+      *    88 FIM-ARQ-ARQ                          VALUE "10".
+      *
+       77  WS-SQLCODE                      PIC +9(9).
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *
+      * AUXILIARES
+       77  SALARIO-AUX1                    PIC S9(08)V99  COMP-3.
+       77  SALARIO-AUX2                    PIC S9(08)V99  COMP-3.
+       77  SALARIO-1500                    PIC S9(08)V99  COMP-3.
+       77  SALARIO-1000                    PIC S9(08)V99  COMP-3.
+       77  SALARIO-500                     PIC S9(08)V99  COMP-3.
+       77  INSS75                          PIC S9(01)V999 COMP-3.
+       77  INSS9                           PIC S9(01)V999 COMP-3.
+       77  INSS12                          PIC S9(01)V999 COMP-3.
+       77  INSS14                          PIC S9(01)V999 COMP-3.
+       77  INSSTOTAL                       PIC S9(04)V99  COMP-3.
+       77  INSSTOT1                        PIC S9(04)V99  COMP-3.
+       77  INSSTOT2                        PIC S9(04)V99  COMP-3.
+       77  INSSTOT3                        PIC S9(04)V99  COMP-3.
+       77  INSSTOT4                        PIC S9(04)V99  COMP-3.
+      *--------------------------------------------------------------*  00210008
+       PROCEDURE                           DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+      *0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL SQLCODE = +100
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL FROM TIME
+      *
+           INITIALIZE INSSTOT1
+           INITIALIZE INSSTOT2
+           INITIALIZE INSSTOT3
+           INITIALIZE SALARIO-1500
+           INITIALIZE SALARIO-1000
+           INITIALIZE SALARIO-500
+      *
+           INITIALIZE WS-CONTADORES-COMP
+      *
+           INITIALIZE INSS75
+           INITIALIZE INSS9
+           INITIALIZE INSS12
+           INITIALIZE INSS14
+      *
+           EXEC SQL
+               DECLARE FUNC CURSOR FOR
+               SELECT CPF
+                     ,NOME
+                     ,DDD
+                     ,TELEFONE
+                     ,SALARIOBASE
+                     ,INSS
+                     ,IRRF
+                     ,DEPENDENTE
+               FROM FUNCIONARIOS
+           END-EXEC
+      *   ABERTURA DO CURSOR
+           EXEC SQL
+               OPEN FUNC
+           END-EXEC
+      *
+           IF SQLCODE NOT EQUAL 0
+              MOVE "ERRO AO FECHAR CURSOR" TO WS-MSG
+              MOVE SQLCODE                 TO WS-SQLCODE
+              GO TO 9000-ERRO-DB2
+           END-IF
+      *
+           OPEN OUTPUT FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO DE ABERTURA FILE4601" TO WS-MSG
+              MOVE FS-FILE4601                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           .
+      *
+       1100-LER-COMPRA.
+           INITIALIZE DCLFUNC
+           EXEC SQL
+                FETCH FUNC
+                INTO :DCLFUNC-CPF
+                    ,:DCLFUNC-NOME
+                    ,:DCLFUNC-DDD
+                    ,:DCLFUNC-TELEFONE
+                    ,:DCLFUNC-SALARIOBASE
+                    ,:DCLFUNC-INSS
+                    ,:DCLFUNC-IRRF
+                    ,:DCLFUNC-DEPENDENTE
+           END-EXEC
+      *
+           IF SQLCODE = 0
+              ADD 1 TO WS-CTLIDO
+           ELSE
+              IF SQLCODE NOT = +100
+                 MOVE "ERRO LEITURA CURSOR FUNC"
+                                                 TO WS-MSG
+                 MOVE SQLCODE                    TO WS-SQLCODE
+                 GO TO 9000-ERRO-DB2
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           PERFORM 1100-LER-COMPRA
+           IF SQLCODE = 0
+           MOVE DCLFUNC-CPF              TO BK074610-CPF
+           MOVE DCLFUNC-NOME             TO BK074610-NOME
+           MOVE DCLFUNC-DDD              TO BK074610-DDD
+           MOVE DCLFUNC-TELEFONE         TO BK074610-TELEFONE
+           MOVE DCLFUNC-SALARIOBASE      TO BK074610-SALARIOBASE
+           MOVE DCLFUNC-INSS             TO BK074610-INSS
+           MOVE DCLFUNC-IRRF             TO BK074610-IRRF
+           MOVE DCLFUNC-DEPENDENTE       TO BK074610-DEPENDENTE
+      *
+           PERFORM 2100-TRATAMENTO-INSS
+           PERFORM 2300-GRAVAR-VARIAVEIS
+           ELSE
+              IF SQLCODE = +100
+              DISPLAY ' ERRO DE MOVIMENTACAO DE VARIAVEIS'
+           END-IF
+           .
+      *
+       2100-TRATAMENTO-INSS.
+           MOVE 0,075                           TO INSS75
+           MOVE 0,090                           TO INSS9
+           MOVE 0,120                           TO INSS12
+           MOVE 0,140                           TO INSS14
+           MOVE 1500                            TO SALARIO-1500
+           MOVE 1000                            TO SALARIO-1000
+           MOVE 500                             TO SALARIO-500
+           INITIALIZE  INSSTOTAL
+           INITIALIZE SALARIO-AUX1
+           MOVE BK074610-SALARIOBASE            TO SALARIO-AUX1
+           DISPLAY SALARIO-AUX1
+           IF SALARIO-AUX1 > 0 AND SALARIO-AUX1 <= 1500
+      * ALIQUOTA DE 7,5%
+              COMPUTE INSSTOTAL = SALARIO-AUX1 * INSS75
+              DISPLAY INSSTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX1 >= 1501 AND SALARIO-AUX1 <= 2500
+      * ALIQUOTA DE 9%
+              COMPUTE INSSTOTAL = (SALARIO-AUX1 * INSS9) - 22,50
+              DISPLAY INSSTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX1 >= 2501 AND SALARIO-AUX1 <= 3500
+      * ALIQUOTA DE 12%
+              COMPUTE INSSTOT1 = (SALARIO-AUX1 - SALARIO-1500) * INSS75
+              DISPLAY INSSTOT1
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1500
+              COMPUTE INSSTOT2 =  SALARIO-1000  * INSS9
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1000
+              DISPLAY INSSTOT2
+              COMPUTE INSSTOT3 = SALARIO-500 * INSS12
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-500
+              DISPLAY INSSTOT3
+      *
+              COMPUTE INSSTOTAL = INSSTOT1 + INSSTOT2 + INSSTOT3
+              DISPLAY INSSTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX1 > 3500 AND SALARIO-AUX1 <= 7000
+      * ALIQUOTA DE 14%
+              COMPUTE INSSTOT1 = SALARIO-1500 * INSS75
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1500
+              DISPLAY INSSTOT1
+              COMPUTE INSSTOT2 = SALARIO-1000 * INSS9
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1000
+              DISPLAY INSSTOT2
+              COMPUTE INSSTOT3 =  SALARIO-1000 * INSS12
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1000
+              MOVE SALARIO-AUX1                      TO SALARIO-AUX2
+              DISPLAY INSSTOT3
+              COMPUTE INSSTOT4 = SALARIO-AUX1 * INSS14
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-AUX2
+              DISPLAY INSSTOT4
+      *
+              COMPUTE INSSTOTAL = INSSTOT1 + INSSTOT2 + INSSTOT3 +
+                                  INSSTOT4
+              DISPLAY INSSTOTAL
+           END-IF
+      *
+           IF SALARIO-AUX1 > 7000
+      * ALIQUOTA DE 14%
+              COMPUTE INSSTOT1 = SALARIO-1500 * INSS75
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1500
+              DISPLAY INSSTOT1
+              COMPUTE INSSTOT2 = SALARIO-1000 * INSS9
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1000
+              DISPLAY INSSTOT2
+              COMPUTE INSSTOT3 =  SALARIO-1000 * INSS12
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-1000
+              MOVE SALARIO-AUX1                      TO SALARIO-AUX2
+              DISPLAY INSSTOT3
+              COMPUTE INSSTOT4 = 3500 * INSS14
+              COMPUTE SALARIO-AUX1 = SALARIO-AUX1 - SALARIO-AUX2
+              DISPLAY INSSTOT4
+      *
+              COMPUTE INSSTOTAL = INSSTOT1 + INSSTOT2 + INSSTOT3 +
+                                  INSSTOT4
+              DISPLAY INSSTOTAL
+           END-IF
+           MOVE INSSTOTAL                     TO BK074610-INSS
+           .
+      *
+       2300-GRAVAR-VARIAVEIS.
+           WRITE REG-FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE 'ERRO NA GRAVACAO FILE4601'
+                                       TO WS-MSG
+              MOVE FS-FILE4601         TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           ADD 1                       TO WS-CTGRAV
+           .
+      *
+       3000-TERMINO.
+           CLOSE FILE4601
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO FECHAMENTO FILE4601"  TO WS-MSG
+              MOVE FS-FILE4601                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           EXEC SQL
+               CLOSE FUNC
+           END-EXEC
+      *
+           ACCEPT WS-HORARIO-FINAL FROM TIME
+      *
+           PERFORM 9000-CALCULA-TEMPO-PROC
+      *
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTGRAV                  TO WS-CTGRAV-F
+      *
+           PERFORM 9000-IMPRIME-DATA
+      *
+           DISPLAY '   '
+           DISPLAY '   '
+           DISPLAY '=================================================='
+           DISPLAY '==  ESTATISTICA FINAL DE PROCESSAMENTO          =='
+           DISPLAY '=================================================='
+           DISPLAY 'QTDE. DE FUNC LIDOS............... : ' WS-CTLIDO-F
+           DISPLAY 'QTDE. DE FUNC GRAVADOS............ : ' WS-CTGRAV-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO TOTAL DE PROCESSSAMENTO........: '
+                                           WS-TEMPO-PROCESSAMENTO
+           DISPLAY '=================================================='
+           DISPLAY '==  TERMINO NORMAL DO PROGRAMA T5074602         =='
+           DISPLAY '=================================================='
+           .
+      *
+       9000-ERRO-DB2.
+           DISPLAY '==================================================='
+           DISPLAY 'MESSAGE...:' WS-MSG
+           DISPLAY 'SQLCODE...:' WS-SQLCODE
+           DISPLAY '==================================================='
+           DISPLAY '==  TERMINO ANORMAL DO PROGRAMA CURSOR7          =='
+           DISPLAY '==================================================='
+           MOVE 16                         TO RETURN-CODE
+           STOP RUN
+           .
+      *
+      *--------------------------------------------------------------*  00210008
+      * COPY BOOK DE ROTINAS                                            00210008
+      *--------------------------------------------------------------*  00210008
+           COPY ROTDATA.
+           COPY ROTERRO.
+           COPY ROTPROC.

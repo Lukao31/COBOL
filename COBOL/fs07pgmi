@@ -1,0 +1,599 @@
+      *--------------------------------------------------------------*
+       IDENTIFICATION                      DIVISION.
+      *--------------------------------------------------------------*
+       PROGRAM-ID.                         FS07PGMI.
+       AUTHOR.                             LUCAS.
+      *--------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *--------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *--------------------------------------------------------------*
+       DATA                                DIVISION.
+      *--------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *--------------------------------------------------------------*
+       77  WS-MSG-ERRO                     PIC X(80).
+       77  WS-LENGTH                       PIC S9(04) COMP.
+       01  WS-DFHCOMMAREA.
+           05 WS-FASE                      PIC X(01).
+           05 WS-BKP-VCADPRD               PIC X(58).
+      *
+       01  WS-VAR-TEMPO.
+           05 WS-DATA                      PIC X(10).
+           05 WS-HORARIO                   PIC X(08).
+      *
+           COPY FS07CAD.
+           COPY DFHAID.
+           COPY DFHBMSCA.
+      *
+           EXEC SQL
+               INCLUDE BK002TP
+           END-EXEC.
+
+           EXEC SQL
+               INCLUDE SQLCA
+           END-EXEC.
+      * VARIAVEL ESPELHO DO VCADPRD
+       01  WS-REG-VCADPRD.
+           05 WS-CODPROD                  PIC X(04).
+           05 WS-DESCPROD                 PIC X(20).
+           05 WS-UNIDPROD                 PIC X(05).
+           05 WS-LOCALPROD                PIC X(05).
+           05 WS-QTDEST                   PIC 9(05).
+           05 WS-QTDMAX                   PIC 9(05).
+           05 WS-QTDMIN                   PIC 9(05).
+           05 WS-PRECOCOMPRA              PIC 9(06)V99.
+           05 WS-PRECOVENDA               PIC 9(06)V99.
+           05 WS-PERCOMIS                 PIC 9(02)V99.
+      *
+       01  WS-DFHCOMMAREA                 PIC X(01).
+      * BACKUP DO REGISTRO DO VCADPRD
+      *    05 WS-BKP-VCADPRD              PIC X(69).
+
+      *   COPY FS07CAD.
+      *   COPY DFHAID.
+      *   COPY DFHBMSCA.
+      *----------------------------------------------------------------*
+       LINKAGE                             SECTION.
+      *----------------------------------------------------------------*
+       01  DFHCOMMAREA.
+           05 OCCURS 0 TO 24576 TIMES DEPENDING ON EIBCALEN
+                                           PIC X(01).
+      *--------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *--------------------------------------------------------------*
+           EXEC CICS HANDLE CONDITION
+              NOTFND  (999-NOTFND)
+              MAPFAIL (999-ERRO-MAPA)
+              ERROR   (999-ERRO-GENERICO)
+           END-EXEC
+      *
+      * SELETOR DE FASE - O MENU PRINCIPAL POSSUI 3 FASES
+      *    FASE 1 - ENVIA O MAPA PARA O TERMINAL
+      *    FASE 2 - TRATA O CAMPO T2COD
+      *    FASE 3 - TRATA O CAMPO DE DADOS NÃO CHAVE
+      *    FASE 4 - TRATA O CAMPO T2CONF
+      *---------------------------------------------------------------*A
+           MOVE DFHCOMMAREA                 TO WS-DFHCOMMAREA
+      *
+           IF EIBCALEN EQUAL 0
+              MOVE +80                   TO WS-LENGTH
+              MOVE 'ENTRE COM A TRANSACAO F07M'
+                                         TO WS-MSG-ERRO
+              PERFORM 999-ENCERRA-TRANSACAO
+           END-IF
+      *
+           EVALUATE WS-FASE
+              WHEN '1' PERFORM 100-FASE1
+              WHEN '2' PERFORM 200-FASE2
+              WHEN '3' PERFORM 300-FASE3
+              WHEN '4' PERFORM 400-FASE4
+              WHEN OTHER
+                 MOVE +80                   TO WS-LENGTH
+                 MOVE 'UTILIZE A OPCAO B DA TRANSACAO F07M'
+                                            TO WS-MSG-ERRO
+                 PERFORM 999-ENCERRA-TRANSACAO
+           END-EVALUATE
+           .
+      *
+       100-FASE1.
+      * LIMPAR AS VARIAVEIS DO MAPA
+           MOVE LOW-VALUES                 TO MAPACADO
+      * POSICIONAMENTO LOGICO - DIRETO NO CAMPO DESEJADO
+           MOVE -1                         TO T2CODL
+      * MOVER A MENSAGEM PARA O CAMPO APROPRIADO
+           MOVE 'ENTRE O CODIGO DO PRODUTO PARA ALTERAR'
+                                           TO T2MSGO
+      * PROTEGE A DESPROTEGE OS CAMPOS
+           PERFORM 999-PROTECAO-FASE2
+      * MANDAR A TELA PARA O TERMINAL
+           PERFORM 999-MANDA-TELA
+      * ENCERRA A TRANSACAO, CHAMANDO A PROXIMA FASE
+           PERFORM 999-CHAMA-FASE2
+           .
+      *
+       200-FASE2.
+           EXEC CICS HANDLE AID
+                ENTER  (210-ENTER)
+                PF3    (220-PF3)
+                PF5    (230-PF5)
+                CLEAR  (230-PF5)
+                ANYKEY (240-ANYKEY)
+           END-EXEC
+      *
+           EXEC CICS RECEIVE
+                MAP    ('MAPACAD')
+                MAPSET ('FS07CAD')
+                INTO   (MAPACADI)
+           END-EXEC
+           .
+      *
+       210-ENTER.
+           IF T2CODL EQUAL 0 OR T2CODI EQUAL SPACES
+              MOVE 'CODIGO NAO INFORMADO - TENTE NOVAMENTE'
+                                           TO T2MSGO
+              PERFORM 999-TRATA-FASE2
+           END-IF
+      *
+           EXEC SQL
+              SELECT
+                    CODPROD
+                   ,DESCPROD
+                   ,UNIDPROD
+                   ,LOCALPROD
+                   ,QTDEST
+                   ,QTDMAX
+                   ,QTDMIN
+                   ,PRECOCOMPRA
+                   ,PRECOVENDA
+                   ,PERCOMIS
+              INTO  :CODPROD
+                   ,:DESCPROD
+                   ,:UNIDPROD
+                   ,:LOCALPROD
+                   ,:QTDEST
+                   ,:QTDMAX
+                   ,:QTDMIN
+                   ,:PRECOCOMPRA
+                   ,:PRECOVENDA
+                   ,:PERCOMIS
+               FROM TBPRODUTO
+               WHERE CODPROD = :CODPROD
+            END-EXEC
+      *
+           IF SQLCODE = 100
+              PERFORM 999-NOTFND
+           END-IF
+      *
+           MOVE DCLTBPRODUTO            TO WS-BKP-VCADPRD
+      *
+           MOVE CODPROD                 TO T2CODO
+           MOVE DESCPROD                TO T2DESCO
+           MOVE UNIDPROD                TO T2UNIDO
+           MOVE LOCALPROD               TO T2LOCALO
+           MOVE QTDEST                  TO T2ESTO
+           MOVE QTDMAX                  TO T2MAXO
+           MOVE QTDMIN                  TO T2MINO
+           MOVE PRECOCOMPRA             TO T2COMPO
+           MOVE PRECOVENDA              TO T2VENDAO
+           MOVE PERCOMIS                TO T2COMISO
+      *
+           MOVE 'DIGITE SUAS ALTERACOES'  TO T2MSGO
+           PERFORM 999-TRATA-FASE3
+           .
+      *
+       220-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07PGMM')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       230-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       240-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO T2MSGO
+           PERFORM 999-TRATA-FASE2
+           .
+      *
+        300-FASE3.
+            EXEC CICS HANDLE AID
+                 ENTER  (310-ENTER)
+                 PF3    (320-PF3)
+                 PF5    (330-PF5)
+                 CLEAR  (330-PF5)
+                 ANYKEY (340-ANYKEY)
+            END-EXEC
+      *
+            EXEC CICS RECEIVE
+                 MAP    ('MAPACAD')
+                 MAPSET ('FS07CAD')
+                 INTO   (MAPACADI)
+            END-EXEC
+            .
+      *
+       310-ENTER.
+      * LIMPAR OS CAMPOS NUMERICOS DE CARACTERES ALFA...
+        EXEC CICS BIF DEEDIT FIELD(T2ESTI  ) END-EXEC
+        EXEC CICS BIF DEEDIT FIELD(T2MAXI  ) END-EXEC
+        EXEC CICS BIF DEEDIT FIELD(T2MINI  ) END-EXEC
+        EXEC CICS BIF DEEDIT FIELD(T2COMPI ) END-EXEC
+        EXEC CICS BIF DEEDIT FIELD(T2VENDAI) END-EXEC
+        EXEC CICS BIF DEEDIT FIELD(T2COMISI) END-EXEC
+      * VERIFICAR SE ALGUM CAMPO ESTA SEM PREENCHER
+           IF T2DESCL  = 0 OR T2DESCI  EQUAL SPACES OR
+              T2UNIDL  = 0 OR T2UNIDI  EQUAL SPACES OR
+              T2LOCALL = 0 OR T2LOCALI EQUAL SPACES OR
+              T2ESTL   = 0 OR
+              T2MAXL   = 0 OR
+              T2MINL   = 0 OR
+              T2COMPL  = 0 OR
+              T2VENDAL = 0 OR
+              T2COMISL
+              MOVE 'FAVOR PREENCHER TODOS OS CAMPOS'
+                                               TO T2MSGO
+              PERFORM 999-TRATA-FASE3
+           END-IF
+      *
+      * VERIFICAR SE MAX > MIN
+           IF T2MAXI <= T2MINI
+              MOVE 'QTD. MAX. DEVE SER MAIOR QUE QTD. MIN.'
+                                           TO T2MSGO
+              PERFORM 999-TRATA-FASE3
+           END-IF
+           PERFORM 999-TRATA-FASE4
+           .
+      *
+       320-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07PGMM')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       330-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       340-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO T2MSGO
+           PERFORM 999-TRATA-FASE3
+           .
+      *
+        400-FASE4.
+            EXEC CICS HANDLE AID
+                 ENTER  (410-ENTER)
+                 PF3    (420-PF3)
+                 PF5    (430-PF5)
+                 CLEAR  (430-PF5)
+                 ANYKEY (440-ANYKEY)
+            END-EXEC
+      *
+            EXEC CICS RECEIVE
+                 MAP    ('MAPACAD')
+                 MAPSET ('FS07CAD')
+                 INTO   (MAPACADI)
+            END-EXEC
+            .
+      *
+       410-ENTER.
+           IF T2CONFL EQUAL 0 OR T2CONFI NOT = 'S' AND 'N'
+              MOVE 'DIGITE APENAS S OU N'
+                                           TO T2MSGO
+              PERFORM 999-TRATA-FASE4
+           END-IF
+      *
+           IF T2CONFI = 'S'
+              EXEC SQL
+                 SELECT
+                       CODPROD
+                      ,DESCPROD
+                      ,UNIDPROD
+                      ,LOCALPROD
+                      ,QTDEST
+                      ,QTDMAX
+                      ,QTDMIN
+                      ,PRECOCOMPRA
+                      ,PRECOVENDA
+                      ,PERCOMIS
+                 INTO  :CODPROD
+                      ,:DESCPROD
+                      ,:UNIDPROD
+                      ,:LOCALPROD
+                      ,:QTDEST
+                      ,:QTDMAX
+                      ,:QTDMIN
+                      ,:PRECOCOMPRA
+                      ,:PRECOVENDA
+                      ,:PERCOMIS
+                 FROM TBPRODUTO
+                 WHERE CODPROD = :CODPROD
+              END-EXEC
+      *
+              IF DCLTBPRODUTO NOT = WS-BKP-VCADPRD
+                 MOVE LOW-VALUES          TO MAPACADO
+      *       SIGNIFICA QUE O PRODUTO FOI ALTERADO POR OUTRA PESSOA
+                 STRING 'O PRODUTO '      DELIMITED BY SIZE
+                         WS-CODPROD       DELIMITED BY SPACE
+                        ' FOI ALTERADO POR OUTRO USUARIO'
+                                          DELIMITED BY SIZE
+                                          INTO T2MSGO
+                 PERFORM 999-TRATA-FASE2
+              END-IF
+      *
+              MOVE T2CODI                  TO CODPROD
+              MOVE T2DESCI                 TO DESCPROD-TEXT
+              MOVE T2UNIDI                 TO UNIDPROD
+              MOVE T2LOCALI                TO LOCALPROD
+              MOVE T2ESTI                  TO QTDEST
+              MOVE T2MAXI                  TO QTDMAX
+              MOVE T2MINI                  TO QTDMIN
+              MOVE T2COMPI                 TO PRECOCOMPRA
+              MOVE T2VENDAI                TO PRECOVENDA
+              MOVE T2COMISI                TO PERCOMIS
+      *
+
+              EXEC SQL
+                UPDATE TBPRODUTO
+                SET   DESCPROD  = :DESCPROD
+                 ,  UNIDPROD     = :UNIDPROD
+                 ,  LOCALPROD    = :LOCALPROD
+                 ,  QTDEST       = :QTDEST
+                 ,  QTDMAX       = :QTDMAX
+                 ,  QTDMIN       = :QTDMIN
+                 ,  PRECOCOMPRA  = :PRECOCOMPRA
+                 ,  PRECOVENDA   = :PRECOVENDA
+                 ,  PERCOMIS     = :PERCOMIS
+                WHERE CODPROD       = :CODPROD
+              END-EXEC
+           END-IF
+           PERFORM 420-PF3
+           .
+      *
+       420-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07PGMM')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       430-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       440-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO T2MSGO
+           PERFORM 999-TRATA-FASE4
+           .
+      *
+       999-ENCERRA-TRANSACAO.
+           EXEC CICS SEND TEXT
+              FROM (WS-MSG-ERRO)
+              LENGTH (+80)
+              ERASE FREEKB ALARM
+           END-EXEC
+      *
+           EXEC CICS RETURN
+           END-EXEC
+           .
+      *
+       999-PROTECAO-FASE2.
+      *     DFHUNIMD - (UNPROT, ALFA, BRT, ON) - PARA DESPROTEGER ALFA
+           MOVE DFHUNIMD                      TO T2CODA
+      *     DFHBMPRF - (PROT, ALFA, NORM, ON) - PARA PROTEGER
+           MOVE DFHBMPRF                      TO T2DESCA
+           MOVE DFHBMPRF                      TO T2UNIDA
+           MOVE DFHBMPRF                      TO T2LOCALA
+           MOVE DFHBMPRF                      TO T2ESTA
+           MOVE DFHBMPRF                      TO T2MAXA
+           MOVE DFHBMPRF                      TO T2MINA
+           MOVE DFHBMPRF                      TO T2COMPA
+           MOVE DFHBMPRF                      TO T2VENDAA
+           MOVE DFHBMPRF                      TO T2COMISA
+           MOVE DFHBMPRF                      TO T2CONFA
+      *
+           MOVE DFHUNDLN                      TO T2CODH
+      *
+           MOVE DFHALL                        TO T2DESCH
+           MOVE DFHALL                        TO T2UNIDH
+           MOVE DFHALL                        TO T2LOCALH
+           MOVE DFHALL                        TO T2ESTH
+           MOVE DFHALL                        TO T2MAXH
+           MOVE DFHALL                        TO T2MINH
+           MOVE DFHALL                        TO T2COMPH
+           MOVE DFHALL                        TO T2VENDAH
+           MOVE DFHALL                        TO T2COMISH
+           MOVE DFHALL                        TO T2CONFH
+           .
+      *
+       999-PROTECAO-FASE3.
+      * PARA DESPROTEGER ALFA
+           MOVE DFHUNIMD                      TO T2DESCA
+           MOVE DFHUNIMD                      TO T2UNIDA
+           MOVE DFHUNIMD                      TO T2LOCALA
+           MOVE DFHUNIMD                      TO T2ESTA
+           MOVE DFHUNIMD                      TO T2MAXA
+           MOVE DFHUNIMD                      TO T2MINA
+           MOVE DFHUNIMD                      TO T2COMPA
+           MOVE DFHUNIMD                      TO T2VENDAA
+           MOVE DFHUNIMD                      TO T2COMISA
+      * PROTEGER
+           MOVE DFHUNIMD                      TO T2CONFA
+           MOVE DFHUNIMD                      TO T2CODA
+      * UNDERLINE
+            MOVE DFHUNDLN                      TO T2DESCH
+            MOVE DFHUNDLN                      TO T2UNIDH
+            MOVE DFHUNDLN                      TO T2LOCALH
+            MOVE DFHUNDLN                      TO T2ESTH
+            MOVE DFHUNDLN                      TO T2MAXH
+            MOVE DFHUNDLN                      TO T2MINH
+            MOVE DFHUNDLN                      TO T2COMPH
+            MOVE DFHUNDLN                      TO T2VENDAH
+            MOVE DFHUNDLN                      TO T2COMISH
+      * TIRAR UNDERLINE
+            MOVE DFHALL                        TO T2CONFH
+            MOVE DFHALL                        TO T2CODH
+            .
+      *
+        999-PROTECAO-FASE4.
+      * PARA DESPROTEGER ALFA
+            MOVE DFHUNIMD                      TO T2CONFA
+      * PROTEGER
+            MOVE DFHBMPRF                      TO T2CODA
+            MOVE DFHBMPRF                      TO T2DESCA
+            MOVE DFHBMPRF                      TO T2UNIDA
+            MOVE DFHBMPRF                      TO T2LOCALA
+            MOVE DFHBMPRF                      TO T2ESTA
+            MOVE DFHBMPRF                      TO T2MAXA
+            MOVE DFHBMPRF                      TO T2MINA
+            MOVE DFHBMPRF                      TO T2COMPA
+            MOVE DFHBMPRF                      TO T2VENDAA
+            MOVE DFHBMPRF                      TO T2COMISA
+      * UNDERLINE
+            MOVE DFHALL                        TO T2CONFH
+            MOVE DFHALL                        TO T2CODH
+      * TIRAR UNDERLINE
+            MOVE DFHUNDLN                      TO T2DESCH
+            MOVE DFHUNDLN                      TO T2UNIDH
+            MOVE DFHUNDLN                      TO T2LOCALH
+            MOVE DFHUNDLN                      TO T2ESTH
+            MOVE DFHUNDLN                      TO T2MAXH
+            MOVE DFHUNDLN                      TO T2MINH
+            MOVE DFHUNDLN                      TO T2COMPH
+            MOVE DFHUNDLN                      TO T2VENDAH
+            MOVE DFHUNDLN                      TO T2COMISH
+            .
+      *
+       999-MANDA-TELA.
+           MOVE EIBTRMID                   TO T2TERMO
+           MOVE EIBTRNID                   TO T2TRANO
+           MOVE EIBTASKN                   TO T2TASKO
+           MOVE WS-FASE                    TO T2FASEO
+      *
+           MOVE 'ALTERACAO DB2'            TO T2TELAO
+           EXEC CICS ASSIGN
+              USERID(T2USERO)
+           END-EXEC
+      *
+           EXEC CICS LINK
+              PROGRAM('AUXCICS1')
+              COMMAREA(WS-VAR-TEMPO)
+              LENGTH(+18)
+           END-EXEC
+      *
+           MOVE WS-DATA                     TO T2DATAO
+           MOVE WS-HORARIO                  TO T2HORAO
+      *
+           EXEC CICS SEND
+              MAP    ('MAPACAD')
+              MAPSET ('FS07CAD')
+              FROM   (MAPACADO)
+              ERASE FREEKB ALARM CURSOR
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE1.
+           MOVE '1'                         TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07PGMI')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE2.
+           MOVE '2'                         TO WS-FASE
+      *
+           EXEC CICS RETURN
+              TRANSID ('F07I')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE3.
+           MOVE '3'                         TO WS-FASE
+
+           EXEC CICS RETURN
+              TRANSID ('F07I')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE4.
+           MOVE '4'                         TO WS-FASE
+
+           EXEC CICS RETURN
+              TRANSID ('F07I')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-TRATA-FASE2.
+           MOVE -1                           TO T2CODL
+           PERFORM 999-PROTECAO-FASE2
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE2
+           .
+      *
+       999-TRATA-FASE3.
+           MOVE -1                            TO T2DESCL
+      *
+           PERFORM 999-PROTECAO-FASE3
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE3
+           .
+      *
+       999-TRATA-FASE4.
+           MOVE -1                           TO T2CONFL
+           MOVE 'ALTERAR OUTRO (S/N)?'       TO T2ACAOO
+      * MOVER OS CAMPOS DE REGISTRO PARA A TELA
+           PERFORM 999-PROTECAO-FASE4
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE4
+           .
+      *
+       999-ERRO-MAPA.
+           MOVE +80                          TO WS-LENGTH
+           MOVE 'ERRO MAPA FS07MNU'          TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .
+      *
+       999-NOTFND.
+           MOVE T2CODI                       TO WS-CODPROD
+           MOVE LOW-VALUES                   TO MAPACADO
+           IF WS-FASE = 2
+              STRING 'O PRODUTO '            DELIMITED BY SIZE
+                     WS-CODPROD              DELIMITED BY SPACE
+                     ' NAO FOI LOCALIZADO'   DELIMITED BY SIZE
+                                             INTO T2MSGO
+           ELSE
+              STRING 'O PRODUTO '            DELIMITED BY SIZE
+                     WS-CODPROD              DELIMITED BY SPACE
+                     ' FOI EXCLUIDO POR OUTRO USUARIO'
+                                             DELIMITED BY SIZE
+                                             INTO T2MSGO
+           END-IF
+           PERFORM 999-TRATA-FASE2
+           .
+      *
+       999-ERRO-GENERICO.
+           MOVE 'ERRO GENERICO FS07PGMI'     TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .

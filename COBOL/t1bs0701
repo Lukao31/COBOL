@@ -1,0 +1,186 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+       PROGRAM-ID.                         T1BS0701.                    00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *
+       INPUT-OUTPUT                        SECTION.                     00100004
+      *
+       FILE-CONTROL.
+           SELECT A1073101 ASSIGN TO UT-S-A1073101
+           FILE STATUS IS FS-EXTT3101
+           .
+           SELECT A1073102 ASSIGN TO UT-S-A1073102
+           FILE STATUS IS FS-EXTT3102
+           .
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00150004
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  A1073101
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 35 CHARACTERS
+           DATA RECORD IS REG-EXTT3101
+           .
+      *
+           COPY B1073101.
+      *
+       FD  A1073102
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 42 CHARACTERS
+           DATA RECORD IS REG-EXTT3102
+           .
+      *
+           COPY B1073102.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+      * FLAGS PARA O FILE STATUS DOS ARQUIVOS                        *
+      *--------------------------------------------------------------*  00210008
+       01  FS-EXTT3101                     PIC X(02).                   00210108
+           88 SUCESSO-01                           VALUE "00".
+           88 FIM-ARQ-01                           VALUE "10".
+      *
+       01  FS-EXTT3102                     PIC X(02).                   00210108
+           88 SUCESSO-02                           VALUE "00".
+           88 FIM-ARQ-02                           VALUE "10".
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS PARA A ROTINA DE ERRO                              *
+      *--------------------------------------------------------------*  00210008
+       77  WS-MSG                          PIC X(60).                   00210208
+       77  WS-FS                           PIC X(02).                   00210308
+      *--------------------------------------------------------------*
+      * CONTADORES NO FORMATO BINARIO                                *
+      *--------------------------------------------------------------*
+       77  WS-CTLIDO-01                    PIC 9(04) COMP.              00210308
+       77  WS-CTGRAV-02                    PIC 9(04) COMP.              00210308
+       77  WS-CTGRAV-DP                    PIC 9(04) COMP.              00210308
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS COM MASCARA DE EDICAO (FORMATADAS)                 *
+      *--------------------------------------------------------------*  00210008
+       77  WS-CTLIDO-01-F                  PIC ZZZ9.                    00210308
+       77  WS-CTGRAV-02-F                  PIC ZZZ9.                    00210308
+       77  WS-CTGRAV-DP-F                  PIC ZZZ9.                    00210308
+      *--------------------------------------------------------------*
+       77  WS-AUX-VALOR-BRUTO              PIC S9(05)V99.
+      *--------------------------------------------------------------*  00211007
+           COPY VARDATA.
+           COPY VARPROC.
+      *--------------------------------------------------------------*  00211007
+       PROCEDURE                           DIVISION.                    00220004
+      *--------------------------------------------------------------*  00230004
+       0000-T1BS0701.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                        UNTIL FS-EXTT3101 = "10"
+           PERFORM 3000-TERMINO
+           GOBACK
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL       FROM TIME
+           MOVE 0                          TO WS-CTLIDO-01
+                                              WS-CTGRAV-02
+                                              WS-CTGRAV-DP
+
+           OPEN INPUT A1073101
+      *
+           IF NOT SUCESSO-01
+              MOVE "ERRO ABERTURA EXTT3101"  TO WS-MSG
+              MOVE FS-EXTT3101               TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT A1073102
+      *
+           IF NOT SUCESSO-02
+              MOVE "ERRO ABERTURA EXTT3102"  TO WS-MSG
+              MOVE FS-EXTT3102               TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1100-LER-EXTT3101
+           .
+      *
+       1100-LER-EXTT3101.
+           READ A1073101
+      *
+           IF SUCESSO-01
+              ADD 1 TO WS-CTLIDO-01
+           ELSE
+              ADD 1 TO WS-CTGRAV-DP
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+              COMPUTE WS-AUX-VALOR-BRUTO = B1073101-HORAS-TRABALHADAS
+                                         * B1073101-VALOR-HORA
+              MOVE B1073101-MATRICULA     TO B1073102-MATRICULA
+              MOVE B1073101-NOME          TO B1073102-NOME
+              MOVE B1073101-HORAS-TRABALHADAS
+                                          TO B1073102-HORAS-TRABALHADAS
+              MOVE B1073101-VALOR-HORA    TO B1073102-VALOR-HORA
+              MOVE WS-AUX-VALOR-BRUTO     TO B1073102-VALOR-BRUTO
+              PERFORM 1100-LER-EXTT3101
+              PERFORM 2100-GRAVAR-EXTT3102
+              .
+      *
+       2100-GRAVAR-EXTT3102.
+           WRITE REG-EXTT3102
+      *
+           IF SUCESSO-02
+              ADD 1 TO WS-CTGRAV-02
+           ELSE
+              ADD 1 TO WS-CTGRAV-DP
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           PERFORM 9000-IMPRIME-DATA
+      *
+           CLOSE A1073101
+           IF NOT SUCESSO-01
+             MOVE "ERRO FECHAMENTO EXTT3101"   TO WS-MSG
+             MOVE FS-EXTT3101                    TO WS-FS
+             GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE A1073102
+           IF NOT SUCESSO-02
+             MOVE "ERRO FECHAMENTO EXTT3102"   TO WS-MSG
+             MOVE FS-EXTT3102                  TO WS-FS
+             GO TO 9000-ERRO
+           END-IF
+      *
+           ACCEPT WS-HORARIO-FINAL         FROM TIME
+           PERFORM 9000-CALCULA-TEMPO-PROC
+           MOVE WS-CTLIDO-01               TO WS-CTLIDO-01-F
+           MOVE WS-CTGRAV-02               TO WS-CTGRAV-02-F
+           MOVE WS-CTGRAV-DP               TO WS-CTGRAV-DP-F
+      *
+           DISPLAY '=================================================='
+           DISPLAY 'TOTAL DE REGISTROS LIDOS........:' WS-CTLIDO-01-F
+           DISPLAY 'TOTAL DE REGISTROS GRAVADOS.....:' WS-CTGRAV-02-F
+           DISPLAY 'TOTAL DE REGISTROS DESPREZADOS..:' WS-CTGRAV-DP-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO DE PROCESSAMENTO.: ' WS-TEMPO-PROCESSAMENTO-F
+           DISPLAY '=================================================='
+           DISPLAY '             TERMINO NORMAL P107NX03              '
+           DISPLAY '=================================================='
+           .
+      *
+           COPY ROTDATA.
+           COPY ROTPROC2.
+           COPY ROTERRO.

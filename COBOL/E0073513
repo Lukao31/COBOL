@@ -1,0 +1,325 @@
+      ******************************************************************
+      *                                                                *
+      *          I D E N T I F I C A T I O N   D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       IDENTIFICATION                  DIVISION.
+          PROGRAM-ID.                  E0073513.
+          AUTHOR                       LUCAS FOURSYS.
+      ******************************************************************
+      *                                                                *
+      *          E N V I R O N M E N T         D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       ENVIRONMENT                     DIVISION.
+
+      *-----------------------*
+      * CONFIGURATION SECTION *
+      *----------------------------------------------------------------*
+       CONFIGURATION                   SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+
+      *----------------------*
+      * INPUT OUTPUT SECTION *
+      *----------------------------------------------------------------*
+       INPUT-OUTPUT                    SECTION.
+
+       FILE-CONTROL.
+
+           SELECT FILE008 ASSIGN TO FILE008
+                  FILE STATUS IS WRK-FS-FILE008.
+           SELECT RELATO ASSIGN TO RELATO
+                  FILE STATUS IS WRK-FS-RELATO.
+
+      ******************************************************************
+      *                                                                *
+      *          D A T A                       D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       DATA                            DIVISION.
+      *
+      *---------------*
+      * FILE SECTION  *
+      *----------------------------------------------------------------*
+       FILE SECTION.
+
+       FD  FILE008
+           RECORDING MODE IS F
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 374 RECORDS
+           DATA RECORD IS REG-FILE008.
+       01  REG-FILE008.
+           COPY B135F008.
+
+       FD  RELATO
+           RECORDING MODE IS F
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 110 RECORDS
+           DATA RECORD IS REG-RELATO.
+       01  REG-RELATO                   PIC X(110).
+
+      *----------------------------------------------------------*
+       WORKING-STORAGE                  SECTION.
+      *----------------------------------------------------------*
+      * FLAGS
+       01  WRK-FLAGS-SWITCHES.
+           05  WRK-DEBUG               PIC  X(01)  VALUE 'N'.
+               88  WRK-DEBUG-NAO                   VALUE 'N'.
+               88  WRK-DEBUG-SIM                   VALUE 'S'.
+
+      * FILE STATUS
+       01  WRK-STATUS.
+
+           05  WRK-FS-FILE008          PIC  X(02)  VALUE SPACES.
+               88  WRK-FS-FILE008-OK               VALUE '00'.
+               88  WRK-FS-FILE008-EOF              VALUE '10'.
+
+           05  WRK-FS-RELATO           PIC  X(02)  VALUE SPACES.
+               88  WRK-FS-RELATO-OK               VALUE '00'.
+               88  WRK-FS-RELATO-EOF              VALUE '10'.
+
+      * COPYBOOKS
+       01  WRK-BKALERRO.
+           COPY BKALERRO.
+
+
+       01  WS-CABEC1.
+           05 WS-DATA-CABEC1             PIC X(10).
+           05 FILLER                     PIC X(02)
+                                                VALUE SPACES.
+           05 WS-HORA-CABEC1             PIC X(08).
+           05 FILLER                     PIC X(02)
+                                                 VALUE SPACES.
+           05 FILLER                     PIC X(45)
+                                                 VALUE
+                   "RELACAO DE DADOS DE HORAS EXTRAS".
+           05 FILLER                     PIC X(11)
+                                                 VALUE
+                                                     " PAG. ".
+           05 WS-PAG-CABEC1 PIC Z9.
+       01  WS-CABEC2                     PIC X(110)
+                                                 VALUE ALL "-".
+       01  WS-LINDET.
+           05 FILLER                    PIC X(02)
+                                                VALUE SPACES.
+           05 LD-CPF                    PIC 999.999.999.99.
+           05 FILLER                    PIC X(03)
+                                                VALUE SPACES.
+           05 LD-NOME                   PIC X(30).
+           05 FILLER                    PIC X(05)
+                                                VALUE SPACES.
+           05 LD-CARGO                  PIC 9999.
+           05 FILLER                    PIC X(07)
+                                                VALUE SPACES.
+           05 LD-SALARIO                PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(07)
+                                                VALUE SPACES.
+           05 LD-VALOR-HORA-EXTRA       PIC +ZZ.ZZZ.999,99.
+           05 FILLER                    PIC X(06)
+                                                VALUE SPACES.
+       01  WS-RODAPE1                   PIC X(80)
+                                                VALUE ALL "-".
+       01  WS-RODAPE2.
+           05 FILLER                    PIC X(40)
+                                                VALUE
+                                     " INDUSTRIAS LUQUETAS LTDA. ".
+           05 FILLER                    PIC X(40)
+                                                VALUE
+                                 " SERVIMOS BEM PARA SERVIR SEMPRE ".
+
+       01  WS-DATA-SYS.
+           05 WS-ANO                       PIC 99.
+           05 WS-MES                          PIC 99.
+           05 WS-DIA                          PIC 99.
+       01  WS-HORA-SYS.
+           05 WS-HORA                       PIC 99.
+           05 WS-MINUTO                     PIC 99.
+           05 WS-SEGUNDO                    PIC 99.
+       01  WS-DATA-FORMATADA.
+           05 WS-DIA                        PIC 99.
+           05 FILLER                        PIC X(01)
+                                                   VALUE '/'.
+           05 WS-MES                        PIC 99.
+           05 FILLER                        PIC X(03)
+                                                   VALUE '/20'.
+           05 WS-ANO                        PIC 99.
+       01  WS-HORA-FORMATADA.
+           05 WS-HORA                       PIC 99.
+           05 FILLER                        PIC X(01)
+                                                    VALUE ':'.
+           05 WS-MINUTO                     PIC 99.
+           05 FILLER                        PIC X(01)
+                                                    VALUE ':'.
+           05 WS-SEGUNDO                    PIC 99.
+       77  FS-FILE008                       PIC X(02).
+       77  FS-RELATO                        PIC X(02).
+       77  WS-CTLIDO                        PIC 9(03).
+       77  WS-CTDESP                        PIC 9(03).
+       77  WS-CTIMP                         PIC 9(03).
+       77  WS-CTLIN                         PIC 9(02).
+       77  WS-CTPAG                         PIC 9(02).
+       77  WS-PULA                          PIC 9(02).
+       77  WS-MSG                           PIC X(60).
+       77  WS-FS                            PIC X(02).
+       77  WS-QTDREP                        PIC 9(03).
+      *----------------------------------------------------------------*
+       PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+       000-EEXXNN07.
+           PERFORM 010-INICIALIZAR
+           PERFORM 030-PROCESSAR
+                      UNTIL WRK-FS-FILE008-EOF
+           PERFORM 070-TERMINO
+           STOP RUN
+           .
+       010-INICIALIZAR.
+           MOVE 0                           TO WS-CTLIDO
+           MOVE 0                           TO WS-CTDESP
+           MOVE 0                           TO WS-CTIMP
+           MOVE 99                          TO WS-CTLIN
+           MOVE 0                           TO WS-CTPAG
+      *
+           OPEN INPUT FILE008
+           IF NOT WRK-FS-FILE008-OK
+              MOVE "ERRO ABERTURA FILE008" TO WS-MSG
+              MOVE WRK-FS-FILE008          TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           OPEN OUTPUT RELATO
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO ABERTURA ESTOQUE" TO WS-MSG
+              MOVE WRK-FS-RELATO           TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           PERFORM 999-FORMATA-DATA-HORA
+           PERFORM 020-LER-FILE008
+           .
+       020-LER-FILE008.
+           READ FILE008
+           IF WRK-FS-FILE008-OK
+              ADD 1 TO WS-CTLIDO
+           ELSE
+              IF NOT WRK-FS-FILE008-OK
+                 MOVE "ERRO LEITURA FILE008" TO WS-MSG
+                 MOVE WRK-FS-FILE008         TO WS-FS
+                 GO TO 999-ERRO
+              END-IF
+           END-IF
+           .
+       030-PROCESSAR.
+
+              IF WS-CTLIN > 49
+                 PERFORM 040-IMPRIME-CABECALHO
+              END-IF
+              PERFORM 050-IMPRIME-DETALHE
+              IF WS-CTLIN = 48
+                 PERFORM 060-IMPRIME-RODAPE
+              END-IF
+
+           PERFORM 020-LER-FILE008
+           .
+       040-IMPRIME-CABECALHO.
+           MOVE WS-DATA-FORMATADA TO WS-DATA-CABEC1
+           MOVE WS-HORA-FORMATADA TO WS-HORA-CABEC1
+           ADD 1 TO WS-CTPAG
+           MOVE WS-CTPAG TO WS-PAG-CABEC1
+      *
+           WRITE REG-RELATO FROM WS-CABEC1 AFTER PAGE
+      *
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO IMPRESSAO WS-CABEC1" TO WS-MSG
+              MOVE WRK-FS-RELATO              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+      *
+           WRITE REG-RELATO FROM WS-CABEC2
+      *
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO IMPRESSAO WS-CABEC2" TO WS-MSG
+              MOVE WRK-FS-RELATO              TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+      *
+           MOVE 2 TO WS-CTLIN
+           .
+       050-IMPRIME-DETALHE.
+           MOVE B135F008-CPF              TO LD-CPF
+           MOVE B135F008-NOME             TO LD-NOME
+           MOVE B135F008-ID-CARGO         TO LD-CARGO
+           MOVE B135F008-SALARIO-BASE     TO LD-SALARIO
+           MOVE B135F008-VALOR-HORA-EXTRA TO LD-VALOR-HORA-EXTRA
+
+      *
+           WRITE REG-RELATO FROM WS-LINDET
+      *
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO IMPRESSAO LINDET" TO WS-MSG
+              MOVE WRK-FS-RELATO           TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           ADD 1 TO WS-CTIMP
+           ADD 1 TO WS-CTLIN
+           .
+       060-IMPRIME-RODAPE.
+           COMPUTE WS-PULA = 49 - WS-CTLIN
+           WRITE REG-RELATO FROM WS-RODAPE1 AFTER WS-PULA LINES
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO IMPRESSAO WS-RODAPE1" TO WS-MSG
+              MOVE WRK-FS-RELATO               TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           WRITE REG-RELATO FROM WS-RODAPE2
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO IMPRESSAO WS-RODAPE2" TO WS-MSG
+              MOVE WRK-FS-RELATO               TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           MOVE 50 TO WS-CTLIN
+           .
+       070-TERMINO.
+           IF WS-CTLIN < 50
+              PERFORM 060-IMPRIME-RODAPE
+           END-IF
+           DISPLAY "TOTAL DE REGISTROS LIDOS = "       WS-CTLIDO
+           DISPLAY "TOTAL DE REGISTROS IMPRESSOS = "   WS-CTIMP
+           DISPLAY "TOTAL DE REGISTROS DESPREZADOS = " WS-CTDESP
+      *
+           CLOSE FILE008
+      *
+           IF NOT WRK-FS-FILE008-OK
+              MOVE "ERRO FECHAMENTO FILE008" TO WS-MSG
+              MOVE WRK-FS-FILE008            TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+      *
+           CLOSE RELATO
+      *
+           IF NOT WRK-FS-RELATO-OK
+              MOVE "ERRO FECHAMENTO RELATO" TO WS-MSG
+              MOVE WRK-FS-RELATO            TO WS-FS
+              GO TO 999-ERRO
+           END-IF
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " DEU CERTO!!! "
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " TERMINO NORMAL DO E0073513"
+           DISPLAY "*------------------------------------------*"
+           .
+       999-ERRO.
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " MENSAGEM.....: " WS-MSG
+           DISPLAY " FILE STATUS..: " WS-FS
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " DEU ERRO!!! "
+           DISPLAY "*------------------------------------------*"
+           DISPLAY " TERMINO ANORMAL DO E0073513"
+           DISPLAY "*------------------------------------------*"
+           STOP RUN
+           .
+       999-FORMATA-DATA-HORA.
+           ACCEPT WS-DATA-SYS FROM DATE
+           ACCEPT WS-HORA-SYS FROM TIME
+           MOVE CORRESPONDING WS-DATA-SYS TO WS-DATA-FORMATADA
+           MOVE CORRESPONDING WS-HORA-SYS TO WS-HORA-FORMATADA
+           .

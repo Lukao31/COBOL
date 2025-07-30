@@ -1,0 +1,218 @@
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID                          RF007P02.
+       AUTHOR                              LUCAS.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT RALLYTPO ASSIGN          TO UT-S-RALLYTPO
+           FILE STATUS FS-RALLYTPO
+           .
+           SELECT RALLYCLA ASSIGN          TO UT-S-RALLYCLA
+           FILE STATUS FS-RALLYCLA
+           .
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       FILE                                SECTION.
+      *----------------------------------------------------------------*
+       FD  RALLYTPO
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 14 CHARACTERS
+           DATA RECORD IS FD-RALLYTPO
+           .
+      *
+       01  FD-RALLYTPO                     PIC X(14).
+      *----------------------------------------------------------------*
+       FD  RALLYCLA
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 22 CHARACTERS
+           DATA RECORD IS FD-RALLYCLA
+           .
+      *
+       01  FD-RALLYCLA                     PIC X(22).
+      *----------------------------------------------------------------*
+       LINKAGE                             SECTION.
+      *----------------------------------------------------------------*
+       01  LS-REG-LINKAGE.
+           05 LS-REG-LENGTH                PIC S9(04) COMP.
+           05 LS-REG-DADOS.
+              10 LS-TP-ETP1                PIC 9(03)V99.
+              10 LS-TP-ETP2                PIC 9(03)V99.
+              10 LS-TP-ETP3                PIC 9(03)V99.
+      *----------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *----------------------------------------------------------------*
+      *  DECLARACAO DE VARIAVEIS
+      *----------------------------------------------------------------*
+           COPY RALLYTPO.
+           COPY RALLYCLA.
+      *----------------------------------------------------------------*
+       77  FS-RALLYTPO                     PIC X(02).
+       77  FS-RALLYCLA                     PIC X(02).
+      *----------------------------------------------------------------*
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *----------------------------------------------------------------*
+      * VARIAVEIS DO RALLY                                     *
+      *----------------------------------------------------------------*
+       77  WS-DIFERENCA                    PIC 9(03)V99 COMP.
+       77  WS-PONTOS                       PIC 9(05)V99 COMP.
+       77  WS-PONTOS-ETP1                  PIC 9(05)V99 COMP.
+       77  WS-PONTOS-ETP2                  PIC 9(05)V99 COMP.
+       77  WS-PONTOS-ETP3                  PIC 9(05)V99 COMP.
+       77  WS-TOTAL-PONTOS                 PIC 9(06)V99 COMP.
+       77  WS-NUMINSCRICAO-T               PIC 9(05)V99 COMP.
+       77  WS-NUMINSCRICAO-1-LUGAR         PIC 9(05)V99 COMP.
+       77  WS-NUMINSCRICAO-2-LUGAR         PIC 9(05)V99 COMP.
+       77  WS-NUMINSCRICAO-3-LUGAR         PIC 9(05)V99 COMP.
+      *----------------------------------------------------------------*
+      * VARIAVEIS DE SOMA E MULTIPLICACAO                              *
+      *----------------------------------------------------------------*
+      *77  WS-SOMACONT                     PIC 9(03).
+      *77  WS-SOMASAL                      PIC 9(06).
+      *77  WS-ACUMNOTAS                    PIC 9(03).
+      *77  WS-ACUMSAL                      PIC 9(10).
+      *77  WS-GUARDASAL                    PIC 9(10).
+      *----------------------------------------------------------------*
+       77  WS-CTTPO                        PIC 9(04) COMP.
+       77  WS-CTCLA                        PIC 9(04) COMP.
+      *----------------------------------------------------------------*
+       77  WS-MSG01                        PIC X(60)
+           VALUE "ERRO ABERTURA FUNCTRAB".
+       77  WS-MSG02                        PIC X(60)
+           VALUE "ERRO ABERTURA FUNCPAG".
+       77  WS-MSG03                        PIC X(60)
+           VALUE "ERRO LEITURA FUNCTRAB".
+       77  WS-MSG04                        PIC X(60)
+           VALUE "ERRO GRAVACAO FUNCPAG".
+       77  WS-MSG05                        PIC X(60)
+           VALUE "ERRO FECHAMENTO FUNCTRAB".
+       77  WS-MSG06                        PIC X(60)
+           VALUE "ERRO FECHAMENTO FUNCPAG".
+      *----------------------------------------------------------------*
+      * VARIAVEIS DE TEMPO DE PROCESSAMENTO                            *
+      *----------------------------------------------------------------*
+           COPY VARPROC.
+           COPY VARDATA.
+      *----------------------------------------------------------------*
+       PROCEDURE                           DIVISION
+                                           USING LS-REG-LINKAGE.
+      *----------------------------------------------------------------*
+       0000-RF007N01.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FS-FUNCTRAB = "10"
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL       FROM TIME
+           MOVE 0                          TO WS-CTTPO
+           MOVE 0                          TO WS-CTCLA
+      *
+           OPEN INPUT RALLYTPO
+           IF FS-RALLYTPO NOT = "00"
+              MOVE WS-MSG01                TO WS-MSG
+              MOVE FS-RALLYTPO             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT RALLYCLA
+           IF FS-RALLYCLA NOT = "00"
+              MOVE WS-MSG02                TO WS-MSG
+              MOVE FS-RALLYCLA             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           PERFORM 1100-LER-RALLYTPO
+           .
+      *
+       1100-LER-RALLYTPO.
+           READ RALLYTPO INTO WS-REG-RALLYTPO
+           IF FS-RALLYTPO = "00"
+              COMPUTE WS-CTTPO = WS-CTTPO + 1
+           ELSE
+              IF FS-RALLYTPO = "10"
+                 CONTINUE
+              ELSE
+                 MOVE WS-MSG03             TO WS-MSG
+                 MOVE FS-RALLYTPO          TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           PERFORM 2100-CALCULAR-PONTOS
+           PERFORM 2200-DETERMINA-CLASSIFICACAO
+           PERFORM 2300-GRAVAR-RALLYCLA
+           PERFORM 1100-LER-RALLYTPO
+           .
+      *
+       2100-CALCULAR-PONTOS.
+           MOVE 0                          TO WS-TOTALPONTOS
+           COMPUTE WS-DIFERENCA = LS-TP-ETP1 - TEMPO-ETP1
+           PERFORM 2200-CALCULA-PONTO-ETAPA
+           MOVE WS-PONTOS                  TO WS-PONTOS-ETP1
+      *
+           COMPUTE WS-DIFERENCA = LS-TP-ETP2 - TEMPO-ETP2
+           PERFORM 2200-CALCULA-PONTO-ETAPA
+           MOVE WS-PONTOS                  TO WS-PONTOS-ETP2
+      *
+           COMPUTE WS-DIFERENCA = LS-TP-ETP3 - TEMPO-ETP3
+           PERFORM 2200-CALCULA-PONTO-ETAPA
+           MOVE WS-PONTOS                  TO WS-PONTOS-ETP3
+      *
+           ADD WS-PONTOS-ETP1
+               WS-PONTOS-ETP2
+               WS-PONTOS-ETP3              TO WS-TOTAL-PONTOS
+      *
+           MOVE WS-MSG04                   TO WS-MSG
+           MOVE FS-RALLYCLA                TO WS-FS
+           GO TO 9000-ERRO
+           .
+      *
+       3000-TERMINO.
+           CLOSE RALLYTPO
+           IF FS-RALLYTPO NOT = "00"
+              MOVE WS-MSG05 TO WS-MSG
+              MOVE FS-RALLYTPO             TO WS-FS
+              GO TO 9000-ERRO
+      *
+           CLOSE RALLYCLA
+           IF FS-RALLYCLA NOT = "00"
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-RALLYCLA             TO WS-FS
+              GO TO 9000-ERRO
+              .
+
+      *
+           DISPLAY "=================================================="
+           DISPLAY "FUNCIONARIOS LIDOS.....: " WS-CTTPO
+           DISPLAY "PAGAMENTO FUNCIONARIOS.: " WS-CTCLA
+           DISPLAY "=================================================="
+           DISPLAY "TEMPO DE PROCESSAMENTO: " WS-DIFERENCA
+           DISPLAY "=================================================="
+           DISPLAY "MOEDAS DE 1 REAL....: " WS-CT01
+           DISPLAY "NOTAS DE 2 REAIS....: " WS-CT02
+           DISPLAY "NOTAS DE 5 REAIS....: " WS-CT05
+           DISPLAY "NOTAS DE 10 REAIS....: " WS-CT10
+           DISPLAY "NOTAS DE 20 REAIS....: " WS-CT20
+           DISPLAY "NOTAS DE 50 REAIS....: " WS-CT50
+           DISPLAY "NOTAS DE 100 REAIS....: " WS-CT100
+           DISPLAY "NOTAS DE 200 REAIS....: " WS-CT200
+           DISPLAY "=================================================="
+           .
+      *
+           COPY ROTERRO.

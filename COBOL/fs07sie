@@ -1,0 +1,354 @@
+      *--------------------------------------------------------------*
+       IDENTIFICATION                      DIVISION.
+      *--------------------------------------------------------------*
+       PROGRAM-ID.                         FS07SIE.
+       AUTHOR.                             LUCAS.
+
+      *--------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *--------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *--------------------------------------------------------------*
+       DATA                                DIVISION.
+      *--------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *--------------------------------------------------------------*
+       77  WS-MSG-ERRO                     PIC X(80).
+       77  WS-LENGTH                       PIC S9(04) COMP.
+       01  WS-DFHCOMMAREA.
+           05 WS-FASE                      PIC X(01).
+           05 WS-CODPROD-COMMAREA          PIC X(04).
+      *
+       01  WS-VAR-TEMPO.
+           05 WS-DATA                      PIC X(10).
+           05 WS-HORARIO                   PIC X(08).
+      *
+           COPY FS07SML.
+           COPY DFHAID.
+           COPY DFHBMSCA.
+      *
+      * VARIAVEL ESPELHO
+      *
+       01  WS-REG-SML.
+           05 WS-T1SIM                    PIC 9(05).
+           05 WS-T1NOME                   PIC X(26).
+           05 WS-T1DDD                    PIC X(02).
+           05 WS-T1TEL                    PIC X(09).
+           05 WS-T1EMPR                   PIC 9(07)V99.
+           05 WS-T1PAR12                  PIC 9(07)V99.
+           05 WS-T1PAR24                  PIC 9(07)V99.
+           05 WS-T1PAR36                  PIC 9(07)V99.
+           05 WS-T1PAR48                  PIC 9(07)V99.
+           05 WS-T1CONF                   PIC X(01).
+           05 WS-T1FASE                   PIC X(01).
+           05 WS-T1JUROS                  PIC 9(04)V9999.
+           05 WS-T1USER07                 PIC X(08).
+           05 WS-T1MSG                    PIC X(20).
+      *
+       77  WS-VALOR-PARC12                PIC 9(10)V99.
+       77  WS-VALOR-PARC24                PIC 9(10)V99.
+       77  WS-VALOR-PARC36                PIC 9(10)V99.
+       77  WS-VALOR-PARC48                PIC 9(10)V99.
+      *
+       77  WS-ITEM                        PIC 9.
+      *----------------------------------------------------------------*
+       LINKAGE                             SECTION.
+      *----------------------------------------------------------------*
+       01  DFHCOMMAREA.
+           05 OCCURS 0 TO 24576 TIMES DEPENDING ON EIBCALEN
+                                           PIC X(01).
+      *--------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *--------------------------------------------------------------*
+           EXEC CICS HANDLE CONDITION
+              MAPFAIL (999-ERRO-MAPA)
+      *       ERROR   (999-ERRO-GENERICO)
+           END-EXEC
+      *
+      * SELETOR DE FASE - O MENU PRINCIPAL POSSUI 3 FASES
+      *    FASE 1 - ENVIA O MAPA PARA O TERMINAL
+      *    FASE 2 - TRATA O CAMPO T1NOME
+      *    FASE 3 - TRATA O CAMPO T1CONF
+      *---------------------------------------------------------------*A
+           MOVE DFHCOMMAREA                 TO WS-DFHCOMMAREA
+      *
+           IF EIBCALEN EQUAL 0
+              MOVE '1'                      TO WS-FASE
+           END-IF
+      *
+           EVALUATE WS-FASE
+              WHEN '1' PERFORM 100-FASE1
+              WHEN '2' PERFORM 200-FASE2
+              WHEN '3' PERFORM 300-FASE3
+              WHEN OTHER
+                 MOVE +80                   TO WS-LENGTH
+                 MOVE 'UTILIZE A OPCAO A DA TRANSACAO F07K'
+                                            TO WS-MSG-ERRO
+                 PERFORM 999-ENCERRA-TRANSACAO
+           END-EVALUATE
+           .
+      *
+       100-FASE1.
+      * LIMPAR AS VARIAVEIS DO MAPA
+           MOVE LOW-VALUES                 TO MAPASMLO
+      * POSICIONAMENTO LOGICO - DIRETO NO CAMPO DESEJADO
+           MOVE -1                         TO WS-T1NOME
+      * FASE 1
+           MOVE 1                          TO WS-ITEM
+           EXEC CICS READQ TS
+                QUEUE('SMLQUEUE')
+                INTO(WS-T1SIM)
+                ITEM(WS-ITEM)
+           END-EXEC
+      *
+           ADD 1 TO WS-T1SIM
+      *
+           EXEC CICS WRITEQ TS
+                QUEUE('SMLQUEUE')
+                FROM(WS-T1SIM)
+                ITEM(WS-ITEM)
+           END-EXEC
+      * MOVER A MENSAGEM PARA O CAMPO APROPRIADO
+           PERFORM 999-PROTECAO-FASE2
+      * MANDAR A TELA PARA O TERMINAL
+           PERFORM 999-MANDA-TELA
+      * ENCERRA A TRANSACAO, CHAMANDO A PROXIMA FASE
+           PERFORM 999-CHAMA-FASE2
+           .
+      *
+       200-FASE2.
+           EXEC CICS HANDLE AID
+                ENTER  (210-ENTER)
+                PF3    (220-PF3)
+                PF5    (230-PF5)
+                CLEAR  (230-PF5)
+                ANYKEY (240-ANYKEY)
+           END-EXEC
+      *
+           EXEC CICS RECEIVE
+                MAP    ('MAPASML')
+                MAPSET ('FS07SML')
+                INTO   (MAPASMLI)
+           END-EXEC
+      *  FASE 2 - ENTER
+           MOVE 2                TO WS-ITEM
+           EXEC CICS READQ TS
+              QUEUE('SMLQUEUE')
+              INTO(WS-T1JUROS)
+              ITEM(WS-ITEM)
+           END-EXEC
+           .
+      *
+       210-ENTER.
+      * VERIFICAR SE ALGUM CAMPO ESTA SEM PREENCHER
+           IF T1NOMEL  = 0 OR T1NOMEO  EQUAL SPACES OR
+              T1DDDL   = 0 OR
+              T1TELL   = 0 OR
+              T1EMPRL  = 0
+      *
+              MOVE 'FAVOR PREENCHER TODOS OS CAMPOS' TO T1MSGO
+              PERFORM 999-TRATA-FASE2
+           END-IF
+      *
+           MOVE T1EMPRI                         TO WS-T1EMPR
+           MOVE T1PAR12I                        TO WS-T1PAR12
+           MOVE T1PAR24I                        TO WS-T1PAR24
+           MOVE T1PAR36I                        TO WS-T1PAR36
+           MOVE T1PAR48I                        TO WS-T1PAR48
+      *
+           COMPUTE WS-VALOR-PARC12 = (WS-T1EMPR * 0,803) /
+                                   (1 - 1 / (1 + 0,803)
+                                    ** 12)
+           COMPUTE WS-VALOR-PARC24 = (WS-T1EMPR * 0,803) /
+                                   (1 - 1 / (1 + 0,803)
+                                    ** 24)
+           COMPUTE WS-VALOR-PARC36 = (WS-T1EMPR * 0,803) /
+                                   (1 - 1 / (1 + 0,803)
+                                    ** 36)
+           COMPUTE WS-VALOR-PARC48 = (WS-T1EMPR * 0,803) /
+                                   (1 - 1 / (1 + 0,803)
+                                    ** 48)
+           .
+      *
+       220-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07SML')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       230-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       240-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO T1MSGO
+           PERFORM 999-TRATA-FASE2
+           .
+      *
+        300-FASE3.
+            EXEC CICS HANDLE AID
+                 ENTER  (310-ENTER)
+                 PF3    (320-PF3)
+                 PF5    (330-PF5)
+                 CLEAR  (330-PF5)
+                 ANYKEY (340-ANYKEY)
+            END-EXEC
+      *
+            EXEC CICS RECEIVE
+                 MAP    ('MAPASML')
+                 MAPSET ('FS07SML')
+                 INTO   (MAPASMLI)
+            END-EXEC
+            .
+      *
+       310-ENTER.
+           IF T1CONFL EQUAL 0 OR T1CONFI NOT = 'S' AND 'N'
+              MOVE 'DIGITE APENAS S OU N'
+                                           TO T1MSGO
+              PERFORM 999-TRATA-FASE3
+           END-IF
+      *
+           IF T1CONFI = 'S'
+              PERFORM 100-FASE1
+           END-IF
+      *
+           PERFORM 320-PF3
+           .
+      *
+       320-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07SML')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       330-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       340-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO T1MSGO
+           PERFORM 999-TRATA-FASE3
+           .
+      *
+       999-ENCERRA-TRANSACAO.
+           EXEC CICS SEND TEXT
+              FROM (WS-MSG-ERRO)
+              LENGTH (+80)
+              ERASE FREEKB ALARM
+           END-EXEC
+      *
+           EXEC CICS RETURN
+           END-EXEC
+           .
+      *
+       999-PROTECAO-FASE2.
+      *     DFHBMPRF - (PROT, ALFA, NORM, ON) - PARA PROTEGER
+      *     DFHUNIMD - (UNPROT, ALFA, BRT, ON) - PARA DESPROTEGER ALFA
+           MOVE DFHUNIMD                      TO T1NOMEA
+           MOVE DFHUNIMD                      TO T1DDDA
+           MOVE DFHUNIMD                      TO T1TELA
+           MOVE DFHUNIMD                      TO T1EMPRA
+      *
+           MOVE DFHBMPRF                      TO T1SIMA
+           MOVE DFHBMPRF                      TO T1CONFA
+           .
+      *
+       999-PROTECAO-FASE3.
+      *     DFHBMPRF - (PROT, ALFA, NORM, ON) - PARA PROTEGER
+      *     DFHUNIMD - (UNPROT, ALFA, BRT, ON) - PARA DESPROTEGER ALFA
+           MOVE DFHBMPRF                      TO T1NOMEA
+           MOVE DFHBMPRF                      TO T1DDDA
+           MOVE DFHBMPRF                      TO T1TELA
+           MOVE DFHBMPRF                      TO T1EMPRA
+           MOVE DFHBMPRF                      TO T1SIMA
+      *
+           MOVE DFHUNIMD                      TO T1CONFO
+      * MOSTRAR NA TELA
+           MOVE DFHPROTI                      TO T1PAR12O
+           MOVE DFHPROTI                      TO T1PAR24O
+           MOVE DFHPROTI                      TO T1PAR36O
+           MOVE DFHPROTI                      TO T1PAR48O
+           MOVE DFHPROTI                      TO T1CONFO
+           .
+      *
+       999-MANDA-TELA.
+           MOVE WS-T1FASE                  TO T1FASEO
+           MOVE WS-T1SIM                   TO T1SIMO
+      *
+           EXEC CICS ASSIGN
+              USERID(T1USER07O)
+           END-EXEC
+      *
+           EXEC CICS SEND
+              MAP    ('MAPASML')
+              MAPSET ('FS07SML')
+              FROM   (MAPASMLO)
+              ERASE FREEKB ALARM CURSOR
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE1.
+           MOVE '1'                         TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('FS07SML')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE2.
+           MOVE '2'                         TO WS-FASE
+      *
+           EXEC CICS RETURN
+              TRANSID ('F07K')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE3.
+           MOVE '3'                         TO WS-FASE
+
+           EXEC CICS RETURN
+              TRANSID ('F07K')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-TRATA-FASE2.
+           MOVE -1                           TO T1NOMEL
+           PERFORM 999-PROTECAO-FASE2
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE2
+           .
+      *
+       999-TRATA-FASE3.
+           MOVE -1                           TO T1CONFL
+      *
+           PERFORM 999-PROTECAO-FASE3
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE3
+           .
+      *
+       999-ERRO-MAPA.
+           MOVE +80                          TO WS-LENGTH
+           MOVE 'ERRO MAPA FS07MNU'          TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .
+      *
+      *999-ERRO-GENERICO.
+      *    MOVE 'ERRO GENERICO FS07SIE'      TO WS-MSG-ERRO
+      *    PERFORM 999-ENCERRA-TRANSACAO
+      *    .

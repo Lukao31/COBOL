@@ -1,0 +1,255 @@
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID                          RF007N01.
+       AUTHOR                              LUCAS.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT FUNCTRAB ASSIGN          TO UT-S-FUNCTRAB
+           FILE STATUS FS-FUNCTRAB
+           .
+           SELECT FUNCPAG ASSIGN           TO UT-S-FUNCPAG
+           FILE STATUS FS-FUNCPAG
+           .
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       FILE                                SECTION.
+      *----------------------------------------------------------------*
+       FD  FUNCTRAB
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 42 CHARACTERS
+           DATA RECORD IS FD-FUNCTRAB
+           .
+      *
+       01  FD-FUNCTRAB                     PIC X(42).
+      *----------------------------------------------------------------*
+       FD  FUNCPAG
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 66 CHARACTERS
+           DATA RECORD IS FD-FUNCPAG
+           .
+      *
+       01  FD-FUNCPAG                      PIC X(65).
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *----------------------------------------------------------------*
+      *  DECLARACAO DE VARIAVEIS
+      *----------------------------------------------------------------*
+           COPY FUNCTRAB.
+           COPY FUNCPAG.
+      *----------------------------------------------------------------*
+       77  FS-FUNCTRAB                     PIC X(02).
+       77  FS-FUNCPAG                      PIC X(02).
+      *----------------------------------------------------------------*
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *----------------------------------------------------------------*
+      * VARIAVEIS DAS NOTAS                                            *
+      *----------------------------------------------------------------*
+       01  WS-CTNOTAS.
+           05  WS-CT01                     PIC 9(04) COMP-3.
+           05  WS-CT02                     PIC 9(04) COMP-3.
+           05  WS-CT05                     PIC 9(04) COMP-3.
+           05  WS-CT10                     PIC 9(04) COMP-3.
+           05  WS-CT20                     PIC 9(04) COMP-3.
+           05  WS-CT50                     PIC 9(04) COMP-3.
+           05  WS-CT100                    PIC 9(04) COMP-3.
+           05  WS-CT200                    PIC 9(04) COMP-3.
+      *----------------------------------------------------------------*
+      * VARIAVEIS DE SOMA E MULTIPLICACAO                              *
+      *----------------------------------------------------------------*
+       77  WS-SOMACONT                     PIC 9(03).
+       77  WS-SOMASAL                      PIC 9(06).
+       77  WS-ACUMNOTAS                    PIC 9(03).
+       77  WS-ACUMSAL                      PIC 9(10).
+       77  WS-GUARDASAL                    PIC 9(10).
+      *----------------------------------------------------------------*
+       77  WS-CTLIDO-TRAB                  PIC 9(04) COMP.
+       77  WS-CTGRAV-PAG                   PIC 9(04) COMP.
+      *----------------------------------------------------------------*
+       77  WS-MSG01                        PIC X(60)
+           VALUE "ERRO ABERTURA FUNCTRAB".
+       77  WS-MSG02                        PIC X(60)
+           VALUE "ERRO ABERTURA FUNCPAG".
+       77  WS-MSG03                        PIC X(60)
+           VALUE "ERRO LEITURA FUNCTRAB".
+       77  WS-MSG04                        PIC X(60)
+           VALUE "ERRO GRAVACAO FUNCPAG".
+       77  WS-MSG05                        PIC X(60)
+           VALUE "ERRO FECHAMENTO FUNCTRAB".
+       77  WS-MSG06                        PIC X(60)
+           VALUE "ERRO FECHAMENTO FUNCPAG".
+      *----------------------------------------------------------------*
+      * VARIAVEIS DE TEMPO DE PROCESSAMENTO                            *
+      *----------------------------------------------------------------*
+           COPY VARPROC.
+           COPY VARDATA.
+      *----------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *----------------------------------------------------------------*
+       0000-RF007N01.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FS-FUNCTRAB = "10"
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL       FROM TIME
+           MOVE 0                          TO WS-CTLIDO-TRAB
+           MOVE 0                          TO WS-CTGRAV-PAG
+           MOVE 0                          TO WS-CTNOTAS
+           MOVE 0                          TO WS-CT01
+           MOVE 0                          TO WS-CT02
+           MOVE 0                          TO WS-CT05
+           MOVE 0                          TO WS-CT10
+           MOVE 0                          TO WS-CT20
+           MOVE 0                          TO WS-CT50
+           MOVE 0                          TO WS-CT100
+           MOVE 0                          TO WS-CT200
+           MOVE 0                          TO WS-SOMACONT
+           MOVE 0                          TO WS-SOMASAL
+           MOVE 0                          TO WS-ACUMSAL
+           MOVE 0                          TO WS-ACUMNOTAS
+           OPEN INPUT FUNCTRAB
+           IF FS-FUNCTRAB NOT = "00"
+              MOVE WS-MSG01                TO WS-MSG
+              MOVE FS-FUNCTRAB             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT FUNCPAG
+           IF FS-FUNCPAG NOT = "00"
+              MOVE WS-MSG02                TO WS-MSG
+              MOVE FS-FUNCPAG              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           PERFORM 1100-LER-FUNCTRAB
+           .
+      *
+       1100-LER-FUNCTRAB.
+           READ FUNCTRAB INTO WS-REG-FUNCTRAB
+           IF FS-FUNCTRAB = "00"
+              COMPUTE WS-CTLIDO-TRAB = WS-CTLIDO-TRAB + 1
+           ELSE
+              IF FS-FUNCTRAB = "10"
+                 CONTINUE
+              ELSE
+                 MOVE WS-MSG03             TO WS-MSG
+                 MOVE FS-FUNCTRAB          TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           COMPUTE WS-SALARIOFUNC = WS-QTDHORASFUNC *
+                                WS-SALHORAFUNC
+           PERFORM 2100-DETERMINA-NUMERARIO
+           COMPUTE WS-CTGRAV-PAG = WS-CTGRAV-PAG + 1
+           COMPUTE WS-ACUMSAL = WS-SALARIOFUNC +
+                                WS-ACUMSAL
+           PERFORM 1100-LER-FUNCTRAB
+           MOVE WS-CODFUNC                 TO WS-CODFUNC-P
+           MOVE WS-NOMEFUNC                TO WS-NOMEFUNC-P
+           MOVE WS-SALARIOFUNC             TO WS-GUARDASAL
+           MOVE WS-NUMERARIO200            TO WS-CT200
+           MOVE WS-NUMERARIO100            TO WS-CT100
+           MOVE WS-NUMERARIO50             TO WS-CT50
+           MOVE WS-NUMERARIO20             TO WS-CT20
+           MOVE WS-NUMERARIO10             TO WS-CT10
+           MOVE WS-NUMERARIO5              TO WS-CT05
+           MOVE WS-NUMERARIO2              TO WS-CT02
+           MOVE WS-NUMERARIO1              TO WS-CT01
+      *
+           COMPUTE WS-CT200 = WS-GUARDASAL / 200
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT200 * 200)
+      *
+           COMPUTE WS-CT100 = WS-GUARDASAL / 100
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT100 * 100)
+      *
+           COMPUTE WS-CT50 = WS-GUARDASAL / 50
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT50 * 50)
+      *
+           COMPUTE WS-CT20 = WS-GUARDASAL / 20
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT20 * 20)
+      *
+           COMPUTE WS-CT10 = WS-GUARDASAL / 10
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT10 * 10)
+      *
+           COMPUTE WS-CT05 = WS-GUARDASAL / 5
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT05 * 5)
+      *
+           COMPUTE WS-CT02 = WS-GUARDASAL / 2
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT02 * 2)
+      *
+           COMPUTE WS-CT01 = WS-GUARDASAL / 1
+           COMPUTE WS-GUARDASAL = WS-GUARDASAL -
+                                     (WS-CT01 * 1)
+           .
+      *
+       2100-DETERMINA-NUMERARIO.
+           WRITE FD-FUNCPAG FROM WS-REG-FUNCPAG
+      *
+           IF FS-FUNCPAG = "00"
+              ADD 1                        TO WS-CTGRAV-PAG
+           ELSE
+              MOVE WS-MSG04                TO WS-MSG
+              MOVE FS-FUNCPAG              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           CLOSE FUNCTRAB
+           IF FS-FUNCTRAB NOT = "00"
+              MOVE WS-MSG05 TO WS-MSG
+              MOVE FS-FUNCTRAB             TO WS-FS
+              GO TO 9000-ERRO
+      *
+           CLOSE FUNCPAG
+           IF FS-FUNCPAG NOT = "00"
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-FUNCPAG              TO WS-FS
+              GO TO 9000-ERRO
+              .
+
+      *
+           DISPLAY "=================================================="
+           DISPLAY "FUNCIONARIOS LIDOS.....: " WS-CTLIDO-TRAB
+           DISPLAY "PAGAMENTO FUNCIONARIOS.: " WS-CTGRAV-PAG
+           DISPLAY "=================================================="
+           DISPLAY "TEMPO DE PROCESSAMENTO: " WS-DIFERENCA
+           DISPLAY "=================================================="
+           DISPLAY "MOEDAS DE 1 REAL....: " WS-CT01
+           DISPLAY "NOTAS DE 2 REAIS....: " WS-CT02
+           DISPLAY "NOTAS DE 5 REAIS....: " WS-CT05
+           DISPLAY "NOTAS DE 10 REAIS....: " WS-CT10
+           DISPLAY "NOTAS DE 20 REAIS....: " WS-CT20
+           DISPLAY "NOTAS DE 50 REAIS....: " WS-CT50
+           DISPLAY "NOTAS DE 100 REAIS....: " WS-CT100
+           DISPLAY "NOTAS DE 200 REAIS....: " WS-CT200
+           DISPLAY "=================================================="
+           .
+      *
+           COPY ROTERRO.

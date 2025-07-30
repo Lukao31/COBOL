@@ -1,0 +1,19 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - B135F005                                 *00020013
+      * NOME DO BOOK        - B135F005                                  00021013
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - FILE005                                   00023013
+      * TAMANHO DO REGISTRO - 364 CHARACTERS                           *00024014
+      *----------------------------------------------------------------*00030000
+           05 B135F005-CPF                 PIC X(011).                  00050013
+           05 B135F005-NOME                PIC X(100).                  00060013
+           05 B135F005-TELEFONE            PIC 9(015).                  00070013
+           05 B135F005-ID-CARGO            PIC 9(004).                  00080013
+           05 B135F005-ID-DEPARTAMENTO     PIC 9(004).                  00090013
+           05 B135F005-SALARIO-BASE        PIC S9(008)V99 COMP-3.       00091013
+           05 B135F005-DATA-ADMISSAO       PIC X(010).                  00100013
+           05 B135F005-DATA-DEMISSAO       PIC X(010).                  00110013
+           05 B135F005-QTD-DEPENDENTES     PIC 9(002).                  00120013
+           05 B135F005-SOLICITOU-VT        PIC 9(001).                  00130013
+           05 B135F005-CONTRIB-SINDICAL    PIC 9(001).                  00140013
+           05 FILLER                       PIC X(200).                  00150011

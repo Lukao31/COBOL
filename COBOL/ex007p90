@@ -1,0 +1,236 @@
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+      *                                                                 00060004
+       PROGRAM-ID.                         EX007P24.                    00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+      *                                                                 00060004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *                                                                 00060004
+       INPUT-OUTPUT                        SECTION.                     00110004
+      *                                                                 00060004
+       FILE-CONTROL.
+           SELECT CADCLI ASSIGN TO UT-S-CADCLI
+           FILE STATUS IS FS-CADCLI
+           .
+      *
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  CADCLI
+           RECORDING MODE IS F
+           .
+      *
+           COPY CADCLI REPLACING ==::== BY ====.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+      * BOOK DA VARIAVEL ESPELHO                                     *
+      *--------------------------------------------------------------*  00210008
+           COPY CADCLI REPLACING ==::== BY ==WS-==.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA CALCULO DO TEMPO                     *
+      *--------------------------------------------------------------*
+           COPY VARDATA.
+           COPY VARPROC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS HOSPEDEIRAS                               *
+      *--------------------------------------------------------------*
+           EXEC SQL
+              INCLUDE BKEXETC
+           END-EXEC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA O SQL                                *
+      *--------------------------------------------------------------*
+           EXEC SQL
+              INCLUDE SQLCA
+           END-EXEC.
+      *
+       01  WS-CONTADORES-COMP.
+           05 WS-CTLIDO                    PIC 9(04) COMP.
+           05 WS-CTINS                     PIC 9(04) COMP.
+           05 WS-CTDUP                     PIC 9(04) COMP.
+           05 WS-CTINV                     PIC 9(04) COMP.
+      *
+       01  WS-CONTADORES-FORMATADOS.
+           05 WS-CTLIDO-F                  PIC ZZZ9.
+           05 WS-CTINS-F                   PIC ZZZ9.
+           05 WS-CTDUP-F                   PIC ZZZ9.
+           05 WS-CTINV-F                   PIC ZZZ9.
+      *
+       01  FS-CADCLI                       PIC X(02).
+           88 SUCESSO-CAD                          VALUE "00".
+           88 FIM-ARQ-CAD                          VALUE "10".
+      *
+       77  WS-SQLCODE                      PIC +9(9).
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *
+      *--------------------------------------------------------------*  00210008
+       PROCEDURE                           DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FIM-ARQ-CAD
+           PERFORM 3000-TERMINO
+           GOBACK
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL FROM TIME
+      *
+           MOVE 0                          TO WS-CTLIDO
+           MOVE 0                          TO WS-CTINS
+           MOVE 0                          TO WS-CTDUP
+           MOVE 0                          TO WS-CTINV
+      *
+           OPEN INPUT CADCLI
+           IF NOT SUCESSO-CAD
+              MOVE "ERRO DE ABERTURA CADCLI" TO WS-MSG
+              MOVE FS-CADCLI                 TO WS-FS
+              PERFORM 9000-ERRO
+           END-IF
+      *
+           PERFORM 1100-LER-CADCLI
+           .
+      *
+       1100-LER-CADCLI.
+           READ CADCLI INTO WS-REG-CADCLI
+           IF SUCESSO-CAD
+              ADD 1 TO WS-CTLIDO
+           ELSE
+              IF NOT FIM-ARQ-CAD
+                    MOVE "ERRO LEITURA CADCLI" TO WS-MSG
+                    MOVE FS-CADCLI             TO WS-FS
+                    PERFORM 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+      *----------------------------------------------------------------*
+      * MOVER DADOS DA VARIAVEL ESPELHO PARA A HOSPEDEIRA              *
+      *----------------------------------------------------------------*
+           MOVE WS-CODCLI-CADCLI       TO CODCLI
+           MOVE +30                    TO NOMECLI-LEN
+           MOVE WS-NOMECLI-CADCLI      TO NOMECLI-TEXT
+           MOVE +40                    TO ENDCLI-LEN
+           MOVE WS-ENDCLI-CADCLI       TO ENDCLI-TEXT
+           MOVE WS-FONECLI-CADCLI      TO FONECLI
+           MOVE +50                    TO EMAILCLI-LEN
+           MOVE WS-EMAILCLI-CADCLI     TO EMAILCLI-TEXT
+           MOVE WS-CPFCLI-CADCLI       TO CPFCLI
+           MOVE WS-SALDOCLI-CADCLI     TO SALDOCLI
+      *
+      *----------------------------------------------------------------*
+      * INSERIR OS DADOS DA HOSPEDEIRA NA TABELA (SQL FIELDS)          *
+      *----------------------------------------------------------------*
+           EXEC SQL
+              INSERT INTO TBCLIENT
+              (   CODCLI
+                , NOMECLI
+                , ENDCLI
+                , FONECLI
+                , EMAILCLI
+                , CPFCLI
+                , SALDOCLI
+              )
+              VALUES
+              (   :CODCLI
+                , :NOMECLI
+                , :ENDCLI
+                , :FONECLI
+                , :EMAILCLI
+                , :CPFCLI
+                , :SALDOCLI
+              )
+           END-EXEC
+           .
+      *
+      *----------------------------------------------------------------*
+      * TESTAR SQLCODE                                                 *
+      *----------------------------------------------------------------*
+           EVALUATE SQLCODE
+              WHEN 0
+                 ADD 1 TO WS-CTINS
+              WHEN -803
+                 ADD 1 TO WS-CTDUP
+              WHEN -545
+                 ADD 1 TO WS-CTINV
+              WHEN OTHER
+                 MOVE "ERRO INSERT TBCLIENT" TO WS-MSG
+                 MOVE SQLCODE                TO WS-SQLCODE
+                 PERFORM 9000-ERRO-DB2
+           END-EVALUATE
+      *
+           PERFORM 1100-LER-CADCLI
+           .
+      *
+       3000-TERMINO.
+           CLOSE CADCLI
+           IF NOT SUCESSO-CAD
+              MOVE "ERRO FECHAMENTO CADCLI"  TO WS-MSG
+              MOVE FS-CADCLI                 TO WS-FS
+              PERFORM 9000-ERRO
+           END-IF
+      *
+           ACCEPT WS-HORARIO-FINAL FROM TIME
+      *
+           PERFORM 9000-CALCULA-TEMPO-PROC
+      *
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTINS                   TO WS-CTINS-F
+           MOVE WS-CTDUP                   TO WS-CTDUP-F
+           MOVE WS-CTINV                   TO WS-CTINV-F
+      *
+           PERFORM 9000-IMPRIME-DATA
+      *
+      *
+           DISPLAY '   '
+           DISPLAY '   '
+           DISPLAY '=================================================='
+           DISPLAY '==  ESTATISTICA FINAL DE PROCESSAMENTO          =='
+           DISPLAY '=================================================='
+           DISPLAY 'QTDE. DE CLIENTES LIDOS CADCLI.....: ' WS-CTLIDO-F
+           DISPLAY 'QTDE. CLIENTES INSERIDOS TBCLIENT..: ' WS-CTINS-F
+           DISPLAY 'QTDE. CLIENTES DUPLICADOS..........: ' WS-CTDUP-F
+           DISPLAY 'QTDE. CLIENTES INVALIDOS...........: ' WS-CTINV-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO TOTAL DE PROCESSSAMENTO........: '
+                                           WS-TEMPO-PROCESSAMENTO
+           DISPLAY '=================================================='
+           DISPLAY '==  TERMINO NORMAL DO PROGRAMA EXECARGA         =='
+           DISPLAY '=================================================='
+           .
+      *
+       9000-ERRO-DB2.
+           DISPLAY '==================================================='
+           DISPLAY 'MESSAGE...:' WS-MSG
+           DISPLAY 'SQLCODE...:' WS-SQLCODE
+      *    DISPLAY 'SQLERRMC..:' WS-SQLERRMC
+           DISPLAY '==================================================='
+           DISPLAY '==  TERMINO ANORMAL DO PROGRAMA EXECARGA         =='
+           DISPLAY '==================================================='
+           MOVE 16                         TO RETURN-CODE
+           STOP RUN
+           .
+      *
+      *--------------------------------------------------------------*  00210008
+      * COPY BOOK DE ROTINAS                                            00210008
+      *--------------------------------------------------------------*  00210008
+           COPY ROTDATA.
+           COPY ROTERRO.
+           COPY ROTPROC.

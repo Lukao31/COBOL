@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - B135F007                                 *00020013
+      * NOME DO BOOK        - B135F007                                  00021013
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - FILE007                                   00023013
+      * TAMANHO DO REGISTRO - 61 CHARACTERS                            *00024014
+      *----------------------------------------------------------------*00030000
+           05 B135F007-CPF                 PIC X(011).                  00050013
+           05 B135F007-DATA-HORA-INICIO    PIC X(023).                  00060013
+           05 B135F007-DATA-HORA-FIM       PIC x(023).                  00070013
+           05 B135F007-QTD-HORAS-EXTRAS    PIC 9(002)V99.               00080013
+

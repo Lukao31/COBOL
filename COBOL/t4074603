@@ -1,0 +1,233 @@
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+      *                                                                 00060004
+       PROGRAM-ID.                         T4074603                     00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+      *                                                                 00060004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *                                                                 00060004
+       INPUT-OUTPUT                        SECTION.                     00110004
+      *                                                                 00060004
+       FILE-CONTROL.
+           SELECT A1074602 ASSIGN TO UT-S-A1074602
+           FILE STATUS IS FS-A1074602
+           .
+      *
+           SELECT A4074604 ASSIGN TO UT-S-A4074604
+           FILE STATUS IS FS-A4074604
+           .
+      *
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  A1074602
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 75 CHARACTERS
+           DATA RECORD REG-A1074602
+           .
+           COPY BK074602.
+      *
+       FD  A4074604
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 75 CHARACTERS
+           DATA RECORD REG-A4074604
+           .
+           COPY BK074604.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA CALCULO DO TEMPO                     *
+      *--------------------------------------------------------------*
+           COPY VARDATA.
+           COPY VARPROC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS HOSPEDEIRAS                               *
+      *--------------------------------------------------------------*
+           EXEC SQL
+              INCLUDE DCLFUNC
+           END-EXEC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA O SQL                                *
+      *--------------------------------------------------------------*
+           EXEC SQL
+             INCLUDE SQLCA
+           END-EXEC.
+      *
+       01  WS-CONTADORES-COMP.
+           05 WS-CTLIDO                    PIC 9(05) COMP.
+           05 WS-CTALT                     PIC 9(05) COMP.
+           05 WS-CTINV                     PIC 9(05) COMP.
+           05 WS-CTGRAV                    PIC 9(05) COMP.
+      *
+       01  WS-CONTADORES-FORMATADOS.
+           05 WS-CTLIDO-F                  PIC ZZ.ZZ9.
+           05 WS-CTALT-F                   PIC ZZ.ZZ9.
+           05 WS-CTINV-F                   PIC ZZ.ZZ9.
+           05 WS-CTGRAV-F                  PIC ZZ.ZZ9.
+      *
+       01  FS-A1074602                     PIC X(02).
+           88 SUCESSO-ARQ1                         VALUE "00".
+           88 FIM-ARQ1                             VALUE "10".
+      *
+       01  FS-A4074604                     PIC X(02).
+           88 SUCESSO-ARQ                          VALUE "00".
+           88 FIM-ARQ                              VALUE "10".
+      *
+       77  WS-SQLCODE                      PIC +9(9).
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *
+      *--------------------------------------------------------------*  00210008
+       PROCEDURE                           DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+      *0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FIM-ARQ1
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL FROM TIME
+      *
+           INITIALIZE WS-CONTADORES-COMP
+      *
+           OPEN INPUT A1074602
+           IF NOT SUCESSO-ARQ1
+              MOVE "ERRO DE ABERTURA A1074602" TO WS-MSG
+              MOVE FS-A1074602                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT A4074604
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO DE ABERTURA A4074604" TO WS-MSG
+              MOVE FS-A4074604                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1100-LER-CPF
+           .
+      *
+       1100-LER-CPF.
+           READ A1074602
+           DISPLAY 'PAROU AQUI'
+      *    IF NOT SUCESSO-ARQ1
+      *       MOVE "ERRO LEITURA A1074602" TO WS-MSG
+      *       MOVE FS-A4074604             TO WS-FS
+      *       GO TO 9000-ERRO
+      *    END-IF
+           MOVE BK074602-CPF            TO DCLFUNC-CPF
+           MOVE BK074602-NOME           TO DCLFUNC-NOME
+           MOVE BK074602-DDI            TO DCLFUNC-DDI
+           MOVE BK074602-DDD            TO DCLFUNC-DDD
+           MOVE BK074602-TELEFONE       TO DCLFUNC-TELEFONE
+           MOVE BK074602-SALARIOBASE    TO DCLFUNC-SALARIOBASE
+           ADD 1 TO WS-CTLIDO
+           .
+      *
+       2000-PROCESSAR.
+           MOVE DCLFUNC-CPF             TO BK074604-CPF
+           MOVE DCLFUNC-NOME            TO BK074604-NOME
+           MOVE DCLFUNC-DDI             TO BK074604-DDI
+           MOVE DCLFUNC-DDD             TO BK074604-DDD
+           MOVE DCLFUNC-TELEFONE        TO BK074604-TELEFONE
+           MOVE DCLFUNC-SALARIOBASE     TO BK074604-SALARIOBASE
+           PERFORM 2100-ALTERACAO
+           PERFORM 1100-LER-CPF
+           .
+      *
+       2100-ALTERACAO.
+           EXEC SQL
+              UPDATE FUNCIONARIOS
+              SET    NOME        = :DCLFUNC-NOME
+                   , DDI         = :DCLFUNC-DDI
+                   , DDD         = :DCLFUNC-DDD
+                   , TELEFONE    = :DCLFUNC-TELEFONE
+                   , SALARIOBASE = :DCLFUNC-SALARIOBASE
+              WHERE  CPF         = :DCLFUNC-CPF
+           END-EXEC
+      *
+           EVALUATE SQLCODE
+              WHEN 0    ADD 1    TO WS-CTALT
+              WHEN +100 ADD 1    TO WS-CTINV
+              WHEN OTHER
+              MOVE "ERRO ALTERACAO NA TABELA FUNCIONARIOS"
+                                         TO WS-MSG
+              MOVE SQLCODE               TO WS-SQLCODE
+              GO TO 9000-ERRO-DB2
+           END-EVALUATE
+           WRITE REG-A4074604
+           .
+      *
+       3000-TERMINO.
+           CLOSE A1074602
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO FECHAMENTO A1074602"  TO WS-MSG
+              MOVE FS-A1074602                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE A4074604
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO FECHAMENTO A4074604"  TO WS-MSG
+              MOVE FS-A4074604                 TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           ACCEPT WS-HORARIO-FINAL FROM TIME
+      *
+           PERFORM 9000-CALCULA-TEMPO-PROC
+      *
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTALT                   TO WS-CTALT-F
+      *
+           PERFORM 9000-IMPRIME-DATA
+      *
+           DISPLAY '   '
+           DISPLAY '   '
+           DISPLAY '=================================================='
+           DISPLAY '==  ESTATISTICA FINAL DE PROCESSAMENTO          =='
+           DISPLAY '=================================================='
+           DISPLAY 'QTDE. DE FUNC LIDOS............... : ' WS-CTLIDO-F
+           DISPLAY 'QTDE. DE FUNC EXCLUIDOS........... : ' WS-CTALT-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO TOTAL DE PROCESSSAMENTO........: '
+                                           WS-TEMPO-PROCESSAMENTO
+           DISPLAY '=================================================='
+           DISPLAY '==  TERMINO NORMAL DO PROGRAMA T4074603         =='
+           DISPLAY '=================================================='
+           .
+      *
+       9000-ERRO-DB2.
+           DISPLAY '==================================================='
+           DISPLAY 'MESSAGE...:' WS-MSG
+           DISPLAY 'SQLCODE...:' WS-SQLCODE
+           DISPLAY '==================================================='
+           DISPLAY '==  TERMINO ANORMAL DO PROGRAMA T4074603         =='
+           DISPLAY '==================================================='
+           MOVE 16                         TO RETURN-CODE
+           STOP RUN
+           .
+      *
+      *--------------------------------------------------------------*  00210008
+      * COPY BOOK DE ROTINAS                                            00210008
+      *--------------------------------------------------------------*  00210008
+           COPY ROTDATA.
+           COPY ROTERRO.
+           COPY ROTPROC.

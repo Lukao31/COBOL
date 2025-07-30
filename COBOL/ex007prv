@@ -1,0 +1,308 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+       PROGRAM-ID.                         EX007PRV.                    00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT INFLOTEC ASSIGN          TO UT-S-INLOTEC
+           FILE STATUS IS FS-INFLOTEC
+           .
+           SELECT VALCALC ASSIGN           TO UT-S-VALCALC
+           FILE STATUS IS FS-VALCALC
+           .
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00150004
+       FILE                                SECTION.
+      *--------------------------------------------------------------*  00150004
+       FD  INFLOTEC
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 45 CHARACTERS
+           DATA RECORD IS REG-INFLOTEC
+           .
+           COPY INFLOTEC REPLACING ==::== BY ====.
+      *--------------------------------------------------------------*  00150004
+       FD  VALCALC
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 06 CHARACTERS
+           DATA RECORD IS REG-VALCALC
+           .
+           COPY VALCALC REPLACING ==::== BY ====.
+      *--------------------------------------------------------------*  00150004
+      *--------------------------------------------------------------*  00150004
+       WORKING-STORAGE SECTION.
+      *--------------------------------------------------------------*  00150004
+      *   DECLARACAO DE VARIAVEIS ESPELHO DOS ARQUIVOS               *
+      *--------------------------------------------------------------*  00150004
+           COPY INFLOTEC REPLACING ==::== BY ==WS-==.
+           COPY VALCALC REPLACING ==::== BY ==WS-==.
+      *--------------------------------------------------------------*  00150004
+      * VARIAVEIS DE FILE STATUS                                     *
+      *--------------------------------------------------------------*
+       77 FS-INFLOTEC                      PIC X(02).
+       77 FS-VALCALC                       PIC X(02).
+      *--------------------------------------------------------------*  00150004
+      * VARIAVEIS PRINCIPAIS
+      *--------------------------------------------------------------*  00150004
+       01 WS-DADOS-CLI.
+          05 WS-NOMECLI                    PIC A(20).
+          05 WS-MARCACAR                   PIC X(10).
+          05 WS-ANOCAR                     PIC 9(4).
+          05 WS-DISTPER-D                  PIC 9(3)V99.
+          05 WS-DISTPER-M                  PIC 9(3)V99.
+          05 WS-LITGASMES                  PIC 9(3)V99.
+          05 WS-LITGASANO                  PIC 9(3)V99.
+          05 WS-ENERMES                    PIC 9(3)V99.
+          05 WS-ENERANO                    PIC 9(3)V99.
+          05 WS-VALECO                     PIC 9(3)V99.
+          05 WS-RESTOTAL                   PIC 9(3)V99.
+      *--------------------------------------------------------------*  00150004
+      *--------------------------------------------------------------*  00150004
+      * VARIAVEIS DE TRABALHO                                        *
+      *--------------------------------------------------------------*  00150004
+       77 WS-MSG                           PIC X(60).
+       77 WS-FS                            PIC X(02).
+       77 WS-CTLIDO-A                      PIC 9(04) COMP.
+       77 WS-CTLIDO-N                      PIC 9(04) COMP.
+       77 WS-CTGRAV                        PIC 9(04) COMP.
+      *
+      *--------------------------------------------------------------*  00150004
+      * VARIAVEIS COM MASCARA DE EDICAO (FORMATADAS)
+      *--------------------------------------------------------------*  00150004
+       77 WS-CTLIDO-A-F                    PIC ZZZ9.
+       77 WS-CTLIDO-N-F                    PIC ZZZ9.
+       77 WS-CTGRAV-F                      PIC ZZZ9.
+      *
+      *--------------------------------------------------------------*  00150004
+      * MENSAGENS DE ERRO DE FILE STATUS
+      *--------------------------------------------------------------*  00150004
+       77 WS-MSG01                         PIC X(60)
+                                                   VALUE
+          "ERRO ABERTURA FUNCANT".
+      *
+       77 WS-MSG02                         PIC X(60)
+                                                   VALUE
+          "ERRO ABERTURA FUNCNOVO".
+      *
+       77 WS-MSG03                         PIC X(60)
+                                                   VALUE
+          "ERRO ABERTURA FUNCCAD".
+      *
+       77 WS-MSG04                         PIC X(60)
+                                                   VALUE
+          "ERRO LEITURA FUNCANT".
+      *
+       77 WS-MSG05                         PIC X(60)
+                                                   VALUE
+          "ERRO LEITURA FUNCNOVO".
+      *
+       77 WS-MSG06                         PIC X(60)
+                                                   VALUE
+          "ERRO GRAVACAO FUNCCAD".
+      *
+       77 WS-MSG07                         PIC X(60)
+                                                   VALUE
+          "ERRO FECHAMENTO FUNCANT".
+      *
+       77 WS-MSG08                         PIC X(60)
+                                                   VALUE
+          "ERRO FECHAMENTO FUNCNOVO".
+      *
+       77 WS-MSG09                         PIC X(60)
+                                                   VALUE
+          "ERRO FECHAMENTO FUNCCAD".
+      *
+      *--------------------------------------------------------------*  00211007
+      * VARIAVEIS DE CALCULOS                                        *
+      *--------------------------------------------------------------*  00211007
+       77 WS-GASOLINA                      PIC 9(01)V99.
+       77 WS-ENERGIA                       PIC 9(01)V99.
+      *--------------------------------------------------------------*  00211007
+       PROCEDURE                           DIVISION.                    00220004
+      *--------------------------------------------------------------*  00230004
+       0000-EX007PRV.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FS-INFLOTEC = "10"
+                   AND   FS-VALCALC  = "10"
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           MOVE 0                          TO WS-CTLIDO-A
+           MOVE 0                          TO WS-CTLIDO-N
+           MOVE 0                          TO WS-CTGRAV
+      *
+           OPEN INPUT INFLOTEC
+      *
+           IF FS-INFLOTEC NOT = "00"
+              MOVE WS-MSG01                TO WS-MSG
+              MOVE FS-INFLOTEC             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN INPUT VALCALC
+      *
+           IF FS-VALCALC NOT = "00"
+              MOVE WS-MSG02                TO WS-MSG
+              MOVE FS-VALCALC              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1500-LER-INFLOTEC
+           PERFORM 1600-LER-VALCALC
+           .
+      *
+       1500-LER-INFLOTEC.
+           READ INFLOTEC INTO WS-REG-INFLOTEC
+      *
+           IF FS-INFLOTEC = "00"
+              COMPUTE WS-CTLIDO-A = WS-CTLIDO-A + 1
+           ELSE
+              IF FS-FUNCANT = "10"
+                 MOVE HIGH-VALUES          TO WS-CODFUNC-A
+              ELSE
+                 MOVE WS-MSG04             TO WS-MSG
+                 MOVE FS-INFLOTEC          TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       1600-LER-VALCALC.
+           READ VALCALC INTO WS-REG-VALCALC
+      *
+           IF FS-VALCALC = "00"
+              COMPUTE WS-CTLIDO-N = WS-CTLIDO-N + 1
+           ELSE
+              IF FS-VALCALC = "10"
+              MOVE HIGH-VALUES              TO WS-CODFUNC-N
+           ELSE
+              MOVE WS-MSG05                 TO WS-MSG
+              MOVE FS-VALCALC               TO WS-FS
+              GO TO 9000-ERRO
+      *
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           IF WS-DISTPER-M > 200
+              DISPLAY "NOME COMPLETO....:" WS-NOMECLI
+              DISPLAY "RESULTADO INVIABILIZADO"
+           END-IF
+      *
+           IF WS-DISTPER-D > 70
+           COMPUTE WS-CUSTOGASMES = WS-LITROSMES *
+                                       PRECOGAS
+      *
+           COMPUTE WS-CUSTOGASANO = WS-CUSTOGASMES *
+                                       12
+              DISPLAY "NOME COMPLETO....:" WS-NOMECLI
+              DISPLAY "MARCA DO CARRO...:" WS-MARCACAR
+              DISPLAY "ANO DO CARRO.....:" WS-ANOCAR
+              DISPLAY "DISTANCIA P. DIA.:" WS-DISTPER-D
+              DISPLAY "DISTANCIA P. MES.:" WS-DISTPER-M
+              DISPLAY "LT DE GAS. MES...:" WS-LITGASMES
+              DISPLAY "RESULTADO TOTAL..:" WS-RESTOTAL
+              DISPLAY "CLIENTE EM ALTO POTENCIAL"
+           END-IF
+      *
+           IF WS-DISTPER-D > 0,40 * 100 AND
+              WS-DISTPER-D <= 0,69 * 100
+              DISPLAY "NOME COMPLETO....:" WS-NOMECLI
+              DISPLAY "MARCA DO CARRO...:" WS-MARCACAR
+              DISPLAY "ANO DO CARRO.....:" WS-ANOCAR
+              DISPLAY "DISTANCIA P. DIA.:" WS-DISTPER-D
+              DISPLAY "DISTANCIA P. MES.:" WS-DISTPER-M
+              DISPLAY "LT DE GAS. MES...:" WS-LITGASMES
+              DISPLAY "RESULTADO TOTAL..:" WS-RESTOTAL
+              DISPLAY "CLIENTE EM POTENCIAL"
+      *
+           IF WS-DISTPER-D < 0,40 * 100
+              DISPLAY "NOME COMPLETO....:" WS-NOMECLI
+              DISPLAY "MARCA DO CARRO...:" WS-MARCACAR
+              DISPLAY "ANO DO CARRO.....:" WS-ANOCAR
+              DISPLAY "DISTANCIA P. DIA.:" WS-DISTPER-D
+              DISPLAY "DISTANCIA P. MES.:" WS-DISTPER-M
+              DISPLAY "LT DE GAS. MES...:" WS-LITGASMES
+              DISPLAY "RESULTADO TOTAL..:" WS-RESTOTAL
+              DISPLAY "CLIENTE EM BAIXO POTENCIAL"
+      *
+              WRITE REG-INFLOTEC FROM WS-REG-INFLOTEC
+      *
+              IF FS-INFLOTEC NOT = "00"
+                 MOVE WS-MSG06                TO WS-MSG
+                 MOVE FS-INFLOTEC             TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+      *
+              COMPUTE WS-CTGRAV = WS-CTGRAV + 1
+              PERFORM 1500-LER-INFLOTEC
+      *
+              WRITE REG-VALCALC FROM WS-REG-VALCALC
+      *
+              IF FS-VALCALC NOT = "00"
+                 MOVE WS-MSG06             TO WS-MSG
+                 MOVE FS-VALCALC           TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+      *
+              COMPUTE WS-CTGRAV = WS-CTGRAV + 1
+              PERFORM 1600-LER-VALCALC
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           MOVE WS-CTLIDO-A                TO WS-CTLIDO-A-F
+           MOVE WS-CTLIDO-N                TO WS-CTLIDO-N-F
+           MOVE WS-CTGRAV                  TO WS-CTGRAV-F
+           DISPLAY "==================================================="
+           DISPLAY "TOTAL DE REGISTROS LIDOS INFLOTEC.:" WS-CTLIDO-A-F
+           DISPLAY "TOTAL DE REGISTROS LIDOS VALCALC..:" WS-CTLIDO-N-F
+           DISPLAY "TOTAL DE REGISTROS GRAVADOS.......:" WS-CTGRAV-F
+           DISPLAY "==================================================="
+      *
+           CLOSE INFLOTEC
+           IF FS-INFLOTEC NOT = "00"
+              MOVE WS-MSG07                TO WS-MSG
+              MOVE FS-INFLOTEC             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE VALCALC
+           IF FS-VALCALC NOT = "00"
+              MOVE WS-MSG07                TO WS-MSG
+              MOVE FS-VALCALC              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           DISPLAY "==================================================="
+           DISPLAY "               INFORMACOES DO CLIENTE              "
+           DISPLAY "==================================================="
+           DISPLAY "=== NOME DO CLIENTE......:" WS-NOMECLI
+           DISPLAY "=== DIST PER. DIA........:" WS-DISTPER-D
+           DISPLAY "=== DIST PER. MES........:" WS-DISTPER-M
+           DISPLAY "=== CUSTO COM GAS.P. MES :" WS-LITGASMES
+           DISPLAY "=== CUSTO COM GAS.P. ANO :" WS-LITGASANO
+           DISPLAY "=== CUSTO COM KW / MES...:" WS-ENERMES
+           DISPLAY "=== CUSTO COM KW / ANO...:" WS-ENERANO
+           DISPLAY "=== VALOR ECONOMIZADO....:" WS-VALECO
+           DISPLAY "=== RESULTADO............:" WS-RESTOTAL
+           DISPLAY "==================================================="
+           DISPLAY "==================================================="
+           .
+

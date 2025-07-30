@@ -1,0 +1,225 @@
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+      *                                                                 00060004
+       PROGRAM-ID.                         EX007R01                     00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+      *                                                                 00060004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *                                                                 00060004
+       INPUT-OUTPUT                        SECTION.                     00110004
+      *                                                                 00060004
+       FILE-CONTROL.
+           SELECT BANCO ASSIGN TO UT-S-BANCO
+           FILE STATUS IS FS-BANCO
+           .
+      *
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  BANCO
+           LABEL RECORD OMITTED
+           RECORDING MODE IS F
+           RECORD CONTAINS 68 CHARACTERS
+           DATA RECORD REG-BANCO
+           .
+           COPY REGBANCO.
+      *
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA CALCULO DO TEMPO                     *
+      *--------------------------------------------------------------*
+           COPY VARDATA.
+           COPY VARPROC.
+      *
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS HOSPEDEIRAS                               *
+      *--------------------------------------------------------------*
+           EXEC SQL
+              INCLUDE DCLCLI
+           END-EXEC.
+      *
+           EXEC SQL
+              INCLUDE DCLCON
+           END-EXEC.
+      *--------------------------------------------------------------*
+      * BOOK DAS VARIAVEIS PARA O SQL                                *
+      *--------------------------------------------------------------*
+           EXEC SQL
+             INCLUDE SQLCA
+           END-EXEC.
+      *
+       01  WS-CONTADORES-COMP.
+           05 WS-CTLIDO                    PIC 9(05) COMP.
+           05 WS-CTEXC                     PIC 9(05) COMP.
+           05 WS-CTALT                     PIC 9(05) COMP.
+           05 WS-CTGRAV                    PIC 9(05) COMP.
+      *
+       01  WS-CONTADORES-FORMATADOS.
+           05 WS-CTLIDO-F                  PIC ZZ.ZZ9.
+           05 WS-CTEXC-F                   PIC ZZ.ZZ9.
+           05 WS-CTALT-F                   PIC ZZ.ZZ9.
+           05 WS-CTGRAV-F                  PIC ZZ.ZZ9.
+      *
+       01  FS-BANCO                        PIC X(02).
+           88 SUCESSO-ARQ                          VALUE "00".
+      *    88 FIM-ARQ-ARQ                          VALUE "10".
+      *
+       77  WS-SQLCODE                      PIC +9(9).
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+      *
+      *--------------------------------------------------------------*  00210008
+       PROCEDURE                           DIVISION.                    00140004
+      *--------------------------------------------------------------*  00210008
+      *0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL SQLCODE = +100
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           ACCEPT WS-HORARIO-INICIAL FROM TIME
+      *
+           INITIALIZE WS-CONTADORES-COMP
+      *
+           EXEC SQL
+               DECLARE FUNC CURSOR FOR
+               SELECT C.NOME
+                     ,C.CPF
+                     ,T.TIPOCONTA
+                     ,T.SALDO
+               FROM CLIENTES C
+               JOIN CONTA T ON C.IDCLIENTE  = T.IDCLIENTES
+               WHERE C.SITUACAO = 'A' AND T.STATUS = 'A'
+           END-EXEC
+      *   ABERTURA DO CURSOR
+           EXEC SQL
+               OPEN FUNC
+           END-EXEC
+      *
+           IF SQLCODE NOT EQUAL 0
+              MOVE "ERRO AO FECHAR CURSOR" TO WS-MSG
+              MOVE SQLCODE                 TO WS-SQLCODE
+              GO TO 9000-ERRO-DB2
+           END-IF
+      *
+           OPEN OUTPUT BANCO
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO DE ABERTURA BANCO" TO WS-MSG
+              MOVE FS-BANCO                    TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           .
+      *
+       1100-LER.
+           INITIALIZE DCLCLI
+           INITIALIZE DCLCON
+      *
+           EXEC SQL
+                FETCH FUNC
+                INTO :DCLCLI-NOME
+                    ,:DCLCLI-CPF
+                    ,:DCLCON-TIPOCONTA
+                    ,:DCLCON-SALDO
+           END-EXEC
+      *
+           IF SQLCODE = 0
+              ADD 1 TO WS-CTLIDO
+           ELSE
+              IF SQLCODE NOT = +100
+                 MOVE "ERRO LEITURA CURSOR FUNC"
+                                                 TO WS-MSG
+                 MOVE SQLCODE                    TO WS-SQLCODE
+                 GO TO 9000-ERRO-DB2
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           MOVE DCLCLI-NOME             TO RA-NOME
+           MOVE DCLCLI-CPF              TO RA-CPF
+           MOVE DCLCON-TIPOCONTA        TO RA-TIPO
+           MOVE DCLCON-SALDO            TO RA-SALDO
+      *
+           PERFORM 2300-GRAVAR-VARIAVEIS
+           PERFORM 1100-LER
+           .
+      *
+       2300-GRAVAR-VARIAVEIS.
+           WRITE REG-BANCO
+           IF NOT SUCESSO-ARQ
+              MOVE 'ERRO NA GRAVACAO BANCO'
+                                       TO WS-MSG
+              MOVE FS-BANCO            TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           ADD 1                       TO WS-CTGRAV
+           .
+      *
+       3000-TERMINO.
+           CLOSE BANCO
+           IF NOT SUCESSO-ARQ
+              MOVE "ERRO FECHAMENTO BANCO"     TO WS-MSG
+              MOVE FS-BANCO                    TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           EXEC SQL
+               CLOSE FUNC
+           END-EXEC
+      *
+           ACCEPT WS-HORARIO-FINAL FROM TIME
+      *
+           PERFORM 9000-CALCULA-TEMPO-PROC
+      *
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTGRAV                  TO WS-CTGRAV-F
+      *
+           PERFORM 9000-IMPRIME-DATA
+      *
+           DISPLAY '   '
+           DISPLAY '   '
+           DISPLAY '=================================================='
+           DISPLAY '==  ESTATISTICA FINAL DE PROCESSAMENTO          =='
+           DISPLAY '=================================================='
+           DISPLAY 'QTDE. DE CLIENTES LIDOS........... : ' WS-CTLIDO-F
+           DISPLAY 'QTDE. DE CLIENTES GRAVADOS........ : ' WS-CTGRAV-F
+           DISPLAY '=================================================='
+           DISPLAY 'TEMPO TOTAL DE PROCESSSAMENTO........: '
+                                           WS-TEMPO-PROCESSAMENTO
+           DISPLAY '=================================================='
+           DISPLAY '==  TERMINO NORMAL DO PROGRAMA EX007R01         =='
+           DISPLAY '=================================================='
+           .
+      *
+       9000-ERRO-DB2.
+           DISPLAY '==================================================='
+           DISPLAY 'MESSAGE...:' WS-MSG
+           DISPLAY 'SQLCODE...:' WS-SQLCODE
+           DISPLAY '==================================================='
+           DISPLAY '==  TERMINO ANORMAL DO PROGRAMA CURSOR7          =='
+           DISPLAY '==================================================='
+           MOVE 16                         TO RETURN-CODE
+           STOP RUN
+           .
+      *
+      *--------------------------------------------------------------*  00210008
+      * COPY BOOK DE ROTINAS                                            00210008
+      *--------------------------------------------------------------*  00210008
+           COPY ROTDATA.
+           COPY ROTERRO.
+           COPY ROTPROC.

@@ -1,0 +1,404 @@
+      ******************************************************************
+      *                                                                *
+      *          I D E N T I F I C A T I O N   D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       IDENTIFICATION                  DIVISION.
+          PROGRAM-ID.                  E0073516.
+          AUTHOR                       LUCAS FOURSYS.
+      ******************************************************************
+      *                                                                *
+      *          E N V I R O N M E N T         D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       ENVIRONMENT                     DIVISION.
+
+      *-----------------------*
+      * CONFIGURATION SECTION *
+      *----------------------------------------------------------------*
+       CONFIGURATION                   SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+
+      *----------------------*
+      * INPUT OUTPUT SECTION *
+      *----------------------------------------------------------------*
+       INPUT-OUTPUT                    SECTION.
+
+       FILE-CONTROL.
+
+           SELECT FILE009 ASSIGN TO FILE009
+                  FILE STATUS IS WRK-FS-FILE009.
+
+           SELECT FILE010 ASSIGN TO FILE010
+                  FILE STATUS IS WRK-FS-FILE010.
+
+      ******************************************************************
+      *                                                                *
+      *          D A T A                       D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       DATA                            DIVISION.
+      *
+      *---------------*
+      * FILE SECTION  *
+      *----------------------------------------------------------------*
+       FILE SECTION.
+
+       FD  FILE009
+           RECORDING MODE IS F
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 380 RECORDS
+           DATA RECORD IS REG-FILE009.
+       01  REG-FILE009.
+           COPY B135F009.
+
+       FD  FILE010
+           RECORDING MODE IS F
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 380 RECORDS
+           DATA RECORD IS REG-FILE010.
+       01  REG-FILE010.
+           COPY B135F010.
+
+      *-------------------------*
+      * WORKING STORAGE SECTION *
+      *----------------------------------------------------------------*
+       WORKING-STORAGE                 SECTION.
+
+      * FLAGS
+       01  WRK-FLAGS-SWITCHES.
+           05  WRK-DEBUG               PIC  X(01)  VALUE 'N'.
+               88  WRK-DEBUG-NAO                   VALUE 'N'.
+               88  WRK-DEBUG-SIM                   VALUE 'S'.
+
+      * FILE STATUS
+       01  WRK-STATUS.
+
+           05  WRK-FS-FILE009          PIC  X(02)  VALUE SPACES.
+               88  WRK-FS-FILE009-OK               VALUE '00'.
+               88  WRK-FS-FILE009-EOF              VALUE '10'.
+
+           05  WRK-FS-FILE010          PIC  X(02)  VALUE SPACES.
+               88  WRK-FS-FILE010-OK               VALUE '00'.
+               88  WRK-FS-FILE010-EOF              VALUE '10'.
+
+      * COPYBOOKS
+       01  WRK-BKALERRO.
+           COPY BKALERRO.
+      *
+       77  SALARIO-AUX                 PIC S9(008)V99 COMP-3.
+       77  INSSTOTAL                   PIC S9(008)V99 COMP-3.
+       77  INSSTOT1                    PIC S9(008)V99 COMP-3.
+       77  INSSTOT2                    PIC S9(008)V99 COMP-3.
+       77  INSSTOT3                    PIC S9(008)V99 COMP-3.
+       77  INSSTOT4                    PIC S9(008)V99 COMP-3.
+       77  BASE-DE-CALCULO             PIC S9(008)V99 COMP-3.
+       77  IRRF                        PIC S9(008)V99 COMP-3.
+      ******************************************************************
+      *                                                                *
+      *          P R O C E D U R E             D I V I S I O N         *
+      *                                                                *
+      ******************************************************************
+       PROCEDURE                       DIVISION.
+      *----------------------------------------------------------------*
+      * 0000-PRINCIPAL: ESTRUTURA PRINCIPAL DO PROGRAMA.               *
+      *----------------------------------------------------------------*
+       0000-MAIN                       SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY '0000-MAINLINE'
+           END-IF
+
+           PERFORM 1000-INICIAR
+              THRU 1000-INICIAR-FIM
+
+           PERFORM 2000-PROCESSAR
+              THRU 2000-PROCESSAR-FIM
+             UNTIL WRK-FS-FILE009-EOF
+
+           PERFORM 3000-FINALIZAR
+              THRU 3000-FINALIZAR-FIM
+
+           STOP RUN.
+
+       0000-FIM.                       EXIT.
+      *----------------------------------------------------------------*
+      * 1000-INICAR: TODOS OS PROCEDIMENTOS PARA INICIAR O PROGRAMA DA *
+      *    FORMA CORRETA COMO: ABRIR ARQUIVOS                          *
+      *----------------------------------------------------------------*
+       1000-INICIAR                    SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY ' 1000-INICIAR'
+           END-IF
+
+           PERFORM 1100-ABRIR-ARQUIVOS
+              THRU 1100-ABRIR-ARQUIVOS-FIM
+
+           PERFORM 1200-ABRIR-ARQUIVOS
+              THRU 1200-ABRIR-ARQUIVOS-FIM
+
+           PERFORM 9100-LER-FILE009
+              THRU 9100-LER-FILE009-FIM.
+
+       1000-INICIAR-FIM.               EXIT.
+      *----------------------------------------------------------------*
+      * 1100-ABRIR-ARQUIVOS: REALIZA ABERTURA DOS ARQUIVOS A SEREM UTI-*
+      *    LIZADOS NO PROGRAMA REALIZANDO OS TRATAMENTOS EM CASO DE    *
+      *    ERRO                                                        *
+      *----------------------------------------------------------------*
+       1100-ABRIR-ARQUIVOS             SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY '  1100-ABRIR-ARQUIVOS'
+           END-IF
+
+           OPEN INPUT FILE009
+
+           IF  NOT  WRK-FS-FILE009-OK
+
+               MOVE 'FILE009'          TO BKALERRO-ARQ-NOME
+               MOVE 'ABERTURA'         TO BKALERRO-ARQ-MOMENTO
+               MOVE '1100-ABRIR-ARQUIVOS' TO BKALERRO-PARAGRAFO
+               MOVE 'PAROU AQUI'       TO BKALERRO-ARQ-MENSAGEM
+               MOVE WRK-FS-FILE009     TO BKALERRO-ARQ-FILESTATUS
+
+               PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+
+           END-IF.
+
+       1100-ABRIR-ARQUIVOS-FIM.        EXIT.
+      *
+       1200-ABRIR-ARQUIVOS             SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY '  1200-ABRIR-ARQUIVOS'
+           END-IF
+
+           OPEN OUTPUT FILE010
+
+           IF  NOT  WRK-FS-FILE010-OK
+
+               MOVE 'FILE010'          TO BKALERRO-ARQ-NOME
+               MOVE 'ABERTURA'         TO BKALERRO-ARQ-MOMENTO
+               MOVE WRK-FS-FILE010     TO BKALERRO-ARQ-FILESTATUS
+
+               PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+
+           END-IF.
+
+       1200-ABRIR-ARQUIVOS-FIM.        EXIT.
+      *----------------------------------------------------------------*
+      * 2000-PROCESSAR TODA A REGRA DE NEGOCIO DEVE ESTAR PRESENTE NES-*
+      *    SE PARAGRAFO                                                *
+      *----------------------------------------------------------------*
+       2000-PROCESSAR                  SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY ' 2000-PROCESSAR'
+           END-IF
+           INITIALIZE BASE-DE-CALCULO
+           INITIALIZE IRRF
+            
+           COMPUTE BASE-DE-CALCULO = (B135F009-SALARIO-BASE - 
+                                     B135F009-INSS-CALCULADO) - 
+                                     189,59 * B135F009-QTD-DEPENDENTES         
+
+           EVALUATE TRUE
+           WHEN BASE-DE-CALCULO <= 2112,00
+                CONTINUE
+           WHEN BASE-DE-CALCULO >= 2112,01 AND <= 2826,65
+                COMPUTE IRRF = BASE-DE-CALCULO * 0,075
+           WHEN BASE-DE-CALCULO >= 2826,66 AND <= 3751,05
+                COMPUTE IRRF = BASE-DE-CALCULO * 0,150
+           WHEN BASE-DE-CALCULO >= 3751,06 AND <= 4664,68
+                COMPUTE IRRF = BASE-DE-CALCULO * 0,225
+           WHEN BASE-DE-CALCULO > 4664,68
+                COMPUTE IRRF = BASE-DE-CALCULO * 0,275
+           WHEN OTHER
+                PERFORM 9999-ABEND
+                   THRU 9999-ABEND-FIM
+           END-EVALUATE   
+      *
+           PERFORM 9200-GRAVAR-FILE010
+              THRU 9200-GRAVAR-FILE010
+           PERFORM 9100-LER-FILE009
+              THRU 9100-LER-FILE009.
+
+       2000-PROCESSAR-FIM.             EXIT.
+      *
+      *----------------------------------------------------------------*
+      * 3000-FINALIZAR: SAO REALIZADOS TODOS OS PROCEDIMENTOS PARA FI- *
+      *    NALIZAR O PROGRAMA DA FORMA CORRETA. OS ARQUIVOS SAO FECHA- *
+      *    DOS E A ESTATISTICA DO PROGRAMA EH REALIZADA                *
+      *----------------------------------------------------------------*
+       3000-FINALIZAR                  SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY ' 3000-FINALIZAR'
+           END-IF
+
+           PERFORM 3100-FECHAR-ARQUIVOS
+              THRU 3100-FECHAR-ARQUIVOS-FIM.
+
+           PERFORM 3200-FECHAR-ARQUIVOS
+              THRU 3200-FECHAR-ARQUIVOS-FIM.
+
+       3000-FINALIZAR-FIM.             EXIT.
+      *----------------------------------------------------------------*
+      * 3100-FECHAR ARQUIVOS: TODOS OS ARQUIVOS DEVEM SER FECHADOS COM *
+      *    OS RESPECTIVOS TRATAMENTOS DE FILE STATUS REALIZADOS        *
+      *----------------------------------------------------------------*
+       3100-FECHAR-ARQUIVOS            SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY '  3100-FECHAR-ARQUIVOS'
+           END-IF
+
+           CLOSE FILE009.
+
+           IF  NOT  WRK-FS-FILE009-OK
+
+               MOVE '3100-FECHAR-ARQUIVOS'
+                                       TO BKALERRO-PARAGRAFO
+               MOVE 'FILE009'          TO BKALERRO-ARQ-NOME
+               MOVE 'FECHAMENTO'       TO BKALERRO-ARQ-MOMENTO
+               MOVE WRK-FS-FILE009     TO BKALERRO-ARQ-FILESTATUS
+
+               PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+
+           END-IF.
+
+       3100-FECHAR-ARQUIVOS-FIM.       EXIT.
+      *
+       3200-FECHAR-ARQUIVOS            SECTION.
+
+            IF  WRK-DEBUG-SIM
+                DISPLAY '  3200-FECHAR-ARQUIVOS'
+            END-IF
+
+            CLOSE FILE010.
+
+            IF NOT  WRK-FS-FILE010-OK
+
+               MOVE '3200-FECHAR-ARQUIVOS'
+                                       TO BKALERRO-PARAGRAFO
+               MOVE 'FILE010'          TO BKALERRO-ARQ-NOME
+               MOVE 'FECHAMENTO'       TO BKALERRO-ARQ-MOMENTO
+               MOVE WRK-FS-FILE010     TO BKALERRO-ARQ-FILESTATUS
+
+               PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+
+           END-IF.
+
+       3200-FECHAR-ARQUIVOS-FIM.       EXIT.
+      *----------------------------------------------------------------*
+      * 9100-LER-ARQUIVO                                               *
+      * DESC: TODOS OS PROCEDIMENTOS PARA INICIAR O PROGRAMA DA FORMA  *
+      *       CORRETA COMO: ABRIR ARQUIVOS                             *
+      *----------------------------------------------------------------*
+       9100-LER-FILE009                SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY ' 9100-LER-FILE009'
+           END-IF
+      *    INITIALIZE FILE009
+           READ FILE009
+
+           IF WRK-FS-FILE009-EOF
+              DISPLAY 'LEITURA DO FILE009 CORRETA'
+              IF NOT WRK-FS-FILE009-OK
+
+                 MOVE 'FILE009'          TO BKALERRO-ARQ-NOME
+                 MOVE 'LEITURA'          TO BKALERRO-ARQ-MOMENTO
+                 MOVE WRK-FS-FILE009     TO BKALERRO-ARQ-FILESTATUS
+
+                 PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+              END-IF
+           END-IF.
+
+       9100-LER-FILE009-FIM.           EXIT.
+      *
+
+       9200-GRAVAR-FILE010             SECTION.
+           IF  WRK-DEBUG-SIM
+               DISPLAY ' 9300-GRAVAR-FILE010'
+           END-IF
+           MOVE B135F009-CPF              TO B135F010-CPF
+           DISPLAY 'MOVEU'
+           MOVE B135F009-NOME             TO B135F010-NOME
+           DISPLAY 'MOVEU'
+           MOVE B135F009-TELEFONE         TO B135F010-TELEFONE
+           DISPLAY 'MOVEU'
+           MOVE B135F009-ID-CARGO         TO B135F010-ID-CARGO
+           DISPLAY 'MOVEU'
+           MOVE B135F009-ID-DEPARTAMENTO  TO B135F010-ID-DEPARTAMENTO
+           DISPLAY 'MOVEU'
+           MOVE B135F009-SALARIO-BASE     TO B135F010-SALARIO-BASE
+           DISPLAY 'MOVEU'
+           MOVE B135F009-DATA-ADMISSAO    TO B135F010-DATA-ADMISSAO
+           DISPLAY 'MOVEU'
+           MOVE B135F009-DATA-DEMISSAO    TO B135F010-DATA-DEMISSAO
+           DISPLAY 'MOVEU'
+           MOVE B135F009-QTD-DEPENDENTES  TO B135F010-QTD-DEPENDENTES
+           DISPLAY 'MOVEU'
+           MOVE B135F009-SOLICITOU-VT     TO B135F010-SOLICITOU-VT
+           DISPLAY 'MOVEU'
+           MOVE B135F009-CONTRIB-SINDICAL TO B135F010-CONTRIB-SINDICAL
+           DISPLAY 'MOVEU'
+           MOVE B135F009-QTD-HORAS-EXTRAS TO B135F010-QTD-HORAS-EXTRAS
+           DISPLAY 'MOVEU'
+           MOVE B135F009-VALOR-HORA-EXTRA TO B135F010-VALOR-HORA-EXTRA
+           DISPLAY 'MOVEU'
+           MOVE B135F009-INSS-CALCULADO   TO B135F010-INSS-CALCULADO
+           DISPLAY 'MOVEU'
+           MOVE IRRF                      TO B135F010-IRRF-CALCULADO    
+      *
+           WRITE REG-FILE010
+
+           IF  NOT WRK-FS-FILE010-OK
+      *    AND NOT WRK-FS-FILE010-EOF
+
+               MOVE 'FILE010'          TO BKALERRO-ARQ-NOME
+               MOVE 'GRAVACAO'         TO BKALERRO-ARQ-MOMENTO
+               MOVE '9300-GRAVAR-FILE010' TO BKALERRO-PARAGRAFO
+               MOVE WRK-FS-FILE010     TO BKALERRO-ARQ-FILESTATUS
+               MOVE 'CAIU AQUI'        TO BKALERRO-ARQ-MENSAGEM
+
+               PERFORM 9999-ABEND
+                  THRU 9999-ABEND-FIM
+
+           END-IF.
+
+       9200-GRAVAR-FILE010-FIM.        EXIT.
+      *----------------------------------------------------------------*
+      * 9999-ABEND                                                     *
+      * DESC: UMA VEZ QUE O DIMENTOS PARA FINALIZAR O PROGRAMA DA FOR- *
+      *       MA CORRETA COMO: FECHAR ARQUIVOS                         *
+      *----------------------------------------------------------------*
+       9999-ABEND                      SECTION.
+
+           IF  WRK-DEBUG-SIM
+               DISPLAY '9999-ABEND'
+           END-IF
+
+           DISPLAY '***************************************'
+           DISPLAY '*                ERRO                 *'
+           DISPLAY '***************************************'
+           DISPLAY 'PARAGRAFO  : ' BKALERRO-PARAGRAFO
+           DISPLAY 'ARQUIVO    : ' BKALERRO-ARQ-NOME
+           DISPLAY 'MENSAGEM   : ' BKALERRO-ARQ-MENSAGEM
+           DISPLAY 'ACAO       : ' BKALERRO-ARQ-MOMENTO
+           DISPLAY 'FILE STATUS: ' BKALERRO-ARQ-FILESTATUS
+           DISPLAY '***************************************'
+           .
+      *    COMPUTE BKALERRO-RESULTADO =
+      *            BKALERRO-NUMERADOR / BKALERRO-DENOMINADOR.
+
+       9999-ABEND-FIM.                 EXIT.

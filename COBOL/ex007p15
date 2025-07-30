@@ -1,0 +1,356 @@
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID                          EX007P15.
+       AUTHOR                              LUCAS.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                        DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *
+       INPUT-OUTPUT                        SECTION.
+       FILE-CONTROL.
+           SELECT PRODCAD ASSIGN             TO UT-S-PRODCAD
+           FILE STATUS FS-PRODCAD
+           .
+           SELECT PRODMOV ASSIGN             TO UT-S-PRODMOV
+           FILE STATUS FS-PRODMOV
+           .
+           SELECT PRODNEW ASSIGN             TO UT-S-PRODNEW
+           FILE STATUS FS-PRODNEW
+           .
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       FILE                                SECTION.
+      *----------------------------------------------------------------*
+       FD  PRODCAD
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 30 CHARACTERS
+           DATA RECORD IS FD-PRODCAD
+           .
+       01  FD-PRODCAD                      PIC X(30).
+           COPY PRODCAD.
+      *----------------------------------------------------------------*
+       FD  PRODMOV
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 37 CHARACTERS
+           DATA RECORD IS FD-PRODMOV
+           .
+       01  FD-PRODMOV                     PIC X(37).
+           COPY PRODMOV.
+      *----------------------------------------------------------------*
+       FD  PRODNEW
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 30 CHARACTERS
+           DATA RECORD IS FD-PRODNEW
+           .
+       01  FD-PRODNEW                      PIC X(30).
+           COPY PRODNEW.
+      *----------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *----------------------------------------------------------------*
+      *  DECLARACAO DE VARIAVEIS ESPELHO
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+      *  FLAGS PARA FILE STATUS
+      *----------------------------------------------------------------*
+       01  FS-PRODCAD                       PIC X(02).
+           88 SUCESSO-CAD                           VALUE "00".
+           88 FIM-ARQ-CAD                           VALUE "10".
+      *
+       01  FS-PRODMOV                       PIC X(02).
+           88 SUCESSO-MOV                           VALUE "00".
+           88 FIM-ARQ-MOV                           VALUE "10".
+      *
+       01  FS-PRODNEW                       PIC X(02).
+           88 SUCESSO-NEW                           VALUE "00".
+           88 FIM-ARQ-NEW                           VALUE "10".
+      *----------------------------------------------------------------*
+      *  DECLARACAO DE VARIAVEIS
+      *----------------------------------------------------------------*
+       77  WS-MSG                          PIC X(60).
+       77  WS-FS                           PIC X(02).
+       77  WS-CTLIDO-CAD                   PIC 9(04) COMP.
+       77  WS-CTLIDO-MOV                   PIC 9(04) COMP.
+       77  WS-CTGRAV-NEW                   PIC 9(04) COMP.
+       77  WS-CTINC                        PIC 9(04) COMP.
+       77  WS-CTEXC                        PIC 9(04) COMP.
+       77  WS-CTALT                        PIC 9(04) COMP.
+       77  WS-CTINV                        PIC 9(04) COMP.
+       77  WS-CTPERM                       PIC 9(04) COMP.
+      *----------------------------------------------------------------*
+       77  WS-CTLIDO-CAD-F                 PIC ZZZ9.
+       77  WS-CTLIDO-MOV-F                 PIC ZZZ9.
+       77  WS-CTGRAV-NEW-F                 PIC ZZZ9.
+       77  WS-CTINC-F                      PIC ZZZ9.
+       77  WS-CTEXC-F                      PIC ZZZ9.
+       77  WS-CTALT-F                      PIC ZZZ9.
+       77  WS-CTINV-F                      PIC ZZZ9.
+       77  WS-CTPERM-F                     PIC ZZZ9.
+       77  WS-CODMOV-AUX                   PIC X(04).
+      *----------------------------------------------------------------*
+       77  WS-MSG01                        PIC X(60)
+           VALUE "ERRO ABERTURA CADPROD".
+       77  WS-MSG02                        PIC X(60)
+           VALUE "ERRO ABERTURA CADMOV".
+       77  WS-MSG03                        PIC X(60)
+           VALUE "ERRO ABERTURA CADNEW".
+       77  WS-MSG04                        PIC X(60)
+           VALUE "ERRO LEITURA CADPROD".
+       77  WS-MSG05                        PIC X(60)
+           VALUE "ERRO LEITURA CADMOV".
+       77  WS-MSG06                        PIC X(60)
+           VALUE "ERRO GRAVACAO CADNEW".
+       77  WS-MSG07                        PIC X(60)
+           VALUE "ERRO FECHAMENTO CADPROD".
+       77  WS-MSG08                        PIC X(60)
+           VALUE "ERRO FECHAMENTO CADMOV".
+       77  WS-MSG09                        PIC X(60)
+           VALUE "ERRO FECHAMENTO CADNEW".
+      *----------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *----------------------------------------------------------------*
+       0000-EX011P14.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+                   UNTIL FIM-ARQ-CAD
+                     AND FIM-ARQ-MOV
+           PERFORM 3000-TERMINO
+           STOP RUN
+           .
+      *
+       1000-INICIALIZAR.
+           MOVE 0                          TO WS-CTLIDO-CAD
+           MOVE 0                          TO WS-CTLIDO-MOV
+           MOVE 0                          TO WS-CTGRAV-NEW
+           MOVE 0                          TO WS-CTINC
+           MOVE 0                          TO WS-CTEXC
+           MOVE 0                          TO WS-CTALT
+           MOVE 0                          TO WS-CTINV
+           MOVE 0                          TO WS-CTPERM
+      *
+           OPEN INPUT PRODCAD
+           IF NOT SUCESSO-CAD
+              MOVE WS-MSG01                TO WS-MSG
+              MOVE FS-PRODCAD              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN INPUT PRODMOV
+           IF NOT SUCESSO-MOV
+              MOVE WS-MSG02                TO WS-MSG
+              MOVE FS-PRODMOV              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT PRODNEW
+           IF NOT SUCESSO-NEW
+              MOVE WS-MSG03                TO WS-MSG
+              MOVE FS-PRODNEW              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1100-LER-PRODCAD
+           IF FIM-ARQ-CAD
+              MOVE " PRODCAD VAZIO"          TO WS-MSG
+              MOVE FS-PRODCAD                TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           PERFORM 1200-LER-PRODMOV
+           IF FIM-ARQ-MOV
+              MOVE " PRODMOV VAZIO"          TO WS-MSG
+              MOVE FS-PRODMOV              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *    MOVE WS-CODPROD-MOV             TO WS-CODMOV-AUX
+           .
+      *
+       1100-LER-PRODCAD.
+           READ PRODCAD INTO WS-REG-PRODCAD
+           DISPLAY '1100'
+           IF SUCESSO-CAD
+              ADD 1                        TO WS-CTLIDO-CAD
+           ELSE
+              IF FIM-ARQ-CAD
+                 MOVE HIGH-VALUES          TO WS-CODPS-CAD
+              ELSE
+                 MOVE WS-MSG04             TO WS-MSG
+                 MOVE FS-PRODCAD           TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       1200-LER-PSMOV.
+           READ PRODMOV  INTO WS-REG-PRODMOV
+           DISPLAY '1200'
+           IF SUCESSO-MOV
+              ADD 1                        TO WS-CTLIDO-MOV
+           ELSE
+              IF FIM-ARQ-MOV
+                 MOVE HIGH-VALUES          TO WS-CODPS-MOV
+              ELSE
+                 MOVE WS-MSG05             TO WS-MSG
+                 MOVE FS-PRODMOV           TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           DISPLAY ' 2000'
+           IF WS-CODPROD-CAD < WS-CODPROD-MOV
+              PERFORM 2100-MANTER
+              DISPLAY WS-CODPROD-CAD 'PRODUTO SEM MOVIMENTO DE ESTOQUE'
+              PERFORM 1100-LER-CODPROD-CAD
+           ELSE
+              IF WS-CODPROD-MOV < WS-CODPROD-CAD
+                 PERFORM 2200-INCLUIR
+                 PERFORM 1200-LER-CODPROD-MOV
+              ELSE
+                 PERFORM 2300-ALT-EXC
+                 PERFORM 1100-LER-CODPROD-CAD
+                 PERFORM 1200-LER-CODPROD-MOV
+              END-IF
+           END-IF
+           .
+      *
+       2100-MANTER.
+           DISPLAY '2100'
+           MOVE WS-REG-PRODCAD             TO WS-REG-PRODNEW
+           WRITE REG-PRODNEW               FROM WS-REG-PRODNEW
+           IF NOT SUCESSO-NEW
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-PRODNEW              TO WS-FS
+              GO TO 9000-ERRO
+           ELSE
+              ADD 1                        TO WS-CTGRAV-NEW
+           END-IF
+           .
+           ADD 1                           TO WS-CTPERM
+           .
+      *
+       2200-INCLUIR.
+           DISPLAY '2200'
+           IF WS-CODPROD-MOV NOT EQUAL WS-CODMOV-AUX
+              IF WS-TIPOMOVIMENTO-MOV = 'E'
+                 ADD 1                        TO WS-CTINC
+                 PERFORM 2400-GRAVAR-E
+                 MOVE WS-CODPROD-MOV          TO WS-CODMOV-AUX
+              ELSE
+                 ADD 1                        TO WS-CTINV
+                 PERFORM 1500-LER-MOV
+              END-IF
+           ELSE
+              PERFORM 1500-LER-MOV
+           END-IF
+           .
+      *
+       2300-ALT-EXC.
+           DISPLAY '2300'
+           IF WS-TIPOMOV-M = "A"
+              PERFORM 2500-GRAVA-M
+              ADD 1                        TO WS-CTALT
+           ELSE
+              IF WS-TIPOMOV-M = "E"
+                 ADD 1                     TO WS-CTEXC
+              ELSE
+                 ADD 1                     TO WS-CTINV
+                 ADD 1                     TO WS-CTPERM
+                 PERFORM 2400-GRAVA-O
+              END-IF
+           END-IF
+           .
+      *
+       2400-GRAVA-O.
+           DISPLAY '2400'
+           MOVE WS-REG-PSOLD               TO WS-REG-PSNEW
+           WRITE REG-PSNEW                 FROM WS-REG-PSNEW
+           IF NOT SUCESSO-N
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-PSNEW                TO WS-FS
+              GO TO 9000-ERRO
+           ELSE
+              ADD 1                        TO WS-CTGRAV-N
+           END-IF
+           .
+      *
+       2500-GRAVA-M.
+           DISPLAY '2500'
+           MOVE WS-CODPROD-CAD             TO WS-CODPROD-NEW
+           IF WS-QTDESTOQUE-MOV
+              ADD WS-QTDESTOQUE-MOV        TO WS-QTDESTOQUE-CAD GIVING
+              MOVE WS-DESCPS-M             TO WS-DESCPS-N
+           ELSE
+              MOVE WS-DESCPS-O             TO WS-DESCPS-N
+           END-IF
+           IF WS-VALORPS-M IS NUMERIC
+              MOVE WS-VALORPS-M            TO WS-VALORPS-N
+           ELSE
+              MOVE WS-VALORPS-O            TO WS-VALORPS-N
+           END-IF
+      *
+           WRITE REG-PSNEW                 FROM WS-REG-PSNEW
+           IF NOT SUCESSO-N
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-PSNEW                TO WS-FS
+              GO TO 9000-ERRO
+           ELSE
+              ADD 1                        TO WS-CTGRAV-N
+           END-IF
+           .
+      *
+       3000-TERMINO.
+           DISPLAY '3000'
+           MOVE WS-CTLIDO-O                TO WS-CTLIDO-O-F
+           MOVE WS-CTLIDO-M                TO WS-CTLIDO-M-F
+           MOVE WS-CTGRAV-N                TO WS-CTGRAV-N-F
+           MOVE WS-CTINC                   TO WS-CTINC-F
+           MOVE WS-CTEXC                   TO WS-CTEXC-F
+           MOVE WS-CTALT                   TO WS-CTALT-F
+           MOVE WS-CTINV                   TO WS-CTINV-F
+           MOVE WS-CTPERM                  TO WS-CTPERM-F
+      *
+           DISPLAY "=================================================="
+           DISPLAY "REGISTROS LIDOS OLD...: " WS-CTLIDO-O-F
+           DISPLAY "REGISTROS LIDOS MOV...: " WS-CTLIDO-M-F
+           DISPLAY "REGISTROS GRAVADOS....: " WS-CTGRAV-N-F
+           DISPLAY "REGISTROS INCLUIDOS...: " WS-CTINC-F
+           DISPLAY "REGISTROS EXCLUIDOS...: " WS-CTEXC-F
+           DISPLAY "REGISTROS ALTERADOS...: " WS-CTALT-F
+           DISPLAY "REGISTROS INVALIDOS...: " WS-CTINV-F
+           DISPLAY "REGISTROS PERMANECIDOS: " WS-CTPERM-F
+           DISPLAY "=================================================="
+      *
+           CLOSE PSOLD
+           IF NOT SUCESSO-O
+              MOVE WS-MSG07                TO WS-MSG
+              MOVE FS-PSOLD                TO WS-FS
+              GO TO 9000-ERRO
+      *
+           CLOSE PSMOV
+           IF NOT SUCESSO-M
+              MOVE WS-MSG08                TO WS-MSG
+              MOVE FS-PSMOV                TO WS-FS
+              GO TO 9000-ERRO
+      *
+           CLOSE PSNEW
+           IF NOT SUCESSO-N
+              MOVE WS-MSG09                TO WS-MSG
+              MOVE FS-PSNEW                TO WS-FS
+              GO TO 9000-ERRO
+      *
+           DISPLAY "=================================================="
+           DISPLAY "         TERMINO NORMAL EX007P15                  "
+           DISPLAY "=================================================="
+           .
+           COPY ROTERRO.
