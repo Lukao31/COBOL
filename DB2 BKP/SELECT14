@@ -1,0 +1,3 @@
+SELECT NOMECLI,YEAR(DATANASCCLI), CURRENT DATE                          00010000
+FROM TBCLI                                                              00020000
+WHERE YEAR(CURRENT DATE - DATANASCCLI) >= 18                            00030004

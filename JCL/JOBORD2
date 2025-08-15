@@ -1,0 +1,36 @@
+//FSYS007J JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB DD DISP=SHR,DSN=FS.GERAL.LOADLIB
+//*******************************************************************
+//* APAGA ARQUIVOS JA CRIADOS
+//*******************************************************************
+//STEP001 EXEC PGM=IDCAMS,COND=(0,NE)
+//SYSOUT DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSIN DD *
+    DELETE FS.FSYS007.FILE005
+    DELETE FS.FSYS007.FILE007
+    DELETE FS.FSYS007.FILE008
+    SET MAXCC=0
+//*******************************************************************
+//* ORDENA ARQUIVOS 1
+//*******************************************************************
+//STEP002 EXEC PGM=SORT,COND=(0,NE)
+//SYSOUT DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SORTIN DD DSN=FS.FSYS031.FILE006,DISP=SHR
+//SORTOUT DD DSN=FS.FSYS007.FILE007,
+// DISP=(NEW,CATLG,DELETE),
+// UNIT=SYSALLDA,
+// SPACE=(TRK,(1,1),RLSE),
+// DCB=(RECFM=FB,LRECL=0,BLKSIZE=0)
+//SYSIN DD *
+    SORT FIELDS=(1,11,CH,A)
+//*******************************************************************
+//* ESCREVE ARQUIVO      ;
+//*******************************************************************
+//STEP003  EXEC PGM=E0073512
+//FILE005  DD  DSN=FS.FSYS007.FILE005,DISP=SHR
+//FILE007  DD  DSN=FS.FSYS007.FILE007,DISP=SHR
+//FILE008  DD  DSN=FS.FSYS007.FILE008,DISP=(NEW,CATLG,DELETE),
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//             DCB=(LRECL=0,RECFM=FB,DSORG=PS)

@@ -1,0 +1,6 @@
+-- CRIACAO DO INDICE IDXTIPOCLI                                         00010000
+                                                                        00020000
+   CREATE UNIQUE INDEX IDXTIPOCLI                                       00030000
+   ON TBTIPOCLI(CODTIPOCLI)                                             00040000
+-- EXCLUSAO DO INDICE IDXTIPOCLI                                        00050000
+-- DROP INDEX (CODTIPOCLI)                                              00060000

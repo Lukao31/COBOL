@@ -1,0 +1,30 @@
+      ******************************************************************
+      * DCLGEN TABLE(TREINO1)                                          *
+      *        LIBRARY(FS.FSYS007.DB2LIB(PRATICA1))                    *
+      *        LANGUAGE(COBOL)                                         *
+      *        QUOTE                                                   *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE TREINO1 TABLE
+           ( CODCLIE                        CHAR(5) NOT NULL,
+             NOMECLIE                       VARCHAR(25) NOT NULL,
+             IDADECLIE                      INTEGER,
+             CPFCLIE                        CHAR(11) NOT NULL,
+             ESTADOCLIE                     CHAR(2) NOT NULL,
+             SALDOCLIE                      DECIMAL(8, 2)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE TREINO1                            *
+      ******************************************************************
+       01  DCLTREINO1.
+           10 CODCLIE              PIC X(5).
+           10 NOMECLIE.
+              49 NOMECLIE-LEN      PIC S9(4) USAGE COMP.
+              49 NOMECLIE-TEXT     PIC X(25).
+           10 IDADECLIE            PIC S9(9) USAGE COMP.
+           10 CPFCLIE              PIC X(11).
+           10 ESTADOCLIE           PIC X(2).
+           10 SALDOCLIE            PIC S9(6)V9(2) USAGE COMP-3.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 6       *
+      ******************************************************************

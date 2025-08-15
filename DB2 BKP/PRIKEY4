@@ -1,0 +1,6 @@
+-- CRIACAO DA CHAVE PRIMARIA TBPROD                                     00010000
+   ALTER TABLE TBPROD                                                   00020000
+   ADD PRIMARY KEY (CODPROD)                                            00030000
+-- EXCLUSAO DA PRIMARY KEY                                              00040000
+-- ALTER TABLE TBPROD                                                   00050000
+-- DROP PRIMARY KEY                                                     00060000

@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - DEVEDOR                                  *00020005
+      * NOME DO BOOK        - DEVEDOR                                  *00021005
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - DEVEDOR                                  *00023005
+      * TAMANHO DO REGISTRO - 50 CHARACTERS                            *00024004
+      *----------------------------------------------------------------*00030000
+       01  REG-DEVEDOR.                                                 00040005
+           05 CPFCLI-D                     PIC X(11).                   00050005
+           05 NOMECLI-D                    PIC X(20).                   00060005
+           05 AGENCIA-D                    PIC X(11).                   00070005
+           05 SALDO-D                      PIC S9(5)V99 COMP-3.         00080005

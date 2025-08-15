@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     -                                          *00020012
+      * NOME DO BOOK        -                                           00021012
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     -                                           00023012
+      * TAMANHO DO REGISTRO - 29 CHARACTERS                            *00024012
+      *----------------------------------------------------------------*00030000
+       01  FILTERS.                                                     00040012
+           05 WS-FILTRO-NOME                     PIC X(15).             00050012
+           05 WS-FILTRO-DE                       PIC 9(07).             00060012
+           05 WS-FILTRO-ATE                      PIC 9(07).             00070012
+                                                                        00080012

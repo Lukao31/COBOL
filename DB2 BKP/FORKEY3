@@ -1,0 +1,9 @@
+-- CRIACAO DA CHAVE ESTRANGEIRA DA TBCLI                                00010000
+   ALTER TABLE TBCLI                                                    00020000
+   ADD CONSTRAINT FKEY_TBCLI_TBTIPOCLI                                  00030000
+   FOREIGN KEY(CODTIPOCLI)                                              00040000
+   REFERENCES TBTIPOCLI(CODTIPOCLI)                                     00050000
+   ON DELETE SET NULL                                                   00060000
+-- EXCLUSAO DA FOREIGN KEY                                              00070000
+-- ALTER TABLE TBCLI                                                    00080000
+-- DROP FOREIGN KEY FKEY_TBCLI_TBTIPOCLI                                00090000

@@ -1,0 +1,3 @@
+SELECT V.QTDEVENDA * P.PRECOPROD VALOR_COMPRA                           00010001
+FROM TBVENDA V, TBPROD P                                                00020000
+WHERE V.CODCLI = '02'                                                   00030002

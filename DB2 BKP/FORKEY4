@@ -1,0 +1,9 @@
+-- CRIACAO DA CHAVE ESTRANGEIRA DA TBPROD                               00010000
+   ALTER TABLE TBPROD                                                   00020000
+   ADD CONSTRAINT FKEY_TBPROD_TBTIPOPROD                                00030000
+   FOREIGN KEY(CODTIPOPROD)                                             00040000
+   REFERENCES TBTIPOPROD(CODTIPOPROD)                                   00050000
+   ON DELETE SET NULL                                                   00060000
+-- EXCLUSAO DA FOREIGN KEY                                              00070000
+-- ALTER TABLE TBPROD                                                   00080000
+-- DROP FOREIGN KEY FKEY_TBPROD_TBTIPOPROD                              00090000

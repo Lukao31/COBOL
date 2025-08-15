@@ -1,0 +1,39 @@
+      ******************************************************************
+      * DCLGEN TABLE(PEDIDOS_PRODUTOS)                                 *
+      *        LIBRARY(FS.FSYS007.DB2LIB(PEDPROD))                     *
+      *        ACTION(REPLACE)                                         *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(DCLPED-)                                          *
+      *        STRUCTURE(DCLPED)                                       *
+      *        QUOTE                                                   *
+      *        DBCSDELIM(NO)                                           *
+      *        COLSUFFIX(YES)                                          *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE PEDIDOS_PRODUTOS TABLE
+           ( NUMERO_PEDIDO_PRODUTO          INTEGER NOT NULL,
+             NUMERO_PEDIDO                  INTEGER NOT NULL,
+             ID_PRODUTO                     INTEGER NOT NULL,
+             QTD_PRODUTO                    SMALLINT NOT NULL,
+             VALOR_UNITARIO_PEDIDO          DECIMAL(7, 2) NOT NULL
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE PEDIDOS_PRODUTOS                   *
+      ******************************************************************
+       01  DCLPED.
+      *                       NUMERO_PEDIDO_PRODUTO
+           10 DCLPED-NUMERO-PEDIDO-PRODUTO
+              PIC S9(9) USAGE COMP.
+      *                       NUMERO_PEDIDO
+           10 DCLPED-NUMERO-PEDIDO
+              PIC S9(9) USAGE COMP.
+      *                       ID_PRODUTO
+           10 DCLPED-ID-PRODUTO    PIC S9(9) USAGE COMP.
+      *                       QTD_PRODUTO
+           10 DCLPED-QTD-PRODUTO   PIC S9(4) USAGE COMP.
+      *                       VALOR_UNITARIO_PEDIDO
+           10 DCLPED-VALOR-UNITARIO-PEDIDO
+              PIC S9(5)V9(2) USAGE COMP-3.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 5       *
+      ******************************************************************

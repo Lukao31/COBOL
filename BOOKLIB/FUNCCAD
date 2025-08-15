@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - CADASTRO DE FUNCIONARIOS CADASTRADOS     *00020001
+      * NOME DO BOOK        - FUNCCAD                                  *00030001
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00040000
+      * NOME DO ARQUIVO     - FUNCCAD                                  *00050001
+      * TAMANHO DO REGISTRO - 43 CHARACTERS                            *00060000
+      *----------------------------------------------------------------*00070000
+       01  ::REG-FUNCCAD.                                               00080002
+           05 ::CODFUNC-C                  PIC X(05).                   00090001
+           05 ::NOMEFUNC-C                 PIC X(30).                   00091001
+           05 ::VALORHORA-C                PIC 9(02)V99.                00092001
+           05 ::QTDHRSTRAB-C               PIC 9(04).                   00093001

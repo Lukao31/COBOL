@@ -1,0 +1,36 @@
+      ******************************************************************
+      * DCLGEN TABLE(CONTA)                                            *
+      *        LIBRARY(FS.FSYS007.DB2LIB(CLICON01))                    *
+      *        ACTION(REPLACE)                                         *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(DCLCON-)                                          *
+      *        STRUCTURE(DCLCON)                                       *
+      *        QUOTE                                                   *
+      *        DBCSDELIM(NO)                                           *
+      *        COLSUFFIX(YES)                                          *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE CONTA TABLE
+           ( IDCONTA                        INTEGER NOT NULL,
+             IDCLIENTES                     INTEGER NOT NULL,
+             TIPOCONTA                      CHAR(2) NOT NULL,
+             SALDO                          DECIMAL(9, 2) NOT NULL,
+             STATUS                         CHAR(1) NOT NULL
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE CONTA                              *
+      ******************************************************************
+       01  DCLCON.
+      *                       IDCONTA
+           10 DCLCON-IDCONTA       PIC S9(9) USAGE COMP.
+      *                       IDCLIENTES
+           10 DCLCON-IDCLIENTES    PIC S9(9) USAGE COMP.
+      *                       TIPOCONTA
+           10 DCLCON-TIPOCONTA     PIC X(2).
+      *                       SALDO
+           10 DCLCON-SALDO         PIC S9(7)V9(2) USAGE COMP-3.
+      *                       STATUS
+           10 DCLCON-STATUS        PIC X(1).
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 5       *
+      ******************************************************************

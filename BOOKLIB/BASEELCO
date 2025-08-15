@@ -1,0 +1,9 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ROTINA      - 1200-CALC-CONSUM                         *00020005
+      * NOME DO BOOK        - VALASCAL                                 *00030004
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00040000
+      * VARIAVEIS USADAS    - WS-CONSUM   PIC 9(03)V99.                *00050005
+      *                                                                *00060005
+      *----------------------------------------------------------------*00070000
+       1200-CALC-CONSUM.                                                00080005
+           COMPUTE WS-CONSUM-E = WS-ENERGIA * 12                        00090005

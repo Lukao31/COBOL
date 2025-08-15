@@ -1,0 +1,12 @@
+-- TABELA TBPROD                                                        00010000
+   CREATE TABLE TBPROD                                                  00020004
+   (                                                                    00030004
+     CODPROD         CHAR(4)                    NOT NULL                00040004
+    ,DESCPROD        VARCHAR(30)                NOT NULL                00050004
+    ,PRECOPROD       DECIMAL(9,2)                                       00060004
+                     CHECK (PRECOPROD > 0)                              00061004
+    ,UNIDPROD        VARCHAR(10)                                        00070004
+                     CHECK (UNIDPROD IN ('KG', 'PECA', 'PCT', 'LITRO')) 00071004
+    ,CODTIPOPROD     CHAR(2)                                            00080004
+   )                                                                    00090004
+-- DROP TABLE TBPROD                                                    00100004

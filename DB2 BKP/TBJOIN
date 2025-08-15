@@ -1,0 +1,32 @@
+-- DROP TABLE TBCLISP;                                                  00001002
+-- COMMIT;                                                              00002002
+-- DROP TABLE TBCLIRJ;                                                  00003002
+-- COMMIT;                                                              00004002
+                                                                        00005001
+CREATE TABLE TBCLISP                                                    00010000
+( CODCLISP CHAR(3) NOT NULL,                                            00020000
+  NOMECLISP VARCHAR(10),                                                00030000
+  SALDOCLISP DECIMAL(8,2),                                              00040000
+  PRIMARY KEY (CODCLISP)                                                00050000
+);                                                                      00060000
+ CREATE TABLE TBCLIRJ                                                   00070000
+ ( CODCLIRJ CHAR(3) NOT NULL,                                           00080000
+   NOMECLIRJ VARCHAR(10),                                               00090000
+   SALDOCLIRJ DECIMAL(8,2),                                             00100000
+   PRIMARY KEY (CODCLIRJ)                                               00110000
+ );                                                                     00120000
+ CREATE UNIQUE INDEX IDXSP ON TBCLISP(CODCLISP);                        00130000
+ CREATE UNIQUE INDEX IDXRJ ON TBCLIRJ(CODCLIRJ);                        00140000
+                                                                        00150000
+      INSERT INTO TBCLISP VALUES ('001','ANA'    , 100);                00160000
+      INSERT INTO TBCLISP VALUES ('003','BEATRIZ', 300);                00170000
+      INSERT INTO TBCLISP VALUES ('005','CARLA'  , 500);                00180000
+      INSERT INTO TBCLISP VALUES ('008','PEDRO'  ,2800);                00190000
+      INSERT INTO TBCLISP VALUES ('009','JOAO'   ,2900);                00200000
+      INSERT INTO TBCLISP VALUES ('010','JOSE'   ,3000);                00210000
+      INSERT INTO TBCLIRJ VALUES ('002','DANIEL' , 200);                00220001
+      INSERT INTO TBCLIRJ VALUES ('004','ELIZABETE', 400);              00230001
+      INSERT INTO TBCLIRJ VALUES ('006','CARLA'  , 600);                00240000
+      INSERT INTO TBCLIRJ VALUES ('008','PEDRO'  , 800);                00250000
+      INSERT INTO TBCLIRJ VALUES ('009','JOAO'   , 900);                00260000
+      INSERT INTO TBCLIRJ VALUES ('010','JOSE'   ,1000);                00270000

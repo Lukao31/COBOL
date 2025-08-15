@@ -1,0 +1,115 @@
+-- CRIACAO DA TABELA CLIENTE                                            00010010
+CREATE TABLE CLIENTE(                                                   00020010
+CODCLI CHAR(4) NOT NULL,                                                00030010
+NOMECLI VARCHAR(50),                                                    00040010
+FONECLI VARCHAR(15)                                                     00050010
+);                                                                      00060010
+                                                                        00070010
+CREATE UNIQUE INDEX IDXCLIENTE                                          00080010
+ON CLIENTE(CODCLI);                                                     00090010
+                                                                        00100010
+ALTER TABLE CLIENTE                                                     00110010
+ADD PRIMARY KEY(CODCLI);                                                00120010
+                                                                        00130010
+-- CRIACAO DA TABELA MOTOBOY                                            00140010
+CREATE TABLE MOTOBOY(                                                   00150010
+CODBOY CHAR(4) NOT NULL,                                                00160010
+NOMEBOY VARCHAR(50),                                                    00170010
+ALCUNHABOY VARCHAR(50)                                                  00180010
+);                                                                      00190010
+                                                                        00191010
+CREATE UNIQUE INDEX IDXMOTOBOY                                          00200010
+ON MOTOBOY(CODBOY);                                                     00210010
+                                                                        00211010
+ALTER TABLE MOTOBOY                                                     00220010
+ADD PRIMARY KEY(CODBOY);                                                00230010
+                                                                        00240010
+-- CRIACAO DA TABELA PRODUTO                                            00250010
+CREATE TABLE PRODUTO(                                                   00260010
+CODPROD CHAR(4) NOT NULL,                                               00270010
+DESCPROD VARCHAR(50),                                                   00280010
+PRECOPROD DECIMAL(10,2)                                                 00290010
+);                                                                      00300010
+                                                                        00301010
+CREATE UNIQUE INDEX IDXPRODUTO                                          00310010
+ON PRODUTO(CODPROD);                                                    00320010
+                                                                        00321010
+ALTER TABLE PRODUTO                                                     00330010
+ADD PRIMARY KEY(CODPROD);                                               00340010
+                                                                        00350010
+-- CRIACAO DA TABELA FORMAPGTO                                          00360010
+CREATE TABLE FORMAPGTO(                                                 00370010
+CODFORMA CHAR(4) NOT NULL,                                              00380010
+DESCFORMA VARCHAR(50)                                                   00390010
+);                                                                      00400010
+                                                                        00410010
+CREATE UNIQUE INDEX IDXFORMAPGTO                                        00420010
+ON FORMAPGTO(CODFORMA);                                                 00430010
+                                                                        00440010
+ALTER TABLE FORMAPGTO                                                   00450010
+ADD PRIMARY KEY(CODFORMA);                                              00460010
+                                                                        00470010
+-- CRIACAO DA TABELA PEDIDO                                             00480010
+CREATE TABLE PEDIDO(                                                    00490010
+NUMPED CHAR(6) NOT NULL,                                                00500010
+DATAPED DATE,                                                           00510010
+CODCLI CHAR(4),                                                         00520010
+CODBOY CHAR(4)                                                          00530010
+);                                                                      00540010
+                                                                        00541010
+CREATE UNIQUE INDEX IDXPEDIDO                                           00550010
+ON PEDIDO(NUMPED);                                                      00560010
+                                                                        00570010
+ALTER TABLE PEDIDO                                                      00580010
+ADD PRIMARY KEY(NUMPED);                                                00590010
+                                                                        00600010
+ALTER TABLE PEDIDO                                                      00610010
+ADD FOREIGN KEY(CODCLI)                                                 00620010
+REFERENCES CLIENTE(CODCLI)                                              00630010
+ON DELETE RESTRICT;                                                     00640010
+                                                                        00650010
+-- CRIACAO DA TABELA ITEM                                               00660010
+CREATE TABLE ITEM(                                                      00670010
+NUMPED CHAR(6) NOT NULL,                                                00680010
+NUMITEM CHAR(4) NOT NULL,                                               00690010
+CODPROD CHAR(4)                                                         00700010
+QTDPROD INTEGER                                                         00710010
+);                                                                      00720010
+                                                                        00730010
+CREATE UNIQUE INDEX IDXITEM                                             00740010
+ON ITEM (NUMPED, NUMITEM);                                              00750010
+                                                                        00760010
+ALTER TABLE ITEM                                                        00770010
+ADD PRIMARY KEY(NUMPED, NUMITEM);                                       00780010
+                                                                        00790010
+ALTER TABLE ITEM                                                        00800010
+ADD FOREIGN KEY(NUMPED)                                                 00810010
+REFERENCES PEDIDO(NUMPED)                                               00820010
+ON DELETE RESTRICT;                                                     00830010
+                                                                        00840010
+ALTER TABLE ITEM                                                        00850010
+ADD FOREIGN KEY(CODPROD)                                                00860010
+REFERENCES PRODUTO(CODPROD)                                             00870010
+ON DELETE RESTRICT;                                                     00880010
+                                                                        00890010
+CREATE TABLE COMPAGTO(                                                  00900010
+NUMPED CHAR(6) NOT NULL,                                                00910010
+CODFORMA CHAR(4) NOT NULL,                                              00920010
+VALORPAGTO DECIMAL(10,2)                                                00930010
+);                                                                      00940010
+                                                                        00950010
+CREATE UNIQUE INDEX IDXCOMPAGTO                                         00960010
+ON COMPAGTO(NUMPED, CODFORMA);                                          00970010
+                                                                        00980010
+ALTER TABLE COMPAGTO                                                    00990010
+ADD PRIMARY KEY(NUMPED, CODFORMA);                                      01000010
+                                                                        01010010
+ALTER TABLE COMPAGTO                                                    01020010
+ADD FOREIGN KEY(NUMPED)                                                 01030010
+REFERENCES PEDIDO(NUMPED)                                               01040010
+ON DELETE RESTRICT;                                                     01050010
+                                                                        01060010
+ALTER TABLE COMPAGTO                                                    01070010
+ADD FOREIGN KEY(CODFORMA)                                               01080010
+REFERENCES FORMAPGTO(CODFORMA)                                          01090010
+ON DELETE RESTRICT;                                                     01100010

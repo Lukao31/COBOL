@@ -1,0 +1,17 @@
+-- COM SUB-QUERY                                                        00000106
+SELECT DESCPROD                                                         00001006
+FROM TBPROD                                                             00002006
+WHERE CODPROD IN (                                                      00003006
+  SELECT CODPROD                                                        00004006
+  FROM TBVENDA                                                          00005006
+  WHERE CODCLI IN (                                                     00006006
+    SELECT CODCLI                                                       00010006
+    FROM TBCLI                                                          00020006
+    WHERE CODTIPOCLI = '04'));                                          00030007
+                                                                        00040006
+-- COM JOIN NATURAL                                                     00041006
+SELECT DESCPROD                                                         00050006
+FROM TBPROD P, TBVENDA V, TBCLI C                                       00060006
+WHERE P.CODPROD = V.CODPROD                                             00070006
+  AND V.CODCLI = C.CODCLI                                               00080006
+  AND C.CODTIPOCLI = '04';                                              00090007

@@ -1,0 +1,16 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - BK074603                                 *00020010
+      * NOME DO BOOK        - BK074603                                  00021010
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - FILE4601                                  00023011
+      * TAMANHO DO REGISTRO - 69 CHARACTERS                            *00024012
+      *----------------------------------------------------------------*00030000
+       01  REG-FILE4601.                                                00040011
+           05 BK074610-CPF                 PIC X(11).                   00050011
+           05 BK074610-NOME                PIC X(30).                   00060011
+           05 BK074610-DDD                 PIC X(02).                   00070011
+           05 BK074610-TELEFONE            PIC X(11).                   00080011
+           05 BK074610-SALARIOBASE         PIC S9(08)V99 COMP-3.        00090011
+           05 BK074610-INSS                PIC S9(04)V99 COMP-3.        00100011
+           05 BK074610-IRRF                PIC S9(04)V99 COMP-3.        00110011
+           05 BK074610-DEPENDENTE          PIC 9(1).                    00120011

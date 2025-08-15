@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - PRODMOV                                  *00020012
+      * NOME DO BOOK        - PRODMOV                                   00021012
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - PRODMOV                                   00023012
+      * TAMANHO DO REGISTRO - 37 CHARACTERS                            *00024012
+      *----------------------------------------------------------------*00030000
+           05 CODPROD-MOV                  PIC X(04).                   00041013
+           05 DESCPROD-MOV                 PIC X(20).                   00042015
+           05 DATAMOVTO-MOV                PIC X(08).                   00043013
+           05 TIPOMOVIMENTO-MOV            PIC X(01).                   00044013
+           05 QTDMOVIMENTO-MOV             PIC 9(04).                   00045013

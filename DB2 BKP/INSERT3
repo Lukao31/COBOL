@@ -1,0 +1,51 @@
+-- DELETE FROM TBCLI;                                                   00001008
+-- COMMIT;                                                              00002008
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00010000
+                  ALTURACLI,CODTIPOCLI)                                 00020000
+VALUES ('01', 'RICO LEWIS DA SILVA', 'AV. FLORES, 123',                 00030006
+               '12/02/2004', 1.78, '01');                               00040004
+                                                                        00050000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00060000
+                   ALTURACLI,CODTIPOCLI)                                00070000
+VALUES ('02', 'PETER QUILL SANTOS', 'AVENIDA DOS ESTADOS, 456',         00080006
+               '02/03/2002', 1.92, '01');                               00090004
+                                                                        00100000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00110000
+                   ALTURACLI,CODTIPOCLI)                                00120000
+VALUES ('03', 'RACHEL NORMAN FIGUEIRA', 'RUA DO COMERCIO, 789',         00130006
+                '05/09/2002', 1.85, '02');                              00140004
+                                                                        00141000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00150000
+                   ALTURACLI,CODTIPOCLI)                                00160000
+VALUES ('04', 'LUKE GALLOWS PEREIRA', 'RUA DAS LARANJEIRAS, 901',       00170000
+                '04/12/2003', 1.80, '02');                              00180004
+                                                                        00190000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00200000
+                   ALTURACLI,CODTIPOCLI)                                00210000
+VALUES ('05', 'RODRIGO GARRO SILVA', 'PARQUE SAO JORGE, 1910',          00220006
+                '01/06/1999', 1.74, '03');                              00230004
+                                                                        00240000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00250000
+                   ALTURACLI,CODTIPOCLI)                                00260000
+VALUES ('06', 'ROMERO SILVESTRE', 'PARQUE SAO LUIS, 110',               00270006
+                '07/08/2000', 1.72, '03');                              00280004
+                                                                        00290000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00300000
+                   ALTURACLI,CODTIPOCLI)                                00310000
+VALUES ('07', 'LIEDSON GONCALVES', 'AVENIDA PAULISTA, 2450',            00320006
+                '07/05/1993', 1.65, '04');                              00330004
+                                                                        00340000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00350000
+                   ALTURACLI,CODTIPOCLI)                                00360000
+VALUES ('08', 'YURI ALBERTO NUNES', 'RUA ESPANHA, 082',                 00370006
+                '11/04/2001', 1.78, '04');                              00380004
+                                                                        00390000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00400000
+                   ALTURACLI,CODTIPOCLI)                                00410000
+VALUES ('09', 'MARTA DA SILVA', 'RUA FINLANDIA, 12',                    00420006
+                '01/11/1998', 1.60, '05');                              00430004
+                                                                        00440000
+INSERT INTO TBCLI(CODCLI,NOMECLI,ENDCLI,DATANASCCLI,                    00450000
+                   ALTURACLI,CODTIPOCLI)                                00460000
+VALUES ('10', 'LETICIA ALVES', 'RUA JOHNSONS BABY, 67',                 00470006
+                '01/11/2006', 1.55, '05');                              00480004

@@ -1,0 +1,17 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - COPYBOOK EXTRATO 2024                    *00020006
+      * NOME DO BOOK        - EXTTORD                                  *00021004
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022003
+      * NOME DO ARQUIVO     - EXTTDO24                                 *00023006
+      * TAMANHO DO REGISTRO - 44 CHARACTERS                            *00024004
+      *----------------------------------------------------------------*00030000
+       01  ::REG-EXTTDO24.                                              00040006
+           05 ::CPF24                     PIC X(11).                    00050011
+           05 ::NOME24                    PIC X(15).                    00051013
+           05 ::DATA24.                                                 00060010
+              10 ::DIA24                  PIC X(02).                    00070012
+              10 FILLER                   PIC X(01).                    00080012
+              10 ::MES24                  PIC X(02).                    00090012
+              10 FILLER                   PIC X(01).                    00100012
+              10 ::ANO24                  PIC X(04).                    00110012
+           05 ::SALDO24                   PIC S9(11)V99 COMP-3.         00120014

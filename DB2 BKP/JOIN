@@ -1,0 +1,4 @@
+ SELECT CODCLISP,CODCLIRJ, NOMECLIRJ, SALDOCLIRJ                        00010005
+ FROM TBCLISP  LEFT JOIN TBCLIRJ                                        00020005
+  ON CODCLISP = CODCLIRJ                                                00030005
+ WHERE CODCLIRJ IS NULL                                                 00040005

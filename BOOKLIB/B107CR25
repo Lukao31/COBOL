@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - B107CR25                                 *00020012
+      * NOME DO BOOK        - B107CR25                                  00021012
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - B107CR25                                  00023012
+      * TAMANHO DO REGISTRO - 44 CHARACTERS                            *00024007
+      *----------------------------------------------------------------*00030000
+       01  REG-EXTTCR25.                                                00040012
+           05 B107CR25-CPF                 PIC X(11).                   00050012
+           05 B107CR25-NOME                PIC X(16).                   00060012
+           05 B107CR25-DATA                PIC X(10).                   00070012
+           05 B107CR25-SALDO               PIC S9(11)V99 COMP-3.        00080012

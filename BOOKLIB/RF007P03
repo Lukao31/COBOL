@@ -1,0 +1,241 @@
+      *--------------------------------------------------------------*  00010004
+       IDENTIFICATION                      DIVISION.                    00020004
+      *--------------------------------------------------------------*  00030004
+       PROGRAM-ID.                         RF007P3.                     00040008
+       AUTHOR.                             LUCAS.                       00050008
+      *                                                                 00060004
+      *--------------------------------------------------------------*  00070004
+       ENVIRONMENT                         DIVISION.                    00080004
+      *--------------------------------------------------------------*  00090004
+       CONFIGURATION                       SECTION.                     00100004
+       SPECIAL-NAMES.                                                   00110004
+           DECIMAL-POINT IS COMMA.                                      00120004
+      *
+       INPUT-OUTPUT                        SECTION.                     00100004
+      *
+       FILE-CONTROL.
+           SELECT CLIENTES ASSIGN TO UT-S-CLIENTES
+           FILE STATUS IS FS-CLIENTES
+           .
+           SELECT DEVEDOR ASSIGN TO UT-S-DEVEDOR
+           FILE STATUS IS FS-DEVEDOR
+           .
+           SELECT ATIVO ASSIGN TO UT-S-ATIVO
+           FILE STATUS IS FS-ATIVO
+           .
+      *--------------------------------------------------------------*  00130004
+       DATA                                DIVISION.                    00140004
+      *--------------------------------------------------------------*  00150004
+       FILE                                SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+       FD  CLIENTES
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 46 CHARACTERS
+           DATA RECORD IS REG-CLIENTES
+           .
+           COPY CLIENTES.
+      *
+       FD  DEVEDOR
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 46 CHARACTERS
+           DATA RECORD IS REG-DEVEDOR
+           .
+           COPY DEVEDOR.
+      *
+       FD  ATIVO
+           LABEL RECORD IS STANDARD
+           BLOCK CONTAINS 0 RECORDS
+           RECORDING MODE IS F
+           RECORD CONTAINS 46 CHARACTERS
+           DATA RECORD IS REG-ATIVO
+           .
+          COPY ATIVO.
+      *--------------------------------------------------------------*  00210008
+       WORKING-STORAGE                     SECTION.                     00160004
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS DE FILE STATUS                                     *
+      *--------------------------------------------------------------*  00210008
+       77  FS-CLIENTES                     PIC X(02).                   00210108
+       77  FS-DEVEDOR                      PIC X(02).                   00210108
+       77  FS-ATIVO                        PIC X(02).
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS DE TRABALHO                                        *
+      *--------------------------------------------------------------*  00210008
+       77  WS-MSG                          PIC X(60).                   00210208
+       77  WS-FS                           PIC X(02).                   00210308
+      *
+       77  WS-CTLIDO                       PIC 9(04) COMP.              00210308
+       77  WS-CTGRAV-D                     PIC 9(04) COMP.              00210308
+       77  WS-CTGRAV-A                     PIC 9(04) COMP.
+      *
+       77  WS-DIFERENCA                    PIC 9(03)V99 COMP.
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS COM MASCARA DE EDICAO (FORMATADAS)                 *
+      *--------------------------------------------------------------*  00210008
+       77  WS-CTLIDO-F                     PIC ZZZ9.                    00210308
+       77  WS-CTGRAV-F-D                   PIC ZZZ9.                    00210308
+       77  WS-CTGRAV-F-A                   PIC ZZZ9.
+      *--------------------------------------------------------------*  00210008
+      * VARIAVEIS DE MENSAGENS                                      *
+      *--------------------------------------------------------------*  00210008
+       77  WS-MSG01                        PIC X(60)
+                                                   VALUE
+           'ERRO ABERTURA CLIENTES'.
+       77  WS-MSG02                        PIC X(60)
+                                                   VALUE
+           'ERRO ABERTURA DEVEDOR'.
+       77  WS-MSG03                        PIC X(60)
+                                                   VALUE
+           'ERRO ABERTURA ATIVO'.
+       77  WS-MSG04                        PIC X(60)
+                                                   VALUE
+           'ERRO LEITURA CLIENTES'.
+       77  WS-MSG05                        PIC X(60)
+                                                   VALUE
+           'ERRO GRAVACAO DEVEDOR'.
+       77  WS-MSG06                        PIC X(60)
+                                                   VALUE
+           'ERRO GRAVACAO ATIVO'.
+       77  WS-MSG07                        PIC X(60)
+                                                   VALUE
+           'ERRO FECHAMENTO CLIENTES'.
+       77  WS-MSG08                        PIC X(60)
+                                                   VALUE
+           'ERRO FECHAMENTO DEVEDOR'.
+       77  WS-MSG09                        PIC X(60)
+                                                   VALUE
+           'ERRO FECHAMENTO ATIVO'.
+      *--------------------------------------------------------------*  00211007
+      *--------------------------------------------------------------*  00211007
+       PROCEDURE                           DIVISION.                    00220004
+      *--------------------------------------------------------------*  00230004
+       0000-RF007P03.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-PROCESSAR
+           PERFORM 3000-TERMINO
+           GOBACK
+           .
+      *
+       1000-INICIALIZAR.
+           MOVE ZEROS                      TO WS-CTLIDO
+                                              WS-CTGRAV-D
+                                              WS-CTGRAV-A
+           OPEN INPUT CLIENTES
+      *
+           IF FS-CLIENTES NOT = '00'
+              MOVE WS-MSG01                TO WS-MSG
+              MOVE FS-CLIENTES             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT DEVEDOR
+      *
+           IF FS-DEVEDOR NOT = '00'
+              MOVE WS-MSG02                TO WS-MSG
+              MOVE FS-DEVEDOR              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           OPEN OUTPUT ATIVO
+      *
+           IF FS-DEVEDOR NOT = '00'
+              MOVE WS-MSG03                TO WS-MSG
+              MOVE FS-DEVEDOR              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+           PERFORM 1500-LER-CLIENTES
+           .
+      *
+       1500-LER-CLIENTES.
+           READ CLIENTES
+      *
+           IF FS-CLIENTES = '00'
+              ADD 1 TO WS-CTLIDO
+           ELSE
+              IF FS-CLIENTES NOT = '10'
+                 MOVE WS-MSG04             TO WS-MSG
+                 MOVE FS-CLIENTES          TO WS-FS
+                 GO TO 9000-ERRO
+              END-IF
+           END-IF
+           .
+      *
+       2000-PROCESSAR.
+           PERFORM 1500-LER-CLIENTES
+           PERFORM 2100-GRAVAR-DEVEDOR
+           PERFORM 2200-GRAVAR-ATIVO
+           .
+      *
+       2100-GRAVAR-DEVEDOR.
+           IF REG-CLIENTES < 0
+              WRITE REG-DEVEDOR
+           END-IF
+           MOVE REG-CLIENTES               TO REG-DEVEDOR
+      *
+           IF FS-DEVEDOR NOT = '00'
+              MOVE WS-MSG05                TO WS-MSG
+              MOVE FS-DEVEDOR              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+
+           ADD 1                           TO WS-CTGRAV-D
+           .
+       2200-GRAVAR-ATIVO.
+           IF REG-CLIENTES >= 0
+           COMPUTE SALDO = SALDO + 50
+           MOVE REG-CLIENTES               TO REG-ATIVO
+              WRITE REG-ATIVO
+      *
+           IF FS-ATIVO NOT = '00'
+              MOVE WS-MSG06                TO WS-MSG
+              MOVE FS-ATIVO                TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+
+           ADD 1                           TO WS-CTGRAV-A
+           .
+      *
+       3000-TERMINO.
+           MOVE WS-CTLIDO                  TO WS-CTLIDO-F
+           MOVE WS-CTGRAV-D                TO WS-CTGRAV-F-D
+           MOVE WS-CTGRAV-A                TO WS-CTGRAV-F-A
+      *
+           DISPLAY '=================================================='
+           DISPLAY 'TOTAL DE EQUIPES LIDAS........: ' WS-CTLIDO-F
+           DISPLAY 'TOTAL DE EQUIPES GRAVADAS.....: ' WS-CTGRAV-F-A
+           DISPLAY '=================================================='
+      *
+           CLOSE CLIENTES
+      *
+           IF FS-CLIENTES NOT = '00'
+              MOVE WS-MSG07                TO WS-MSG
+              MOVE FS-CLIENTES             TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE DEVEDOR
+      *
+           IF FS-DEVEDOR NOT = '00'
+              MOVE WS-MSG08                TO WS-MSG
+              MOVE FS-DEVEDOR              TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           CLOSE ATIVO
+      *
+           IF FS-ATIVO NOT = '00'
+              MOVE WS-MSG09                TO WS-MSG
+              MOVE FS-ATIVO                TO WS-FS
+              GO TO 9000-ERRO
+           END-IF
+      *
+           DISPLAY '=================================================='
+           DISPLAY '             TERMINO NORMAL REF012P2              '
+           DISPLAY '=================================================='
+           .
+      *
+           COPY ROTERRO.

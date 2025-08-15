@@ -1,0 +1,124 @@
+       01  MAPALOGI.
+           02  FILLER PIC X(12).
+           02  USERLOGL    COMP  PIC  S9(4).
+           02  USERLOGF    PICTURE X.
+           02  FILLER REDEFINES USERLOGF.
+             03 USERLOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  USERLOGI  PIC X(20).
+           02  SENHALOGL    COMP  PIC  S9(4).
+           02  SENHALOGF    PICTURE X.
+           02  FILLER REDEFINES SENHALOGF.
+             03 SENHALOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  SENHALOGI  PIC X(20).
+           02  MSGLOGL    COMP  PIC  S9(4).
+           02  MSGLOGF    PICTURE X.
+           02  FILLER REDEFINES MSGLOGF.
+             03 MSGLOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MSGLOGI  PIC X(60).
+           02  DIADATL    COMP  PIC  S9(4).
+           02  DIADATF    PICTURE X.
+           02  FILLER REDEFINES DIADATF.
+             03 DIADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIADATI  PIC X(2).
+           02  MESDATL    COMP  PIC  S9(4).
+           02  MESDATF    PICTURE X.
+           02  FILLER REDEFINES MESDATF.
+             03 MESDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MESDATI  PIC X(2).
+           02  ANODATL    COMP  PIC  S9(4).
+           02  ANODATF    PICTURE X.
+           02  FILLER REDEFINES ANODATF.
+             03 ANODATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANODATI  PIC X(4).
+           02  HORADATL    COMP  PIC  S9(4).
+           02  HORADATF    PICTURE X.
+           02  FILLER REDEFINES HORADATF.
+             03 HORADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  HORADATI  PIC X(2).
+           02  MINDATL    COMP  PIC  S9(4).
+           02  MINDATF    PICTURE X.
+           02  FILLER REDEFINES MINDATF.
+             03 MINDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MINDATI  PIC X(2).
+           02  FASELOGL    COMP  PIC  S9(4).
+           02  FASELOGF    PICTURE X.
+           02  FILLER REDEFINES FASELOGF.
+             03 FASELOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  FASELOGI  PIC X(2).
+           02  TASKLOGL    COMP  PIC  S9(4).
+           02  TASKLOGF    PICTURE X.
+           02  FILLER REDEFINES TASKLOGF.
+             03 TASKLOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TASKLOGI  PIC X(6).
+           02  TERMLOGL    COMP  PIC  S9(4).
+           02  TERMLOGF    PICTURE X.
+           02  FILLER REDEFINES TERMLOGF.
+             03 TERMLOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TERMLOGI  PIC X(4).
+           02  TRANSLOGL    COMP  PIC  S9(4).
+           02  TRANSLOGF    PICTURE X.
+           02  FILLER REDEFINES TRANSLOGF.
+             03 TRANSLOGA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TRANSLOGI  PIC X(4).
+       01  MAPALOGO REDEFINES MAPALOGI.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  USERLOGC    PICTURE X.
+           02  USERLOGH    PICTURE X.
+           02  USERLOGO  PIC X(20).
+           02  FILLER PICTURE X(3).
+           02  SENHALOGC    PICTURE X.
+           02  SENHALOGH    PICTURE X.
+           02  SENHALOGO  PIC X(20).
+           02  FILLER PICTURE X(3).
+           02  MSGLOGC    PICTURE X.
+           02  MSGLOGH    PICTURE X.
+           02  MSGLOGO PIC X(60).
+           02  FILLER PICTURE X(3).
+           02  DIADATC    PICTURE X.
+           02  DIADATH    PICTURE X.
+           02  DIADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MESDATC    PICTURE X.
+           02  MESDATH    PICTURE X.
+           02  MESDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  ANODATC    PICTURE X.
+           02  ANODATH    PICTURE X.
+           02  ANODATO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  HORADATC    PICTURE X.
+           02  HORADATH    PICTURE X.
+           02  HORADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MINDATC    PICTURE X.
+           02  MINDATH    PICTURE X.
+           02  MINDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  FASELOGC    PICTURE X.
+           02  FASELOGH    PICTURE X.
+           02  FASELOGO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  TASKLOGC    PICTURE X.
+           02  TASKLOGH    PICTURE X.
+           02  TASKLOGO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  TERMLOGC    PICTURE X.
+           02  TERMLOGH    PICTURE X.
+           02  TERMLOGO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  TRANSLOGC    PICTURE X.
+           02  TRANSLOGH    PICTURE X.
+           02  TRANSLOGO PIC 9(04).

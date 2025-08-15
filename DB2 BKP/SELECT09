@@ -1,0 +1,3 @@
+SELECT *                                                                00010003
+FROM TBCLI                                                              00020000
+WHERE CODTIPOCLI = '03' AND ALTURACLI > 1.70 ORDER BY NOMECLI DESC      00030004

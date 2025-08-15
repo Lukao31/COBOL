@@ -1,0 +1,6 @@
+-- CRIACAO DA CHAVE PRIMARIA TBCLI                                      00010000
+   ALTER TABLE TBCLI                                                    00020000
+   ADD PRIMARY KEY (CODCLI)                                             00030000
+-- EXCLUSAO DA PRIMARY KEY                                              00040000
+-- ALTER TABLE TBCLI                                                    00050000
+-- DROP PRIMARY KEY                                                     00060000

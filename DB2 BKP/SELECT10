@@ -1,0 +1,3 @@
+SELECT COUNT(*)                                                         00010001
+FROM TBVENDA                                                            00020000
+WHERE CODCLI = '01'                                                     00030000

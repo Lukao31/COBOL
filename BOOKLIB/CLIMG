@@ -1,0 +1,14 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - CLIENTES DE MINAS GERAIS                 *00020003
+      * NOME DO BOOK        - CLIMG                                    *00021003
+      * NOME DO PDS         - FS.FSYS012.BOOKLIB                       *00022001
+      * NOME DO ARQUIVO     - CLIMG                                    *00023003
+      * TAMANHO DO REGISTRO - 94 CHARACTERS                            *00024002
+      *----------------------------------------------------------------*00030000
+       01  ::REG-CLIMG.                                                 00040003
+           05 ::CPFCLI-MG                  PIC X(11).                   00050003
+           05 ::NOMECLI-MG                 PIC X(25).                   00060003
+           05 ::ENDCLI-MG                  PIC X(30).                   00070003
+           05 ::FONECLI-MG                 PIC X(10).                   00080003
+           05 ::TOTALCOMPRAS-MG            PIC 9(08)V99.                00090003
+           05 ::ULTIMACOMPRA-MG            PIC X(08).                   00100003

@@ -1,0 +1,134 @@
+       01  MAPAENTI.
+           02  FILLER PIC X(12).
+           02  CARENTL    COMP  PIC  S9(4).
+           02  CARENTF    PICTURE X.
+           02  FILLER REDEFINES CARENTF.
+             03 CARENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  CARENTI  PIC X(6).
+           02  ENDENTL    COMP  PIC  S9(4).
+           02  ENDENTF    PICTURE X.
+           02  FILLER REDEFINES ENDENTF.
+             03 ENDENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ENDENTI  PIC X(40).
+           02  CONENTL    COMP  PIC  S9(4).
+           02  CONENTF    PICTURE X.
+           02  FILLER REDEFINES CONENTF.
+             03 CONENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  CONENTI  PIC X(40).
+           02  MSGENTL    COMP  PIC  S9(4).
+           02  MSGENTF    PICTURE X.
+           02  FILLER REDEFINES MSGENTF.
+             03 MSGENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MSGENTI  PIC X(60).
+           02  DIADATL    COMP  PIC  S9(4).
+           02  DIADATF    PICTURE X.
+           02  FILLER REDEFINES DIADATF.
+             03 DIADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIADATI  PIC X(2).
+           02  MESDATL    COMP  PIC  S9(4).
+           02  MESDATF    PICTURE X.
+           02  FILLER REDEFINES MESDATF.
+             03 MESDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MESDATI  PIC X(2).
+           02  ANODATL    COMP  PIC  S9(4).
+           02  ANODATF    PICTURE X.
+           02  FILLER REDEFINES ANODATF.
+             03 ANODATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANODATI  PIC X(4).
+           02  HORADATL    COMP  PIC  S9(4).
+           02  HORADATF    PICTURE X.
+           02  FILLER REDEFINES HORADATF.
+             03 HORADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  HORADATI  PIC X(2).
+           02  MINDATL    COMP  PIC  S9(4).
+           02  MINDATF    PICTURE X.
+           02  FILLER REDEFINES MINDATF.
+             03 MINDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MINDATI  PIC X(2).
+           02  FASEENTL    COMP  PIC  S9(4).
+           02  FASEENTF    PICTURE X.
+           02  FILLER REDEFINES FASEENTF.
+             03 FASEENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  FASEENTI  PIC X(2).
+           02  TASKENTL    COMP  PIC  S9(4).
+           02  TASKENTF    PICTURE X.
+           02  FILLER REDEFINES TASKENTF.
+             03 TASKENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TASKENTI  PIC X(6).
+           02  TERMENTL    COMP  PIC  S9(4).
+           02  TERMENTF    PICTURE X.
+           02  FILLER REDEFINES TERMENTF.
+             03 TERMENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TERMENTI  PIC X(4).
+           02  TRANSENTL    COMP  PIC  S9(4).
+           02  TRANSENTF    PICTURE X.
+           02  FILLER REDEFINES TRANSENTF.
+             03 TRANSENTA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TRANSENTI  PIC X(4).
+       01  MAPAENTO REDEFINES MAPAENTI.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  CARENTC    PICTURE X.
+           02  CARENTH    PICTURE X.
+           02  CARENTO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  ENDENTC    PICTURE X.
+           02  ENDENTH    PICTURE X.
+           02  ENDENTO  PIC X(40).
+           02  FILLER PICTURE X(3).
+           02  CONENTC    PICTURE X.
+           02  CONENTH    PICTURE X.
+           02  CONENTO  PIC X(40).
+           02  FILLER PICTURE X(3).
+           02  MSGENTC    PICTURE X.
+           02  MSGENTH    PICTURE X.
+           02  MSGENTO PIC X(60).
+           02  FILLER PICTURE X(3).
+           02  DIADATC    PICTURE X.
+           02  DIADATH    PICTURE X.
+           02  DIADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MESDATC    PICTURE X.
+           02  MESDATH    PICTURE X.
+           02  MESDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  ANODATC    PICTURE X.
+           02  ANODATH    PICTURE X.
+           02  ANODATO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  HORADATC    PICTURE X.
+           02  HORADATH    PICTURE X.
+           02  HORADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MINDATC    PICTURE X.
+           02  MINDATH    PICTURE X.
+           02  MINDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  FASEENTC    PICTURE X.
+           02  FASEENTH    PICTURE X.
+           02  FASEENTO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  TASKENTC    PICTURE X.
+           02  TASKENTH    PICTURE X.
+           02  TASKENTO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  TERMENTC    PICTURE X.
+           02  TERMENTH    PICTURE X.
+           02  TERMENTO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  TRANSENTC    PICTURE X.
+           02  TRANSENTH    PICTURE X.
+           02  TRANSENTO PIC 9(04).

@@ -1,0 +1,10 @@
+INSERT INTO TBTIPOCLI(CODTIPOCLI, DESCTIPOCLI)                          00010000
+VALUES ('01', 'V.I.P');                                                 00020000
+INSERT INTO TBTIPOCLI(CODTIPOCLI, DESCTIPOCLI)                          00030000
+VALUES ('02', 'GOLD');                                                  00040000
+INSERT INTO TBTIPOCLI(CODTIPOCLI, DESCTIPOCLI)                          00050000
+VALUES ('03', 'SILVER');                                                00060000
+INSERT INTO TBTIPOCLI(CODTIPOCLI, DESCTIPOCLI)                          00070000
+VALUES ('04', 'BRONZE');                                                00080000
+INSERT INTO TBTIPOCLI(CODTIPOCLI, DESCTIPOCLI)                          00090000
+VALUES ('05', 'UNIVERSITARIO');                                         00100000

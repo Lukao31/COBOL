@@ -1,0 +1,18 @@
+-- DROP TABLE TBCLIENT;
+-- COMMIT;
+   DELETE FROM TBCLIENT;
+   COMMIT;
+-- SELECT * FROM FSYS007.TBCLIENT;
+
+-- CREATE TABLE TBCLIENT
+-- ( CODCLI                         CHAR(4) NOT NULL,
+--   NOMECLI                        VARCHAR(30) NOT NULL,
+--   ENDCLI                         VARCHAR(40),
+--   FONECLI                        CHAR(9),
+--   EMAILCLI                       VARCHAR(50),
+--   CPFCLI                         CHAR(11),
+--   SALDOCLI                       DECIMAL(9, 2));
+-- CREATE UNIQUE INDEX IDXCODCLI
+-- ON TBCLIENT(CODCLI);
+-- ALTER TABLE TBCLIENT
+-- ADD PRIMARY KEY(CODCLI);

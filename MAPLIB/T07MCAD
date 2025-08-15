@@ -1,0 +1,184 @@
+       01  MAPACADI.
+           02  FILLER PIC X(12).
+           02  NOMECADL    COMP  PIC  S9(4).
+           02  NOMECADF    PICTURE X.
+           02  FILLER REDEFINES NOMECADF.
+             03 NOMECADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  NOMECADI  PIC X(30).
+           02  DIACADL    COMP  PIC  S9(4).
+           02  DIACADF    PICTURE X.
+           02  FILLER REDEFINES DIACADF.
+             03 DIACADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIACADI  PIC 9(02).
+           02  MESCADL    COMP  PIC  S9(4).
+           02  MESCADF    PICTURE X.
+           02  FILLER REDEFINES MESCADF.
+             03 MESCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MESCADI  PIC 9(02).
+           02  ANOCADL    COMP  PIC  S9(4).
+           02  ANOCADF    PICTURE X.
+           02  FILLER REDEFINES ANOCADF.
+             03 ANOCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANOCADI  PIC 9(04).
+           02  CPFCADL    COMP  PIC  S9(4).
+           02  CPFCADF    PICTURE X.
+           02  FILLER REDEFINES CPFCADF.
+             03 CPFCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  CPFCADI  PIC 9(11).
+           02  USERCADL    COMP  PIC  S9(4).
+           02  USERCADF    PICTURE X.
+           02  FILLER REDEFINES USERCADF.
+             03 USERCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  USERCADI  PIC X(20).
+           02  EMAILCADL    COMP  PIC  S9(4).
+           02  EMAILCADF    PICTURE X.
+           02  FILLER REDEFINES EMAILCADF.
+             03 EMAILCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  EMAILCADI  PIC X(30).
+           02  SENHACADL    COMP  PIC  S9(4).
+           02  SENHACADF    PICTURE X.
+           02  FILLER REDEFINES SENHACADF.
+             03 SENHACADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  SENHACADI  PIC X(20).
+           02  MSGCADL    COMP  PIC  S9(4).
+           02  MSGCADF    PICTURE X.
+           02  FILLER REDEFINES MSGCADF.
+             03 MSGCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MSGCADI  PIC X(60).
+           02  DIADATL    COMP  PIC  S9(4).
+           02  DIADATF    PICTURE X.
+           02  FILLER REDEFINES DIADATF.
+             03 DIADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIADATI  PIC X(2).
+           02  MESDATL    COMP  PIC  S9(4).
+           02  MESDATF    PICTURE X.
+           02  FILLER REDEFINES MESDATF.
+             03 MESDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MESDATI  PIC X(2).
+           02  ANODATL    COMP  PIC  S9(4).
+           02  ANODATF    PICTURE X.
+           02  FILLER REDEFINES ANODATF.
+             03 ANODATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANODATI  PIC X(4).
+           02  HORADATL    COMP  PIC  S9(4).
+           02  HORADATF    PICTURE X.
+           02  FILLER REDEFINES HORADATF.
+             03 HORADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  HORADATI  PIC X(2).
+           02  MINDATL    COMP  PIC  S9(4).
+           02  MINDATF    PICTURE X.
+           02  FILLER REDEFINES MINDATF.
+             03 MINDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MINDATI  PIC X(2).
+           02  FASECADL    COMP  PIC  S9(4).
+           02  FASECADF    PICTURE X.
+           02  FILLER REDEFINES FASECADF.
+             03 FASECADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  FASECADI  PIC X(2).
+           02  TASKCADL    COMP  PIC  S9(4).
+           02  TASKCADF    PICTURE X.
+           02  FILLER REDEFINES TASKCADF.
+             03 TASKCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TASKCADI  PIC X(6).
+           02  TERMCADL    COMP  PIC  S9(4).
+           02  TERMCADF    PICTURE X.
+           02  FILLER REDEFINES TERMCADF.
+             03 TERMCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TERMCADI  PIC X(4).
+           02  TRANSCADL    COMP  PIC  S9(4).
+           02  TRANSCADF    PICTURE X.
+           02  FILLER REDEFINES TRANSCADF.
+             03 TRANSCADA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TRANSCADI  PIC X(4).
+       01  MAPACADO REDEFINES MAPACADI.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  NOMECADC    PICTURE X.
+           02  NOMECADH    PICTURE X.
+           02  NOMECADO  PIC X(30).
+           02  FILLER PICTURE X(3).
+           02  DIACADC    PICTURE X.
+           02  DIACADH    PICTURE X.
+           02  DIACADO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  MESCADC    PICTURE X.
+           02  MESCADH    PICTURE X.
+           02  MESCADO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  ANOCADC    PICTURE X.
+           02  ANOCADH    PICTURE X.
+           02  ANOCADO  PIC X(4).
+           02  FILLER PICTURE X(3).
+           02  CPFCADC    PICTURE X.
+           02  CPFCADH    PICTURE X.
+           02  CPFCADO  PIC X(11).
+           02  FILLER PICTURE X(3).
+           02  USERCADC    PICTURE X.
+           02  USERCADH    PICTURE X.
+           02  USERCADO  PIC X(20).
+           02  FILLER PICTURE X(3).
+           02  EMAILCADC    PICTURE X.
+           02  EMAILCADH    PICTURE X.
+           02  EMAILCADO  PIC X(30).
+           02  FILLER PICTURE X(3).
+           02  SENHACADC    PICTURE X.
+           02  SENHACADH    PICTURE X.
+           02  SENHACADO  PIC X(20).
+           02  FILLER PICTURE X(3).
+           02  MSGCADC    PICTURE X.
+           02  MSGCADH    PICTURE X.
+           02  MSGCADO PIC X(60).
+           02  FILLER PICTURE X(3).
+           02  DIADATC    PICTURE X.
+           02  DIADATH    PICTURE X.
+           02  DIADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MESDATC    PICTURE X.
+           02  MESDATH    PICTURE X.
+           02  MESDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  ANODATC    PICTURE X.
+           02  ANODATH    PICTURE X.
+           02  ANODATO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  HORADATC    PICTURE X.
+           02  HORADATH    PICTURE X.
+           02  HORADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MINDATC    PICTURE X.
+           02  MINDATH    PICTURE X.
+           02  MINDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  FASECADC    PICTURE X.
+           02  FASECADH    PICTURE X.
+           02  FASECADO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  TASKCADC    PICTURE X.
+           02  TASKCADH    PICTURE X.
+           02  TASKCADO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  TERMCADC    PICTURE X.
+           02  TERMCADH    PICTURE X.
+           02  TERMCADO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  TRANSCADC    PICTURE X.
+           02  TRANSCADH    PICTURE X.
+           02  TRANSCADO PIC 9(04).

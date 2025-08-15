@@ -1,0 +1,7 @@
+SELECT NOMECLI,DESCTIPOCLI                                              00010000
+FROM TBCLI C, TBTIPOCLI T                                               00020001
+WHERE C.CODTIPOCLI = T.CODTIPOCLI;                                      00030001
+                                                                        00040002
+SELECT NOMECLI, DESCTIPOCLI                                             00050002
+FROM TBCLI C INNER JOIN TBTIPOCLI T                                     00060002
+  ON C.CODTIPOCLI = T.CODTIPOCLI;                                       00070002

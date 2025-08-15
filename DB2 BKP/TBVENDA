@@ -1,0 +1,26 @@
+      ******************************************************************
+      * DCLGEN TABLE(TBVENDA)                                          *
+      *        LIBRARY(FS.FSYS007.DB2BKP(TBVENDA))                     *
+      *        LANGUAGE(COBOL)                                         *
+      *        QUOTE                                                   *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE TBVENDA TABLE
+           ( NUMVENDA                       CHAR(6) NOT NULL,
+             DATAHORAVENDA                  TIMESTAMP,
+             QTDEVENDA                      SMALLINT,
+             CODCLI                         CHAR(4) NOT NULL,
+             CODPROD                        CHAR(4) NOT NULL
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE TBVENDA                            *
+      ******************************************************************
+       01  DCLTBVENDA.
+           10 NUMVENDA             PIC X(6).
+           10 DATAHORAVENDA        PIC X(26).
+           10 QTDEVENDA            PIC S9(4) USAGE COMP.
+           10 CODCLI               PIC X(4).
+           10 CODPROD              PIC X(4).
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 5       *
+      ******************************************************************

@@ -1,0 +1,22 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - FUNIONARIOS TRABALHO                     *00020004
+      * NOME DO BOOK        - FUNCTRAB                                 *00021004
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022007
+      * NOME DO ARQUIVO     - FUNCTRAB                                 *00023004
+      * TAMANHO DO REGISTRO - 42 CHARACTERS                            *00024004
+      *----------------------------------------------------------------*00030000
+       01  WS-REG-FUNCTRAB.                                             00040007
+           05 WS-CODFUNC                   PIC 9(05).                   00050006
+           05 WS-NOMEFUNC                  PIC X(30).                   00060006
+           05 WS-QTDHORASFUNC              PIC 9(05) COMP-3.            00070006
+           05 WS-SALHORAFUNC               PIC 9(05)V99 COMP-3.         00080006
+                                                                        00090006
+                                                                        00100006
+                                                                        00110006
+                                                                        00120006
+                                                                        00130006
+                                                                        00140006
+                                                                        00150006
+                                                                        00160006
+                                                                        00170006
+                                                                        00180006

@@ -1,0 +1,55 @@
+      ******************************************************************
+      * DCLGEN TABLE(PRODUTOS)                                         *
+      *        LIBRARY(FS.FSYS007.DB2LIB(PRODUTOS))                    *
+      *        ACTION(REPLACE)                                         *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(DCLPRD-)                                          *
+      *        STRUCTURE(DCLPRD)                                       *
+      *        QUOTE                                                   *
+      *        DBCSDELIM(NO)                                           *
+      *        COLSUFFIX(YES)                                          *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE PRODUTOS TABLE
+           ( ID_PRODUTO                     INTEGER NOT NULL,
+             NOME_PRODUTO                   VARCHAR(25) NOT NULL,
+             DESCRICAO                      CHAR(255) NOT NULL,
+             VENDIDO_POR                    VARCHAR(20) NOT NULL,
+             DATA_CADASTRO                  DATE NOT NULL,
+             QUANTIDADE_ESTOQUE             INTEGER NOT NULL,
+             VALOR_UNITARIO                 DECIMAL(7, 2)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE PRODUTOS                           *
+      ******************************************************************
+       01  DCLPRD.
+      *                       ID_PRODUTO
+           10 DCLPRD-ID-PRODUTO    PIC S9(9) USAGE COMP.
+           10 DCLPRD-NOME-PRODUTO.
+      *                       NOME_PRODUTO LENGTH
+              49 DCLPRD-NOME-PRODUTO-LEN
+                 PIC S9(4) USAGE COMP.
+      *                       NOME_PRODUTO
+              49 DCLPRD-NOME-PRODUTO-TEXT
+                 PIC X(25).
+      *                       DESCRICAO
+           10 DCLPRD-DESCRICAO     PIC X(255).
+           10 DCLPRD-VENDIDO-POR.
+      *                       VENDIDO_POR LENGTH
+              49 DCLPRD-VENDIDO-POR-LEN
+                 PIC S9(4) USAGE COMP.
+      *                       VENDIDO_POR
+              49 DCLPRD-VENDIDO-POR-TEXT
+                 PIC X(20).
+      *                       DATA_CADASTRO
+           10 DCLPRD-DATA-CADASTRO
+              PIC X(10).
+      *                       QUANTIDADE_ESTOQUE
+           10 DCLPRD-QUANTIDADE-ESTOQUE
+              PIC S9(9) USAGE COMP.
+      *                       VALOR_UNITARIO
+           10 DCLPRD-VALOR-UNITARIO
+              PIC S9(5)V9(2) USAGE COMP-3.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 7       *
+      ******************************************************************

@@ -1,0 +1,87 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB   DD  DSN=FS.GERAL.LOADLIB,DISP=SHR
+//*-----------EXCLUSAO DE ARQUIVOS--------------------------------------
+//STEP001 EXEC PGM=IDCAMS
+//SYSOUT   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+   DELETE FS.FSYS007.FILE002
+   DELETE FS.FSYS007.FILE004
+   DELETE FS.FSYS007.FILE005
+   DELETE FS.FSYS007.FILE007
+   DELETE FS.FSYS007.FILE008
+   DELETE FS.FSYS007.FILE009
+   DELETE FS.FSYS007.FILE010
+   SET MAXCC = 0
+//*--ORDENA ARQUIVOS----------------------------------------------------
+//STEP002  EXEC PGM=SORT
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SORTIN   DD DSN=FS.FSYS031.FILE001,DISP=SHR
+//SORTOUT  DD DSN=FS.FSYS007.FILE002,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(DSORG=PS,RECFM=FB,LRECL=358)
+//SYSIN    DD *
+ SORT FIELDS=(01,11,CH,A)
+/*
+//*--------------------------------------------------------------------
+//STEP003  EXEC PGM=SORT
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SORTIN   DD DSN=FS.FSYS031.FILE003,DISP=SHR
+//SORTOUT  DD DSN=FS.FSYS007.FILE004,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(DSORG=PS,RECFM=FB,LRECL=217)
+//SYSIN    DD *
+ SORT FIELDS=(01,11,CH,A)
+/*
+//*--------------------------------------------------------------------
+//STEP004  EXEC PGM=SORT
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SORTIN   DD DSN=FS.FSYS031.FILE006,DISP=SHR
+//SORTOUT  DD DSN=FS.FSYS007.FILE007,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(DSORG=PS,RECFM=FB,LRECL=61)
+//SYSIN    DD *
+ SORT FIELDS=(01,11,CH,A)
+/*
+//*-------------------------------------------------------------------
+//STEP005  EXEC PGM=E0073511
+//FILE002  DD  DSN=FS.FSYS007.FILE002,DISP=SHR
+//FILE004  DD  DSN=FS.FSYS007.FILE004,DISP=SHR
+//FILE005  DD  DSN=FS.FSYS007.FILE005,DISP=(NEW,CATLG,DELETE),
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//             DCB=(LRECL=364,RECFM=FB,DSORG=PS)
+//*-------------------------------------------------------------------
+//STEP006  EXEC PGM=E0073512
+//FILE005  DD  DSN=FS.FSYS007.FILE005,DISP=SHR
+//FILE007  DD  DSN=FS.FSYS007.FILE007,DISP=SHR
+//FILE008  DD  DSN=FS.FSYS007.FILE008,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(LRECL=374,RECFM=FB,DSORG=PS)
+//*-------------------------------------------------------------------
+//STEP007  EXEC PGM=E0073513
+//FILE008  DD  DSN=FS.FSYS007.FILE008,DISP=SHR
+//RELATO   DD  SYSOUT=*
+//*-------------------------------------------------------------------
+//STEP008  EXEC PGM=E0073514
+//FILE008  DD  DSN=FS.FSYS007.FILE008,DISP=SHR
+//FILE009  DD  DSN=FS.FSYS007.FILE009,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(LRECL=380,RECFM=FB,DSORG=PS)
+//*-------------------------------------------------------------------
+//STEP009  EXEC PGM=E0073515
+//FILE009  DD  DSN=FS.FSYS007.FILE009,DISP=SHR
+//RELATO2  DD  SYSOUT=*
+//*-------------------------------------------------------------------
+//STEP010  EXEC PGM=E0073516
+//FILE009  DD  DSN=FS.FSYS007.FILE009,DISP=SHR
+//FILE010  DD  DSN=FS.FSYS007.FILE010,DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//            DCB=(LRECL=386,RECFM=FB,DSORG=PS)
+//*-------------------------------------------------------------------
+//STEP011  EXEC PGM=E0073517
+//FILE010  DD  DSN=FS.FSYS007.FILE010,DISP=SHR
+//RELATO3  DD  SYSOUT=*
+//*-------------------------------------------------------------------

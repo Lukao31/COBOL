@@ -1,0 +1,30 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ROTINA      - ROTINA DE PROCESSAMENTO                  *00020004
+      * NOME DO BOOK        - ROTPROC2                                 *00030004
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00040000
+      * VARIAVEIS USADAS    - WS-MSG    PIC X(60).                     *00050001
+      *                       WS-FS     PIC X(02).                     *00060001
+      *----------------------------------------------------------------*00070000
+       9000-CALCULA-TEMPO-PROC.                                         00080003
+           COMPUTE WS-DIFERENCA = (WS-HORA-F * 360000 +                 00090003
+                                   WS-MIN-F  *   6000 +                 00100003
+                                   WS-SEG-F  *    100 +                 00110003
+                                   WS-CENT-F)         -                 00120003
+                                  (WS-HORA-I * 360000 +                 00130003
+                                   WS-MIN-I  *   6000 +                 00140003
+                                   WS-SEG-I  *    100 +                 00150003
+                                   WS-CENT-I)                           00160003
+      *                                                                 00170003
+           COMPUTE WS-HORA-P    = WS-DIFERENCA / 360000                 00180005
+           COMPUTE WS-DIFERENCA = WS-DIFERENCA - WS-HORA-P * 360000     00181005
+           COMPUTE WS-MIN-P     = WS-DIFERENCA / 6000                   00182005
+           COMPUTE WS-DIFERENCA = WS-DIFERENCA - WS-MIN-P  *   6000     00183005
+           COMPUTE WS-SEG-P     = WS-DIFERENCA / 100                    00184005
+           COMPUTE WS-DIFERENCA = WS-DIFERENCA - WS-SEG-P  *    100     00185005
+           COMPUTE WS-CENT-P    = WS-DIFERENCA                          00190005
+      *                                                                 00200003
+           MOVE WS-HORA-P                  TO WS-HORA-PF                00210005
+           MOVE WS-MIN-P                   TO WS-MIN-PF                 00220005
+           MOVE WS-SEG-P                   TO WS-SEG-PF                 00230005
+           MOVE WS-CENT-P                  TO WS-CENT-PF                00240005
+           .                                                            00250005

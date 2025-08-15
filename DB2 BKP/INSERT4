@@ -1,0 +1,29 @@
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00010000
+VALUES ('01', 'MARTELO', 50.00, 'PECA', '01');                          00020000
+                                                                        00030000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00040000
+VALUES ('02', 'PREGOS', 10.00, 'PCT', '01');                            00050000
+                                                                        00060000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00070000
+VALUES ('03', 'TV', 2110.99, 'PECA', '02');                             00080000
+                                                                        00090000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00100000
+VALUES ('04', 'CELULAR', 6500.00, 'PECA', '02');                        00110000
+                                                                        00120000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00130000
+VALUES ('05', 'GIBI', 20.00, 'PECA', '03');                             00140000
+                                                                        00150000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00160000
+VALUES ('06', 'MANGA', 40.00, 'PCT', '03');                             00170000
+                                                                        00180000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00190000
+VALUES ('07', 'CAMISETA',  60.00, 'PECA', '04');                        00200000
+                                                                        00210000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00220000
+VALUES ('08', 'SHORTS',  80.00, 'PECA', '04');                          00230000
+                                                                        00240000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00250000
+VALUES ('09', 'TENIS', 280.00, 'PECA', '05');                           00260000
+                                                                        00270000
+INSERT INTO TBPROD(CODPROD, DESCPROD, PRECOPROD, UNIDPROD, CODTIPOPROD) 00280000
+VALUES ('10', 'CROCS', 100.00, 'PECA', '05');                           00290000

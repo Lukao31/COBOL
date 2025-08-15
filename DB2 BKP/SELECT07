@@ -1,0 +1,3 @@
+SELECT AVG(PRECOPROD)                                                   00010003
+FROM TBPROD                                                             00020000
+WHERE CODTIPOPROD = '02'                                                00030004

@@ -1,0 +1,10 @@
+-- CRIACAO DA CHAVE PRIMARIA TBTIPOCLI                                  00010000
+   ALTER TABLE TBTIPOCLI                                                00020000
+   ADD PRIMARY KEY (CODTIPOCLI)                                         00030000
+-- EXCLUSAO DA PRIMARY KEY                                              00040000
+-- ALTER TABLE TBTIPOCLI                                                00050000
+-- DROP PRIMARY KEY                                                     00060000
+                                                                        00070000
+                                                                        00080000
+                                                                        00090000
+                                                                        00100000

@@ -1,0 +1,225 @@
+       01  MAPAPEDI.
+           02  FILLER PIC X(12).
+           02  CARPEDL    COMP  PIC  S9(4).
+           02  CARPEDF    PICTURE X.
+           02  FILLER REDEFINES CARPEDF.
+             03 CARPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  CARPEDI  PIC X(6).
+           02  PEDPEDL    COMP  PIC  S9(4).
+           02  PEDPEDF    PICTURE X.
+           02  FILLER REDEFINES PEDPEDF.
+             03 PEDPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  PEDPEDI  PIC X(07).
+           02  DIPEDL    COMP  PIC  S9(4).
+           02  DIPEDF    PICTURE X.
+           02  FILLER REDEFINES DIPEDF.
+             03 DIPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIPEDI  PIC 9(02).
+           02  MEPEDL    COMP  PIC  S9(4).
+           02  MEPEDF    PICTURE X.
+           02  FILLER REDEFINES MEPEDF.
+             03 MEPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MEPEDI  PIC 9(02).
+           02  ANPEDL    COMP  PIC  S9(4).
+           02  ANPEDF    PICTURE X.
+           02  FILLER REDEFINES ANPEDF.
+             03 ANPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANPEDI  PIC 9(04).
+           02  DFPEDL    COMP  PIC  S9(4).
+           02  DFPEDF    PICTURE X.
+           02  FILLER REDEFINES DFPEDF.
+             03 DFPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DFPEDI  PIC 9(02).
+           02  MFPEDL    COMP  PIC  S9(4).
+           02  MFPEDF    PICTURE X.
+           02  FILLER REDEFINES MFPEDF.
+             03 MFPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MFPEDI  PIC 9(02).
+           02  AFPEDL    COMP  PIC  S9(4).
+           02  AFPEDF    PICTURE X.
+           02  FILLER REDEFINES AFPEDF.
+             03 AFPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  AFPEDI  PIC 9(04).
+           02  VTPEDL    COMP  PIC  S9(4).
+           02  VTPEDF    PICTURE X.
+           02  FILLER REDEFINES VTPEDF.
+             03 VTPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  VTPEDI  PIC 9(12).
+           02  PAGPEDL    COMP  PIC  S9(4).
+           02  PAGPEDF    PICTURE X.
+           02  FILLER REDEFINES PAGPEDF.
+             03 PAGPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  PAGPEDI  PIC 9(02).
+           02  DEPEDL    COMP  PIC  S9(4).
+           02  DEPEDF    PICTURE X.
+           02  FILLER REDEFINES DEPEDF.
+             03 DEPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DEPEDI  PIC 9(02).
+           02  LINPEDD OCCURS 10 TIMES.
+             03  LINPEDL    COMP  PIC  S9(4).
+             03  LINPEDF    PICTURE X.
+             03  FILLER   PICTURE X(2).
+             03  LINPEDI  PIC X(79).
+           02  MSGPEDL    COMP  PIC  S9(4).
+           02  MSGPEDF    PICTURE X.
+           02  FILLER REDEFINES MSGPEDF.
+             03 MSGPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MSGPEDI  PIC X(60).
+           02  DIADATL    COMP  PIC  S9(4).
+           02  DIADATF    PICTURE X.
+           02  FILLER REDEFINES DIADATF.
+             03 DIADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  DIADATI  PIC X(2).
+           02  MESDATL    COMP  PIC  S9(4).
+           02  MESDATF    PICTURE X.
+           02  FILLER REDEFINES MESDATF.
+             03 MESDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MESDATI  PIC X(2).
+           02  ANODATL    COMP  PIC  S9(4).
+           02  ANODATF    PICTURE X.
+           02  FILLER REDEFINES ANODATF.
+             03 ANODATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  ANODATI  PIC X(4).
+           02  HORADATL    COMP  PIC  S9(4).
+           02  HORADATF    PICTURE X.
+           02  FILLER REDEFINES HORADATF.
+             03 HORADATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  HORADATI  PIC X(2).
+           02  MINDATL    COMP  PIC  S9(4).
+           02  MINDATF    PICTURE X.
+           02  FILLER REDEFINES MINDATF.
+             03 MINDATA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  MINDATI  PIC X(2).
+           02  FASEPEDL    COMP  PIC  S9(4).
+           02  FASEPEDF    PICTURE X.
+           02  FILLER REDEFINES FASEPEDF.
+             03 FASEPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  FASEPEDI  PIC X(2).
+           02  TASKPEDL    COMP  PIC  S9(4).
+           02  TASKPEDF    PICTURE X.
+           02  FILLER REDEFINES TASKPEDF.
+             03 TASKPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TASKPEDI  PIC X(6).
+           02  TERMPEDL    COMP  PIC  S9(4).
+           02  TERMPEDF    PICTURE X.
+           02  FILLER REDEFINES TERMPEDF.
+             03 TERMPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TERMPEDI  PIC X(4).
+           02  TRANSPEDL    COMP  PIC  S9(4).
+           02  TRANSPEDF    PICTURE X.
+           02  FILLER REDEFINES TRANSPEDF.
+             03 TRANSPEDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  TRANSPEDI  PIC X(4).
+       01  MAPAPEDO REDEFINES MAPAPEDI.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  CARPEDC    PICTURE X.
+           02  CARPEDH    PICTURE X.
+           02  CARPEDO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  PEDPEDC    PICTURE X.
+           02  PEDPEDH    PICTURE X.
+           02  PEDPEDO  PIC X(7).
+           02  FILLER PICTURE X(3).
+           02  DIPEDC    PICTURE X.
+           02  DIPEDH    PICTURE X.
+           02  DIPEDO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  MEPEDC    PICTURE X.
+           02  MEPEDH    PICTURE X.
+           02  MEPEDO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  ANPEDC    PICTURE X.
+           02  ANPEDH    PICTURE X.
+           02  ANPEDO  PIC X(4).
+           02  FILLER PICTURE X(3).
+           02  DFPEDC    PICTURE X.
+           02  DFPEDH    PICTURE X.
+           02  DFPEDO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  MFPEDC    PICTURE X.
+           02  MFPEDH    PICTURE X.
+           02  MFPEDO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  AFPEDC    PICTURE X.
+           02  AFPEDH    PICTURE X.
+           02  AFPEDO  PIC X(4).
+           02  FILLER PICTURE X(3).
+           02  VTPEDC    PICTURE X.
+           02  VTPEDH    PICTURE X.
+           02  VTPEDO PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  PAGPEDC    PICTURE X.
+           02  PAGPEDH    PICTURE X.
+           02  PAGPEDO  PIC X(2).
+           02  FILLER PICTURE X(3).
+           02  DEPEDC    PICTURE X.
+           02  DEPEDH    PICTURE X.
+           02  DEPEDO  PIC X(2).
+           02  DFHMS1 OCCURS 10 TIMES.
+             03  FILLER PICTURE X(2).
+             03  LINPEDA    PICTURE X.
+             03  LINPEDC    PICTURE X.
+             03  LINPEDH    PICTURE X.
+             03  LINPEDO  PIC X(79).
+           02  FILLER PICTURE X(3).
+           02  MSGPEDC    PICTURE X.
+           02  MSGPEDH    PICTURE X.
+           02  MSGPEDO PIC X(60).
+           02  FILLER PICTURE X(3).
+           02  DIADATC    PICTURE X.
+           02  DIADATH    PICTURE X.
+           02  DIADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MESDATC    PICTURE X.
+           02  MESDATH    PICTURE X.
+           02  MESDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  ANODATC    PICTURE X.
+           02  ANODATH    PICTURE X.
+           02  ANODATO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  HORADATC    PICTURE X.
+           02  HORADATH    PICTURE X.
+           02  HORADATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  MINDATC    PICTURE X.
+           02  MINDATH    PICTURE X.
+           02  MINDATO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  FASEPEDC    PICTURE X.
+           02  FASEPEDH    PICTURE X.
+           02  FASEPEDO PIC 9(02).
+           02  FILLER PICTURE X(3).
+           02  TASKPEDC    PICTURE X.
+           02  TASKPEDH    PICTURE X.
+           02  TASKPEDO PIC 9(06).
+           02  FILLER PICTURE X(3).
+           02  TERMPEDC    PICTURE X.
+           02  TERMPEDH    PICTURE X.
+           02  TERMPEDO PIC 9(04).
+           02  FILLER PICTURE X(3).
+           02  TRANSPEDC    PICTURE X.
+           02  TRANSPEDH    PICTURE X.
+           02  TRANSPEDO PIC 9(04).

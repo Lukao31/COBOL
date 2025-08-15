@@ -1,0 +1,12 @@
+//COMPMAP1 JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID
+//*====================================================================*
+//*              JOB DE COMPILACAO ONLINE MAPA BMS                     *
+//*====================================================================*
+//* C ALL NMAP     ??????? -> TROCAR PELO NOME DO SEU MAPA             *
+//* C ALL USUARIO  ??????? -> TROCAR PELO COD DO SEU USUARIO           *
+//*====================================================================*
+//STEP0001 JCLLIB ORDER=FS.LB.PROCLIB
+//COMPMAPA EXEC   DFHMAPCS,NOME='MAPAMIL'
+//**********************************************************************
+//*                        F I M   D O   J C L                         *
+//**********************************************************************

@@ -1,0 +1,62 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//*--------------------------------------------------------------------
+//STEP1    EXEC PGM=IKJEFT01,DYNAMNBR=20
+//STEPLIB  DD   DISP=SHR,DSN=DSN810.SDSNLOAD
+//         DD   DISP=SHR,DSN=FS.GERAL.LOADLIB
+//DBRMLIB  DD   DSN=DSN810.DBRMLIB.DATA,DISP=SHR
+//*--------------------------------------------------------------------
+//* ARQUIVO DE ENTRADA
+//CADCLI   DD   DSN=FS.FSYS998.CADCLI,DISP=SHR
+//* SE TIVER ARQUIVO DE SAIDA ADICIONAR
+//* NOME        DSN=FS.FSYS007.NOME,DISP=(NEW,CATLG,DELETE),
+//*             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//*             DCB=(LRECL=44,RECFM=FB,DSORG=PS)
+//*--------------------------------------------------------------------
+//*--------------------------------------------------------------------
+//SYSTSPRT DD   SYSOUT=*
+//SYSPRINT DD   SYSOUT=*
+//SYSUDUMP DD   SYSOUT=*
+//SYSOUT   DD   SYSOUT=*
+//REPORT   DD   SYSOUT=*
+//SYSTSIN  DD   *
+ DSN SYSTEM(DB8G)
+ RUN  PROGRAM(EX011P21) PLAN(EX011P21)  -
+      LIB('FS.GERAL.LOADLIB')
+ END
+//*--------------------------------------------------------------------
+//STEP2    EXEC PGM=IKJEFT01,DYNAMNBR=20,COND=(0,NE)
+//STEPLIB  DD   DISP=SHR,DSN=DSN810.SDSNLOAD
+//         DD   DISP=SHR,DSN=FS.GERAL.LOADLIB
+//DBRMLIB  DD   DSN=DSN810.DBRMLIB.DATA,DISP=SHR
+//*--------------------------------------------------------------------
+//A4114604 DD   DSN=FS.FSYS007.A4114604,DISP=SHR
+//*--------------------------------------------------------------------
+//SYSTSPRT DD   SYSOUT=*
+//SYSPRINT DD   SYSOUT=*
+//SYSUDUMP DD   SYSOUT=*
+//SYSOUT   DD   SYSOUT=*
+//REPORT   DD   SYSOUT=*
+//SYSTSIN  DD   *
+ DSN SYSTEM(DB8G)
+ RUN  PROGRAM(T4114604) PLAN(T4114604)  -
+      LIB('FS.GERAL.LOADLIB')
+ END
+//*--------------------------------------------------------------------
+//STEP3    EXEC PGM=IKJEFT01,DYNAMNBR=20,
+//             COND=((0,NE,STEP1),(0,NE,STEP2))
+//STEPLIB  DD   DISP=SHR,DSN=DSN810.SDSNLOAD
+//         DD   DISP=SHR,DSN=FS.GERAL.LOADLIB
+//DBRMLIB  DD   DSN=DSN810.DBRMLIB.DATA,DISP=SHR
+//*--------------------------------------------------------------------
+//A3114603 DD   DSN=FS.FSYS007.A3114603,DISP=SHR
+//*--------------------------------------------------------------------
+//SYSTSPRT DD   SYSOUT=*
+//SYSPRINT DD   SYSOUT=*
+//SYSUDUMP DD   SYSOUT=*
+//SYSOUT   DD   SYSOUT=*
+//REPORT   DD   SYSOUT=*
+//SYSTSIN  DD   *
+ DSN SYSTEM(DB8G)
+ RUN  PROGRAM(T4114603) PLAN(T4114603)  -
+      LIB('FS.GERAL.LOADLIB')
+ END

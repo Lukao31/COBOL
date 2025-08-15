@@ -1,0 +1,184 @@
+       01  MAPASMLI.
+           02  FILLER PIC X(12).
+           02  T1SIML    COMP  PIC  S9(4).
+           02  T1SIMF    PICTURE X.
+           02  FILLER REDEFINES T1SIMF.
+             03 T1SIMA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1SIMI  PIC X(5).
+           02  T1NOMEL    COMP  PIC  S9(4).
+           02  T1NOMEF    PICTURE X.
+           02  FILLER REDEFINES T1NOMEF.
+             03 T1NOMEA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1NOMEI  PIC X(26).
+           02  T1DDDL    COMP  PIC  S9(4).
+           02  T1DDDF    PICTURE X.
+           02  FILLER REDEFINES T1DDDF.
+             03 T1DDDA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1DDDI  PIC X(2).
+           02  T1TELL    COMP  PIC  S9(4).
+           02  T1TELF    PICTURE X.
+           02  FILLER REDEFINES T1TELF.
+             03 T1TELA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1TELI  PIC X(9).
+           02  T1EMPRL    COMP  PIC  S9(4).
+           02  T1EMPRF    PICTURE X.
+           02  FILLER REDEFINES T1EMPRF.
+             03 T1EMPRA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1EMPRI  PIC 9(12).
+           02  T1RESSIML    COMP  PIC  S9(4).
+           02  T1RESSIMF    PICTURE X.
+           02  FILLER REDEFINES T1RESSIMF.
+             03 T1RESSIMA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1RESSIMI  PIC X(22).
+           02  T1TAXAL    COMP  PIC  S9(4).
+           02  T1TAXAF    PICTURE X.
+           02  FILLER REDEFINES T1TAXAF.
+             03 T1TAXAA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1TAXAI  PIC X(24).
+           02  T1FORML    COMP  PIC  S9(4).
+           02  T1FORMF    PICTURE X.
+           02  FILLER REDEFINES T1FORMF.
+             03 T1FORMA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1FORMI  PIC X(14).
+           02  T1FRA12L    COMP  PIC  S9(4).
+           02  T1FRA12F    PICTURE X.
+           02  FILLER REDEFINES T1FRA12F.
+             03 T1FRA12A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1FRA12I  PIC X(24).
+           02  T1PAR12L    COMP  PIC  S9(4).
+           02  T1PAR12F    PICTURE X.
+           02  FILLER REDEFINES T1PAR12F.
+             03 T1PAR12A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1PAR12I  PIC 9(12).
+           02  T1FRA24L    COMP  PIC  S9(4).
+           02  T1FRA24F    PICTURE X.
+           02  FILLER REDEFINES T1FRA24F.
+             03 T1FRA24A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1FRA24I  PIC X(24).
+           02  T1PAR24L    COMP  PIC  S9(4).
+           02  T1PAR24F    PICTURE X.
+           02  FILLER REDEFINES T1PAR24F.
+             03 T1PAR24A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1PAR24I  PIC 9(12).
+           02  T1FRA36L    COMP  PIC  S9(4).
+           02  T1FRA36F    PICTURE X.
+           02  FILLER REDEFINES T1FRA36F.
+             03 T1FRA36A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1FRA36I  PIC X(24).
+           02  T1PAR36L    COMP  PIC  S9(4).
+           02  T1PAR36F    PICTURE X.
+           02  FILLER REDEFINES T1PAR36F.
+             03 T1PAR36A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1PAR36I  PIC 9(12).
+           02  T1FRA48L    COMP  PIC  S9(4).
+           02  T1FRA48F    PICTURE X.
+           02  FILLER REDEFINES T1FRA48F.
+             03 T1FRA48A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1FRA48I  PIC X(24).
+           02  T1PAR48L    COMP  PIC  S9(4).
+           02  T1PAR48F    PICTURE X.
+           02  FILLER REDEFINES T1PAR48F.
+             03 T1PAR48A    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1PAR48I  PIC 9(12).
+           02  T1OPCL    COMP  PIC  S9(4).
+           02  T1OPCF    PICTURE X.
+           02  FILLER REDEFINES T1OPCF.
+             03 T1OPCA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1OPCI  PIC X(27).
+           02  T1CONFL    COMP  PIC  S9(4).
+           02  T1CONFF    PICTURE X.
+           02  FILLER REDEFINES T1CONFF.
+             03 T1CONFA    PICTURE X.
+           02  FILLER   PICTURE X(2).
+           02  T1CONFI  PIC X(01).
+       01  MAPASMLO REDEFINES MAPASMLI.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  T1SIMC    PICTURE X.
+           02  T1SIMH    PICTURE X.
+           02  T1SIMO PIC X(05).
+           02  FILLER PICTURE X(3).
+           02  T1NOMEC    PICTURE X.
+           02  T1NOMEH    PICTURE X.
+           02  T1NOMEO PIC X(26).
+           02  FILLER PICTURE X(3).
+           02  T1DDDC    PICTURE X.
+           02  T1DDDH    PICTURE X.
+           02  T1DDDO PIC X(02).
+           02  FILLER PICTURE X(3).
+           02  T1TELC    PICTURE X.
+           02  T1TELH    PICTURE X.
+           02  T1TELO PIC X(09).
+           02  FILLER PICTURE X(3).
+           02  T1EMPRC    PICTURE X.
+           02  T1EMPRH    PICTURE X.
+           02  T1EMPRO PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  T1RESSIMC    PICTURE X.
+           02  T1RESSIMH    PICTURE X.
+           02  T1RESSIMO  PIC X(22).
+           02  FILLER PICTURE X(3).
+           02  T1TAXAC    PICTURE X.
+           02  T1TAXAH    PICTURE X.
+           02  T1TAXAO  PIC X(24).
+           02  FILLER PICTURE X(3).
+           02  T1FORMC    PICTURE X.
+           02  T1FORMH    PICTURE X.
+           02  T1FORMO  PIC X(14).
+           02  FILLER PICTURE X(3).
+           02  T1FRA12C    PICTURE X.
+           02  T1FRA12H    PICTURE X.
+           02  T1FRA12O  PIC X(24).
+           02  FILLER PICTURE X(3).
+           02  T1PAR12C    PICTURE X.
+           02  T1PAR12H    PICTURE X.
+           02  T1PAR12O PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  T1FRA24C    PICTURE X.
+           02  T1FRA24H    PICTURE X.
+           02  T1FRA24O  PIC X(24).
+           02  FILLER PICTURE X(3).
+           02  T1PAR24C    PICTURE X.
+           02  T1PAR24H    PICTURE X.
+           02  T1PAR24O PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  T1FRA36C    PICTURE X.
+           02  T1FRA36H    PICTURE X.
+           02  T1FRA36O  PIC X(24).
+           02  FILLER PICTURE X(3).
+           02  T1PAR36C    PICTURE X.
+           02  T1PAR36H    PICTURE X.
+           02  T1PAR36O PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  T1FRA48C    PICTURE X.
+           02  T1FRA48H    PICTURE X.
+           02  T1FRA48O  PIC X(24).
+           02  FILLER PICTURE X(3).
+           02  T1PAR48C    PICTURE X.
+           02  T1PAR48H    PICTURE X.
+           02  T1PAR48O PIC 9.999.999,99.
+           02  FILLER PICTURE X(3).
+           02  T1OPCC    PICTURE X.
+           02  T1OPCH    PICTURE X.
+           02  T1OPCO  PIC X(27).
+           02  FILLER PICTURE X(3).
+           02  T1CONFC    PICTURE X.
+           02  T1CONFH    PICTURE X.
+           02  T1CONFO PIC X(01).

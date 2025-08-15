@@ -1,0 +1,4 @@
+       01  REG-TBCOMPRA.
+           10 WS-TIPOCOMPRA           PIC S9(9)      USAGE COMP.
+           10 WS-IDFORNEC             PIC S9(9)      USAGE COMP.
+           10 WS-VALORCOMPRA          PIC S9(8)V9(2) USAGE COMP-3.

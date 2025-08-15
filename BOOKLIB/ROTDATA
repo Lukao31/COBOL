@@ -1,0 +1,56 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ROTINA      - 9000-IMPRIME-DATA                        *00020003
+      * NOME DO BOOK        - ROTDATA                                  *00021003
+      * NOME DO PDS         - FS.FSYS012.BOOKLIB                       *00022001
+      *----------------------------------------------------------------*00030000
+       9000-IMPRIME-DATA.                                               00040003
+           ACCEPT WS-DATA-SISTEMA          FROM DATE                    00050003
+           ACCEPT WS-DATA-JUL              FROM DAY                     00051003
+           ACCEPT WS-DIA-SEMANA            FROM DAY-OF-WEEK             00060003
+                                                                        00061003
+           MOVE CORR WS-DATA-SISTEMA       TO WS-DATA-SISTEMA-F         00062003
+      *                                                                 00070003
+      *    IDENTIFICACAO DO MES DA DATA GREGORIANA 02                   00071003
+           EVALUATE WS-MES OF WS-DATA-SISTEMA                           00072003
+               WHEN 01 MOVE 'JANEIRO'      TO WS-MES-EXT                00073003
+               WHEN 02 MOVE 'FEVEREIRO'    TO WS-MES-EXT                00074003
+               WHEN 03 MOVE 'MARCO'        TO WS-MES-EXT                00075003
+               WHEN 04 MOVE 'ABRIL'        TO WS-MES-EXT                00076003
+               WHEN 05 MOVE 'MAIO'         TO WS-MES-EXT                00077003
+               WHEN 06 MOVE 'JUNHO'        TO WS-MES-EXT                00078003
+               WHEN 07 MOVE 'JULHO'        TO WS-MES-EXT                00079003
+               WHEN 08 MOVE 'AGOSTO'       TO WS-MES-EXT                00080003
+               WHEN 09 MOVE 'SETEMBRO'     TO WS-MES-EXT                00090003
+               WHEN 10 MOVE 'OUTUBRO'      TO WS-MES-EXT                00100003
+               WHEN 11 MOVE 'NOVEMBRO'     TO WS-MES-EXT                00110003
+               WHEN 12 MOVE 'DEZEMBRO'     TO WS-MES-EXT                00120003
+           END-EVALUATE                                                 00130003
+      *                                                                 00140003
+      *    IDENTIFICACAO DO MES DIA DA SEMANA POR EXTENSO               00150003
+           EVALUATE WS-DIA-SEMANA                                       00160003
+               WHEN 1 MOVE 'SEGUNDA-FEIRA' TO WS-DIA-SEMANA-F           00170003
+               WHEN 2 MOVE 'TERCA-FEIRA'   TO WS-DIA-SEMANA-F           00180003
+               WHEN 3 MOVE 'QUARTA-FEIRA'  TO WS-DIA-SEMANA-F           00190003
+               WHEN 4 MOVE 'QUINTA-FEIRA'  TO WS-DIA-SEMANA-F           00200003
+               WHEN 5 MOVE 'SEXTA-FEIRA'   TO WS-DIA-SEMANA-F           00210003
+               WHEN 6 MOVE 'SABADO'        TO WS-DIA-SEMANA-F           00220003
+               WHEN 7 MOVE 'DOMINGO'       TO WS-DIA-SEMANA-F           00230003
+           END-EVALUATE                                                 00240003
+      *                                                                 00250003
+      *                      1         2         3         4         5  00260003
+      *             12345678901234567890123456789012345678901234567890  00270003
+           DISPLAY '**************************************************' 00280003
+           DISPLAY 'DATA GREGORIANA 1 - ' WS-DATA-SISTEMA-F             00290003
+           DISPLAY 'DATA GREGORIANA 2 - ' WS-DIA OF                     00300003
+                                          WS-DATA-SISTEMA               00310003
+                                        ' DE '                          00320003
+                                          WS-MES-EXT                    00330003
+                                        ' DE 20'                        00340003
+                                          WS-ANO OF                     00350003
+                                          WS-DATA-SISTEMA               00360003
+           DISPLAY 'DATA JULIANA        ' WS-DIA-J                      00370003
+                                        ' DE 20'                        00380003
+                                          WS-ANO-J                      00390003
+           DISPLAY 'DIA DA SEMANA       ' WS-DIA-SEMANA-F               00400003
+           DISPLAY '**************************************************' 00410003
+           .                                                            00420003

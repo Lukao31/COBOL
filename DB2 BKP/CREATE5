@@ -1,0 +1,11 @@
+-- TABELA TBVENDA                                                       00010000
+   CREATE TABLE TBVENDA                                                 00020002
+   (                                                                    00030002
+     NUMVENDA         CHAR(6)                        NOT NULL           00040002
+    ,DATAHORAVENDA    TIMESTAMP         DEFAULT                         00050002
+    ,QTDEVENDA        SMALLINT                                          00060002
+                      CHECK (QTDEVENDA > 0)                             00070002
+    ,CODCLI           CHAR(4)                        NOT NULL           00080002
+    ,CODPROD          CHAR(4)                        NOT NULL           00090002
+   )                                                                    00100002
+-- DROP TABLE TBVENDA                                                   00110002

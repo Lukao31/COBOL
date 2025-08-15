@@ -1,0 +1,34 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB   DD  DISP=SHR,DSN=FS.GERAL.LOADLIB
+//*---------------------------------------------------------------------
+//STEP001  EXEC PGM=IDCAMS
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD *
+ DELETE FS.FSYS007.PRODNEW
+ SET MAXCC=0
+//*---------------------------------------------------------------------
+//STEP002  EXEC PGM=SORT
+//SYSPRINT DD  SYSOUT=*
+//SYSOUT   DD  SYSOUT=*
+//SORTIN   DD  DSN=FS.FSYS998.PRODCAD,DISP=SHR
+//SORTOUT  DD  DSN=&&CADORD,DISP=(NEW,PASS)
+//SYSIN    DD  *
+  SORT FIELDS=(01,04,CH,A)
+/*
+//*---------------------------------------------------------------------
+//STEP003  EXEC PGM=SORT
+//SYSPRINT DD  SYSOUT=*
+//SYSOUT   DD  SYSOUT=*
+//SORTIN   DD  DSN=FS.FSYS998.PRODMOV,DISP=SHR
+//SORTOUT  DD  DSN=&&MOVORD,DISP=(NEW,PASS)
+//SYSIN    DD  *
+  SORT FIELDS=(01,04,CH,A,25,08,CH,A)
+/*
+//*---------------------------------------------------------------------
+//STEP004  EXEC PGM=EX007P17
+//PRODCAD  DD  DSN=&&CADORD,DISP=SHR
+//PRODMOV  DD  DSN=&&MOVORD,DISP=SHR
+//PRODNEW  DD  DSN=FS.FSYS007.PRODNEW,DISP=(NEW,CATLG,DELETE),
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,
+//             DCB=(LRECL=30,RECFM=FB,DSORG=PS,BLKSIZE=0)

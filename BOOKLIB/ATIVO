@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - ATIVO                                    *00020006
+      * NOME DO BOOK        - ATIVO                                    *00021006
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - ATIVO                                    *00023006
+      * TAMANHO DO REGISTRO - 50 CHARACTERS                            *00024004
+      *----------------------------------------------------------------*00030000
+       01  REG-ATIVO.                                                   00040006
+           05 CPFCLI-A                     PIC X(11).                   00050006
+           05 NOMECLI-A                    PIC X(20).                   00060006
+           05 AGENCIA-A                    PIC X(11).                   00070006
+           05 SALDO-A                      PIC S9(5)V99 COMP-3.         00080006

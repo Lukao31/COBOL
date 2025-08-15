@@ -1,0 +1,12 @@
+      *****************************************************************
+      * BOOKLIB - DECLARA  O DE VARI VEIS DA TABELA TREINO1           *
+      * QUANTIDADE DE VARIAVEIS: 7                                    *
+      * TAMANHO TOTAL ESTIMADO: 54 BYTES                              *
+      *****************************************************************
+       01  REG-SAIDADB2.
+           05 WS-CODCLIE                         PIC X(5).
+           05 WS-NOMECLIE                        PIC X(25).
+           05 WS-IDADECLIE                       PIC S9(9) COMP.
+           05 WS-CPFCLIE                         PIC X(11).
+           05 WS-ESTADOCLIE                      PIC X(2).
+           05 WS-SALDOCLIE                       PIC S9(6)V9(2) COMP-3.

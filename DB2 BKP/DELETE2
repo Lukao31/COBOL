@@ -1,0 +1,2 @@
+DELETE FROM TBVENDA                                                     00010000
+WHERE CODPROD IN ('01', '03')                                           00020000

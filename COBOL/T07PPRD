@@ -1,0 +1,318 @@
+      *--------------------------------------------------------------*
+       IDENTIFICATION                      DIVISION.
+      *--------------------------------------------------------------*
+       PROGRAM-ID.                         T07PPRD.
+       AUTHOR.                             LUCAS.
+
+      *--------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *--------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *--------------------------------------------------------------*
+       DATA                                DIVISION.
+      *--------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *--------------------------------------------------------------*
+       77  WS-MSG-ERRO                     PIC X(80).
+       77  WS-LENGTH                       PIC S9(04) COMP.
+       01  WS-DFHCOMMAREA.
+           05 WS-FASE                      PIC X(01).
+           05 WS-CODPROD-COMMAREA          PIC X(04).
+      *
+       01  WS-VAR-TEMPO.
+           05 WS-DATA                      PIC X(10).
+           05 WS-HORARIO                   PIC X(08).
+      *
+           COPY T07MPRD.
+           COPY DFHAID.
+           COPY DFHBMSCA.
+      *
+           EXEC SQL
+               INCLUDE PEDPROD
+           END-EXEC.
+
+           EXEC SQL
+               INCLUDE PRODUTOS
+           END-EXEC.
+
+           EXEC SQL
+               INCLUDE SQLCA
+           END-EXEC.
+      *----------------------------------------------------------------*
+       LINKAGE                             SECTION.
+      *----------------------------------------------------------------*
+       01  DFHCOMMAREA.
+           05 OCCURS 0 TO 24576 TIMES DEPENDING ON EIBCALEN
+                                           PIC X(01).
+      *--------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *--------------------------------------------------------------*
+           EXEC CICS HANDLE CONDITION
+              NOTFND  (999-NOTFND)
+              MAPFAIL (999-ERRO-MAPA)
+              ERROR   (999-ERRO-GENERICO)
+           END-EXEC
+      *---------------------------------------------------------------*A
+           MOVE DFHCOMMAREA                 TO WS-DFHCOMMAREA
+      *
+           IF EIBCALEN EQUAL 0
+              MOVE +80                      TO WS-LENGTH
+              MOVE 'ENTRE COM A TRANSACAO FT7A'
+                                            TO WS-MSG-ERRO
+           END-IF
+      *
+           EVALUATE WS-FASE
+              WHEN '1' PERFORM 100-FASE1
+              WHEN '2' PERFORM 200-FASE2
+              WHEN OTHER
+                 MOVE +80                   TO WS-LENGTH
+                 MOVE 'UTILIZE A OPCAO A DA TRANSACAO FT7A'
+                                            TO WS-MSG-ERRO
+                 PERFORM 999-ENCERRA-TRANSACAO
+           END-EVALUATE
+           .
+      *
+       100-FASE1.
+      * LIMPAR AS VARIAVEIS DO MAPA
+           MOVE LOW-VALUES                 TO MAPAPRDO
+      * POSICIONAMENTO LOGICO - DIRETO NO CAMPO DESEJADO
+           MOVE -1                         TO PRDPRDO
+      * MOVER A MENSAGEM PARA O CAMPO APROPRIADO
+           MOVE 'DIGITE O PRODUTO A SER CONSULTADO'
+                                           TO MSGPRDO
+      * PROTEGE A DESPROTEGE OS CAMPOS
+           PERFORM 999-PROTECAO-FASE2
+      * MANDAR A TELA PARA O TERMINAL
+           PERFORM 999-MANDA-TELA
+      * ENCERRA A TRANSACAO, CHAMANDO A PROXIMA FASE
+           PERFORM 999-CHAMA-FASE2
+      *
+           EXEC SQL
+              DECLARE C1 CURSOR FOR
+              SELECT NUMERO_PEDIDO_PRODUTO
+                    ,NUMERO_PEDIDO 
+                    ,ID_PRODUTO
+                    ,QTD_PRODUTO
+                    ,VALOR_UNITARIO_PEDIDO                
+              FROM PEDIDOS_PRODUTOS
+              WHERE ID_PRODUTO = :DCLPRD-ID-PRODUTO
+           END-EXEC     
+      *
+           EXEC SQL
+              OPEN C1
+           END-EXEC
+      *
+           IF SQLCODE NOT EQUAL 0
+              MOVE "ERRO AO ABRIR  CURSOR" TO WS-MSG-ERRO
+              MOVE SQLCODE                 TO WS-SQLCODE
+              PERFORM 999-ENCERRA-TRANSACAO
+           END-IF 
+      *     
+           EXEC SQL
+             FETCH C1 INTO :DCLPED-NUMERO-PEDIDO-PRODUTO
+                          ,:DCLPED-NUMERO-PEDIDO
+                          ,:DCLPED-ID-PRODUTO
+                          ,:DCLPED-QTD-PRODUTO
+                          ,:DCLPED-VALOR-UNITARIO-PEDIDO
+           END-EXEC
+      *
+           IF SQLCODE EQUAL 100
+              MOVE 'PRODUTO '               TO MSGPRDO
+              STRING DCLPRD-ID-PRODUTO      DELIMITED BY SIZE
+                     ' NAO LOCALIZADO'      DELIMITED BY SIZE
+                     INTO MSGPRDO
+              PERFORM 999-TRATA-FASE2
+           ELSE IF SQLCODE NOT EQUAL 0
+              MOVE 'ERRO AO BUSCAR PRODUTO' TO WS-MSG-ERRO
+              MOVE SQLCODE                 TO WS-SQLCODE
+              PERFORM 999-ENCERRA-TRANSACAO
+           END-IF
+      *      
+           EXEC SQL
+              CLOSE C1
+           END-EXEC
+      *    
+           MOVE DCLPRD-NOME-PRODUTO         TO PRDPRDO
+           MOVE DCLPRD-DESCRICAO            TO DESCPRDO
+           MOVE DCLPRD-VALOR-UNITARIO       TO VALORPRDO
+           MOVE DCLPRD-QUANTIDADE-ESTOQUE   TO ESTQPRDO
+           .
+      *
+       200-FASE2.
+           EXEC CICS HANDLE AID
+                ENTER  (210-ENTER)
+                PF5    (230-PF5)
+                CLEAR  (230-PF5)
+                ANYKEY (240-ANYKEY)
+                PF10   (270-PF10)
+                PF11   (280-PF11)
+                PF12   (290-PF12)
+           END-EXEC
+      *
+           EXEC CICS RECEIVE
+                MAP    ('MAPAPRD')
+                MAPSET ('T07MPRD')
+                INTO   (MAPAPRDI)
+           END-EXEC
+           .
+      *
+       210-ENTER.
+           MOVE 'IRIRIRIRIRI ALGO AQUI'    TO MSGPRDO
+           .
+      *
+       220-PF3.
+           MOVE 1                          TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('T07PPRL')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       230-PF5.
+           PERFORM 999-CHAMA-FASE1
+           .
+      *
+       240-ANYKEY.
+           MOVE 'TECLA INVALIDA'           TO MSGPRDO
+           PERFORM 999-TRATA-FASE2
+           .
+      *
+       270-PF10.
+           MOVE '1'                     TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('T07PCAR')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       280-PF11.
+           MOVE '1'                     TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('T07PPED')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       290-PF12.
+           MOVE '1'                     TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('T07PLOG')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-ENCERRA-TRANSACAO.
+           EXEC CICS SEND TEXT
+              FROM (WS-MSG-ERRO)
+              LENGTH (+80)
+              ERASE FREEKB ALARM
+           END-EXEC
+      *
+           EXEC CICS RETURN
+           END-EXEC
+           .
+      *
+      * 999-PROTECAO-FASE2.
+      * USAR OS SEGUINTES MNEMONICOS DA DFHBMSCA:
+      *     DFHUNIMD - (UNPROT, ALFA, BRT, ON) - PARA DESPROTEGER ALFA
+      *     MOVE DFHUNIMD                      TO T2CODA
+      *     DFHBMPRF - (PROT, ALFA, NORM, ON) - PARA PROTEGER
+      *     MOVE DFHBMPRF                      TO T2DESCA
+      *     MOVE DFHBMPRF                      TO T2UNIDA
+      *     MOVE DFHBMPRF                      TO T2LOCALA
+      *     MOVE DFHBMPRF                      TO T2ESTA
+      *     MOVE DFHBMPRF                      TO T2MAXA
+      *     MOVE DFHBMPRF                      TO T2MINA
+      *     MOVE DFHBMPRF                      TO T2COMPA
+      *     MOVE DFHBMPRF                      TO T2VENDAA
+      *     MOVE DFHBMPRF                      TO T2COMISA
+      *     MOVE DFHBMPRF                      TO T2CONFA
+      *     .
+      *
+       999-MANDA-TELA.
+           MOVE EIBTRMID                   TO TERMPRDO
+           MOVE EIBTRNID                   TO TRANSPRDO
+           MOVE EIBTASKN                   TO TASKPRDO
+           MOVE WS-FASE                    TO FASEPRDO
+      *
+           MOVE DCLPED-NUMERO-PEDIDO-PRODUTO TO PRDPRDI
+           MOVE DCLPED-NUMERO-PEDIDO         TO PRDPRDO
+      *     EXEC CICS ASSIGN
+      *        USERID(T2USERO)
+      *     END-EXEC
+      *
+           EXEC CICS LINK
+              PROGRAM('AUXCICS1')
+              COMMAREA(WS-VAR-TEMPO)
+              LENGTH(+18)
+           END-EXEC
+      *
+           MOVE WS-DATA(01:02)              TO DIADATO
+           MOVE WS-DATA(04:02)              TO MESDATO
+           MOVE WS-DATA(07:04)              TO ANODATO
+           MOVE WS-HORARIO(01:02)           TO HORADATO
+           MOVE WS-HORARIO(04:02)           TO MINDATO
+      *     
+           EXEC CICS SEND
+              MAP    ('MAPAPRD')
+              MAPSET ('T07MPRD')
+              FROM   (MAPAPRDO)
+              ERASE FREEKB ALARM CURSOR
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE1.
+           MOVE '1'                         TO WS-FASE
+      *
+           EXEC CICS XCTL
+              PROGRAM ('T07PPRD')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE2.
+           MOVE '2'                         TO WS-FASE
+      *
+           EXEC CICS RETURN
+              TRANSID ('FT7D')
+              COMMAREA (WS-DFHCOMMAREA)
+              LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+      *
+       999-TRATA-FASE2.
+           MOVE -1                           TO PRDPRDL
+      *     PERFORM 999-PROTECAO-FASE2
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE2
+           .
+      *
+       999-ERRO-MAPA.
+           MOVE +80                          TO WS-LENGTH
+           MOVE 'ERRO MAPA MAPAPRD'          TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .
+      *
+       999-NOTFND.
+           STRING 'PRODUTO '                 DELIMITED BY SIZE
+                   PRDPRDI                   DELIMITED BY SPACE
+                   'NAO LOCALIZADO'          DELIMITED BY SIZE
+                                             INTO MSGPRDO
+           PERFORM 999-TRATA-FASE2
+           .
+      *
+       999-ERRO-GENERICO.
+           MOVE 'ERRO GENERICO T07PPRD'     TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .

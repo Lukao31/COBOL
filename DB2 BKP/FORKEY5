@@ -1,0 +1,17 @@
+-- CRIACAO DA CHAVE ESTRANGEIRA DA TBVENDA                              00010000
+   ALTER TABLE TBVENDA                                                  00020005
+   ADD CONSTRAINT FKEY_TBVENDA_TBCLI                                    00030006
+   FOREIGN KEY(CODCLI)                                                  00040005
+   REFERENCES TBCLI(CODCLI)                                             00040106
+   ON DELETE CASCADE;                                                   00040205
+                                                                        00040300
+   ALTER TABLE TBVENDA                                                  00040405
+   ADD CONSTRAINT FKEY_TBVENDA_TBPROD                                   00040506
+   FOREIGN KEY(CODPROD)                                                 00041005
+   REFERENCES TBPROD(CODPROD)                                           00042006
+   ON DELETE RESTRICT;                                                  00043006
+                                                                        00044000
+-- EXCLUSAO DA FOREIGN KEY                                              00070000
+-- ALTER TABLE TBVENDA                                                  00080005
+-- DROP FOREIGN KEY FKEY_TBCLI_TBTIPOCLI                                00090004
+-- DROP FOREIGN KEY FKEY_TBPROD_TBTIPOPROD                              00100005

@@ -1,0 +1,13 @@
+INSERT INTO TBTIPOPROD(CODTIPOPROD, DESCTIPOPROD)                       00010000
+VALUES ('01', 'FERRAMENTAS');                                           00020000
+                                                                        00021000
+INSERT INTO TBTIPOPROD(CODTIPOPROD, DESCTIPOPROD)                       00030000
+VALUES ('02', 'ELETRONICOS');                                           00040000
+                                                                        00041000
+INSERT INTO TBTIPOPROD(CODTIPOPROD, DESCTIPOPROD)                       00050000
+VALUES ('03', 'LIVROS');                                                00060001
+                                                                        00061000
+INSERT INTO TBTIPOPROD(CODTIPOPROD, DESCTIPOPROD)                       00070000
+VALUES ('04', 'ROUPAS');                                                00080000
+INSERT INTO TBTIPOPROD(CODTIPOPROD, DESCTIPOPROD)                       00090000
+VALUES ('05', 'SAPATOS');                                               00100000

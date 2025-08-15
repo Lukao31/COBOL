@@ -1,0 +1,6 @@
+-- CRIACAO DA CHAVE PRIMARIA TBVENDA                                    00010000
+   ALTER TABLE TBVENDA                                                  00020000
+   ADD PRIMARY KEY (NUMVENDA)                                           00030000
+-- EXCLUSAO DA PRIMARY KEY                                              00040000
+-- ALTER TABLE TBVENDA                                                  00050000
+-- DROP PRIMARY KEY                                                     00060000

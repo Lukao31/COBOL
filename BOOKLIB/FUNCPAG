@@ -1,0 +1,19 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - FUNCIONARIOS PAGAMENTO                   *00020004
+      * NOME DO BOOK        - FUNCPAG                                  *00021004
+      * NOME DO PDS         - FS.FSYS012.BOOKLIB                       *00022001
+      * NOME DO ARQUIVO     - FUNCPAG                                  *00023004
+      * TAMANHO DO REGISTRO - 61 CHARACTERS                            *00024004
+      *----------------------------------------------------------------*00030000
+       01  WS-REG-FUNCPAG.                                              00040006
+           05 WS-CODFUNC-P               PIC 9(05).                     00050005
+           05 WS-NOMEFUNC-P              PIC X(30).                     00060005
+           05 WS-SALARIOFUNC             PIC 9(03) COMP-3.              00070005
+           05 WS-NUMERARIO1              PIC 9(04) COMP-3.              00080005
+           05 WS-NUMERARIO2              PIC 9(04) COMP-3.              00081005
+           05 WS-NUMERARIO5              PIC 9(04) COMP-3.              00090005
+           05 WS-NUMERARIO10             PIC 9(04) COMP-3.              00100005
+           05 WS-NUMERARIO20             PIC 9(04) COMP-3.              00110005
+           05 WS-NUMERARIO50             PIC 9(04) COMP-3.              00120005
+           05 WS-NUMERARIO100            PIC 9(04) COMP-3.              00130005
+           05 WS-NUMERARIO200            PIC 9(04) COMP-3.              00140005

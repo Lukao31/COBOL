@@ -1,0 +1,14 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - CLIENTES DE SAO PAULO                    *00020002
+      * NOME DO BOOK        - CLISP                                    *00021002
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022003
+      * NOME DO ARQUIVO     - CLISP                                    *00023002
+      * TAMANHO DO REGISTRO - 94 CHARACTERS                            *00024002
+      *----------------------------------------------------------------*00030000
+       01  ::REG-CLISP.                                                 00040002
+           05 ::CPFCLI-SP                  PIC X(11).                   00050002
+           05 ::NOMECLI-SP                 PIC X(25).                   00060002
+           05 ::ENDCLI-SP                  PIC X(30).                   00070002
+           05 ::FONECLI-SP                 PIC X(10).                   00080002
+           05 ::TOTALCOMPRAS-SP            PIC 9(08)V99.                00090002
+           05 ::ULTIMACOMPRA-SP            PIC X(08).                   00100002

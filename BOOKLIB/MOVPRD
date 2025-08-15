@@ -1,0 +1,19 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - MOVPRD                                   *00020014
+      * NOME DO BOOK        - MOVPRD                                    00021014
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - MOVPRD                                    00023014
+      * TAMANHO DO REGISTRO - 70 CHARACTERS                            *00024014
+      *----------------------------------------------------------------*00030000
+       01  REG-MOVPRD.                                                  00040014
+           05 CODPROD-M                    PIC X(04).                   00050014
+           05 DESCPROD-M                   PIC X(20).                   00060014
+           05 UNIDPROD-M                   PIC X(05).                   00070014
+           05 LOCALPROD-M                  PIC 9(05).                   00080014
+           05 QTDEST-M                     PIC 9(05).                   00090014
+           05 QTDMAX-M                     PIC 9(05).                   00100014
+           05 QTDMIN-M                     PIC 9(05).                   00110014
+           05 PRECOCOMPRA-M                PIC 9(06)V99.                00120014
+           05 PRECOVENDA-M                 PIC 9(06)V99.                00130014
+           05 PERCOMIS-M                   PIC 9(02)V99.                00140014
+           05 TIPOMOVTO-M                  PIC X(01).                   00150014

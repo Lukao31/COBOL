@@ -1,0 +1,19 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//*--------------------------------------------------------------------
+//STEP0001 EXEC PGM=IKJEFT01,DYNAMNBR=20,COND=(4,LT)
+//STEPLIB  DD   DISP=SHR,DSN=DSN810.SDSNLOAD
+//         DD   DISP=SHR,DSN=FS.GERAL.LOADLIB
+//DBRMLIB  DD   DSN=DSN810.DBRMLIB.DATA,DISP=SHR
+//*--------------------------------------------------------------------
+//RELREPO  DD   SYSOUT=*
+//*--------------------------------------------------------------------
+//SYSTSPRT DD   SYSOUT=*
+//SYSPRINT DD   SYSOUT=*
+//SYSUDUMP DD   SYSOUT=*
+//SYSOUT   DD   SYSOUT=*
+//REPORT   DD   SYSOUT=*
+//SYSTSIN  DD   *
+ DSN SYSTEM(DB8G)
+ RUN  PROGRAM(EX007P27) PLAN(EX007P27) -
+      LIB('FS.GERAL.LOADLIB')
+ END

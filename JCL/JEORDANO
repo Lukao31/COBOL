@@ -1,0 +1,6 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB   DD  DISP=SHR,DSN=FS.GERAL.LOADLIB
+//STEP001  EXEC PGM=P107NX00
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,  //* Aloca espaço no disco
+//             DCB=(LRECL=94,RECFM=FB,DSORG=PS)  //* Define as características
+do dataset (muda de acordo com o tam e tipo de arq)

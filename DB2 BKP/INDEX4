@@ -1,0 +1,6 @@
+-- CRIACAO DO INDICE IDXPROD                                            00010000
+                                                                        00020000
+   CREATE UNIQUE INDEX IDXPROD                                          00030000
+   ON TBPROD(CODPROD)                                                   00040000
+-- EXCLUSAO DO INDICE IDXPROD                                           00050000
+-- DROP INDEX (CODPROD)                                                 00060000

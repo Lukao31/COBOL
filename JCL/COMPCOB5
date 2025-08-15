@@ -1,0 +1,21 @@
+//FSYS007C JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID
+//*====================================================================*
+//*              JOB DE COMPILACAO ONLINE COM DB2                      *
+//*====================================================================*
+//* C ALL FSYS007  ??????? - TROCAR FSYS007 PELO SEU USERID            *
+//* C ALL T07PLOG ??????? - TROCAR T07PLOG PELO SEU PROGRAMA           *
+//*====================================================================*
+//STEP0001 JCLLIB ORDER=FS.LB.PROCLIB
+//CICSDB   EXEC DFHCIDB2,NAME='FORBOL'
+//LKED.SYSIN    DD   *
+  INCLUDE SYSLIB(DSNCLI)
+  NAME FORBOL(R)
+//BIND.SYSTSIN  DD *
+DSN  SYSTEM(DB8G)
+BIND PACKAGE(BRADCOLL) MEM(FORBOL) ACT(REP) ISOLATION(CS) -
+     LIB('DSN810.DBRMLIB.DATA') VALIDATE(BIND)
+BIND PLAN(FORBOL) PKLIST(BRADCOLL.*)                      -
+                    VALIDATE(BIND)   ACT(REP) ISOLATION(CS)
+//**********************************************************************
+//*                        F I M   D O   J C L                         *
+//**********************************************************************

@@ -1,0 +1,41 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//* Biblioteca de programas a ser usada no job
+//JOBLIB   DD  DISP=SHR,DSN=FS.GERAL.LOADLIB
+//* Executa o programa SORT para ordenação de CLISP
+//STEP001  EXEC PGM=SORT
+//SYSPRINT DD  SYSOUT=*                 í       ã              ã     mensagen
+//SYSOUT   DD  SYSOUT=*                 í       ã
+//SORTIN   DD  DSN=FS.FSYS998.CLISP,DISP=SHR                            trada CL
+//SORTOUT  DD  DSN=&&CLISPORD,DISP=(NEW,PASS),                          orário(
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA                ç   o disco
+//SYSIN    DD  *
+  SORT FIELDS=(01,05,CH,A)            çã                 °     °    ractere,
+//*---------------------------------------------------------------------
+//* Executa o programa SORT para ordenação de CLIRJ
+//STEP002  EXEC PGM=SORT
+//SYSPRINT DD  SYSOUT=*                 í       ã              ã     mensagen
+//SYSOUT   DD  SYSOUT=*                 í       ã
+//SORTIN   DD  DSN=FS.FSYS998.CLIRJ,DISP=SHR                            trada CL
+//SORTOUT  DD  DSN=&&CLIRJORD,DISP=(NEW,PASS),                          orário(
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA                ç   o disco
+//SYSIN    DD  *
+  SORT FIELDS=(01,05,CH,A)             çã                 °     °   aractere
+//*---------------------------------------------------------------------
+//* Executa o programa SORT para ordenação de CLIMG
+//STEP003  EXEC PGM=SORT
+//SYSPRINT DD  SYSOUT=*                 í       ã              ã     mensagen
+//SYSOUT   DD  SYSOUT=*                 í       ã
+//SORTIN   DD  DSN=FS.FSYS998.CLIMG,DISP=SHR                            trada CL
+//SORTOUT  DD  DSN=&&CLIMGORD,DISP=(NEW,PASS),                          orário(
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA                ç   o disco
+//SYSIN    DD  *
+  SORT FIELDS=(01,05,CH,A)            çã                 °     °    ractere,
+//*---------------------------------------------------------------------
+//* Executa o programa EX007P07, que processa os arquivos ordenados
+//STEP004  EXEC PGM=EX007P07
+//CLISP    DD  DSN=&&CLISPORD,DISP=SHR                          á      ISPORD
+//CLIRJ    DD  DSN=&&CLIRJORD,DISP=SHR                          á      IRJORD
+//CLIMG    DD  DSN=&&CLIMGORD,DISP=SHR                          á      IMGORD
+//CLIUNIF  DD  DSN=FS.FSYS007.CLIUNIF,DISP=(NEW,CATLG,DELETE),           o datas
+//             SPACE=(TRK,(1,1),RLSE),UNIT=SYSALLDA,                ç  no disco
+//             DCB=(LRECL=94,RECFM=FB,DSORG=PS)                        ísticas

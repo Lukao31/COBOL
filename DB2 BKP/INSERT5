@@ -1,0 +1,90 @@
+INSERT INTO TBVENDA (NUMVENDA, QTDEVENDA, CODCLI, CODPROD)              00010005
+VALUES ('000001',10,'01','01');                                         00020008
+                                                                        00030000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00040000
+VALUES ('000002', 24, '02','02');                                       00050009
+                                                                        00060000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00070000
+VALUES ('000003', 37, '03','03');                                       00080009
+                                                                        00090000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00100000
+VALUES ('000004', 12, '04','04');                                       00110009
+                                                                        00120000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00130000
+VALUES ('000005', 67, '05','05');                                       00140009
+                                                                        00141000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00150000
+VALUES ('000006', 40, '06','06');                                       00160009
+                                                                        00170000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00180000
+VALUES ('000007', 13, '07','07');                                       00190009
+                                                                        00200000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00210000
+VALUES ('000008', 62, '08','08');                                       00220009
+                                                                        00230000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00240000
+VALUES ('000009', 26, '09','09');                                       00250009
+                                                                        00260000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00270000
+VALUES ('000010', 99, '10','10');                                       00280009
+                                                                        00290000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00300000
+VALUES ('000011', 16, '01','01');                                       00310009
+                                                                        00311000
+                                                                        00312000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00313000
+VALUES ('000012', 56, '02','02');                                       00320009
+                                                                        00321000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00322000
+VALUES ('000013', 76, '03','03');                                       00330009
+                                                                        00331000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00332000
+VALUES ('000014', 56, '04','04');                                       00340009
+                                                                        00340100
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00341000
+VALUES ('000015', 56, '05','05');                                       00350010
+                                                                        00350100
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00351000
+VALUES ('000016', 56, '06','06');                                       00360009
+                                                                        00361000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00362000
+VALUES ('000017', 56, '07','07');                                       00370009
+                                                                        00371000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00372000
+VALUES ('000018', 56, '08','08');                                       00380009
+                                                                        00381000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00382000
+VALUES ('000019', 21, '09','09');                                       00390009
+                                                                        00391000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00392000
+VALUES ('000020', 58, '10','10');                                       00400009
+                                                                        00400100
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00401000
+VALUES ('000021', 12, '01','01');                                       00410009
+                                                                        00411000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00412000
+VALUES ('000022', 02, '02','02');                                       00420009
+                                                                        00421000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00422000
+VALUES ('000023', 31, '03','03');                                       00430009
+                                                                        00431000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00432000
+VALUES ('000024', 51, '04','04');                                       00440009
+                                                                        00441000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00442000
+VALUES ('000025', 87, '05','05');                                       00450009
+                                                                        00451000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00452000
+VALUES ('000026', 99, '06','06');                                       00460009
+                                                                        00460100
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00461000
+VALUES ('000027', 49, '07','07');                                       00470009
+                                                                        00470100
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00471000
+VALUES ('000028', 50, '08','08');                                       00480009
+                                                                        00481000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00482000
+VALUES ('000029', 52, '09','09');                                       00490009
+                                                                        00491000
+INSERT INTO TBVENDA(NUMVENDA, QTDEVENDA, CODCLI, CODPROD)               00492000
+VALUES ('000030', 06, '10','10');                                       00500009

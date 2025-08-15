@@ -1,0 +1,16 @@
+//FSYS007A JOB 'FSYS007',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID
+//*====================================================================*
+//*              JOB DE COMPILACAO ONLINE SEM DB2                      *
+//*====================================================================*
+//* C ALL FSYS007  ??????? - TROCAR FSYS007 PELO SEU USERID            *
+//* C ALL FS07PGMM ??????? - TROCAR FS07PGMM PELO SEU PROGRAMA         *
+//*====================================================================*
+//STEP0001 JCLLIB ORDER=FS.LB.PROCLIB
+//CICS     EXEC PROCCICS,NOME='FS07PGMM'
+//ENTCOBOL.SYSDEBUG DD  DSNAME=FSYS007.SYSOUT.DEBUG(FS07PGMM),
+//             DISP=SHR
+//LKED.SYSIN    DD   *
+  NAME FS07PGMM(R)
+//**********************************************************************
+//*                        F I M   D O   J C L                         *
+//**********************************************************************

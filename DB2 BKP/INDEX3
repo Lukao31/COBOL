@@ -1,0 +1,6 @@
+-- CRIACAO DO INDICE IDXCLI                                             00010000
+                                                                        00020000
+   CREATE UNIQUE INDEX IDXCLI                                           00030000
+   ON TBCLI(CODCLI)                                                     00040000
+-- EXCLUSAO DO INDICE IDXCLI                                            00050000
+-- DROP INDEX (CODCLI)                                                  00060000

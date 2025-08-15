@@ -1,0 +1,2 @@
+DELETE FROM TBVENDA                                                     00010000
+WHERE CODCLI IN ('0005','0010')                                         00020001

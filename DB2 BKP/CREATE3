@@ -1,0 +1,14 @@
+-- TABELA TBCLI                                                         00010000
+   CREATE TABLE TBCLI                                                   00020005
+   (                                                                    00030005
+     CODCLI       CHAR(4)                     NOT NULL                  00040005
+    ,NOMECLI      VARCHAR(30)                 NOT NULL                  00050005
+    ,ENDCLI       VARCHAR(40)                                           00060005
+    ,DATANASCCLI  DATE                                                  00070005
+                  CHECK (DATANASCCLI >= '01/01/1900')                   00071005
+    ,ALTURACLI    DECIMAL(3,2)                                          00080005
+                  CHECK (ALTURACLI >= 1.00)                             00081005
+    ,CODTIPOCLI   CHAR(2)                                               00090005
+   )                                                                    00100005
+-- EXCLUSAO DA TABELA                                                   00110004
+-- DROP TABLE TBCLI                                                     00120005

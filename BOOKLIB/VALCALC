@@ -1,0 +1,10 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - VALORES A SEREM ASSUM. PARA CALCULOS     *00020002
+      * NOME DO BOOK        - VALCALC                                 * 00030002
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00040000
+      * NOME DO ARQUIVO     - VALCALC                                  *00050002
+      * TAMANHO DO REGISTRO - 6 CHARACTERS                            * 00060002
+      *----------------------------------------------------------------*00070000
+       01  ::REG-VALCALC.                                               00080002
+           05 ::GASTOGAS-C                 PIC 9(01)V99.                00090002
+           05 ::GASTOENE-C                 PIC 9(01)V99.                00091002

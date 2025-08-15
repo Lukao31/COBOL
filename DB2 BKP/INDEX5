@@ -1,0 +1,6 @@
+-- CRIACAO DO INDICE IDXVENDA                                           00010000
+                                                                        00020000
+   CREATE UNIQUE INDEX IDXVENDA                                         00030000
+   ON TBVENDA(NUMVENDA)                                                 00040000
+-- EXCLUSAO DO INDICE IDXVENDA                                          00050000
+-- DROP INDEX (IDXVENDA)                                                00060000

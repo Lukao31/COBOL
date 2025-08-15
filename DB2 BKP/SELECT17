@@ -1,0 +1,5 @@
+SELECT DISTINCT C.NOMECLI                                               00010000
+FROM TBPROD P, TBVENDA V, TBCLI C                                       00020000
+WHERE P.CODPROD = V.CODPROD                                             00030000
+  AND V.CODCLI = C.CODCLI                                               00040000
+  AND P.CODTIPOPROD = '03';                                             00050001

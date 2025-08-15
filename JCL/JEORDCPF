@@ -1,0 +1,25 @@
+//FSYS007C JOB 'JEORDCPF',MSGCLASS=X,CLASS=C,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB  DD DISP=SHR,DSN=FS.GERAL.LOADLIB
+//*******************************************************************
+//* APAGA ARQUIVOS JA CRIADOS
+//*******************************************************************
+//STEP001 EXEC PGM=IDCAMS,COND=(0,NE)
+//SYSOUT   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+   DELETE FS.FSYS007.EXTTORD
+   SET MAXCC = 0
+//*******************************************************************
+//* ORDENA EXTRATOS
+//*******************************************************************
+//STEP002 EXEC PGM=SORT,COND=(0,NE)
+//SYSOUT   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SORTIN   DD DSN=FS.FSYS007.EXTTDESO,DISP=SHR
+//SORTOUT  DD DSN=FS.FSYS007.EXTTORD,
+//         DISP=(NEW,CATLG,DELETE),
+//         UNIT=SYSALLDA,
+//         SPACE=(TRK,(1,1),RLSE),
+//         DCB=(RECFM=FB,LRECL=44,BLKSIZE=32736)
+//SYSIN    DD *
+   SORT FIELDS=(01,05,CH,A)

@@ -21,30 +21,35 @@
            05 WS-FASE                      PIC X(01).
            05 WS-PAGA                      PIC 9(02).
            05 WS-PAGT                      PIC 9(02).
+           05 WS-VALOR-DE                  PIC S9(07)V99 COMP-3.
+           05 WS-VALOR-ATE                 PIC S9(07)V99 COMP-3.
+           05 WS-VENDIDO-POR               PIC X(15).
       *
        77  WS-ALL-SPACES                   PIC X(15) VALUE ALL SPACES.
-       77  WS-FILTRO                       PIC X(15).
+       77  WS-FILTRO                       PIC X(15) VALUE ALL '%'.
+       77  WS-FILTRO-V                     PIC X(15) VALUE ALL '%'.
        77  WS-TRIM                         PIC 9(02).
+       77  WS-PROD-AUX                     PIC X(15).
+       77  WS-VENDA-AUX                    PIC X(15).
       *
        01  WS-VAR-TEMPO.
            05 WS-DATA                      PIC X(10).
            05 WS-HORARIO                   PIC X(08).
       *
        01  LD-LINDET.
-           05 FILLER                       PIC X(06)
-                                                   VALUE SPACES.
+           05 LD-ID-PRODUTO                PIC 9(04).
+           05 FILLER                       PIC X(04).
            05 LD-NOME-PRODUTO              PIC X(25).
            05 FILLER                       PIC X(04)
                                                    VALUE SPACES.
            05 LD-VENDIDO-POR               PIC X(20).
-           05 FILLER                       PIC X(05)
+           05 FILLER                       PIC X(03)
                                                    VALUE SPACES.
            05 FILLER                       PIC X(01)
                                                    VALUE '$'.
            05 LD-VALOR-UNITARIO                    PIC Z.ZZZ.ZZ9,99.
-           05 FILLER                       PIC X(07)
+           05 FILLER                       PIC X(02)
                                                    VALUE SPACES.
-
       *
        77  WS-SQLCODE                      PIC +9(09).
        77  WS-QUEUE-NAME                   PIC X(08)
@@ -118,6 +123,8 @@
       * MOVER A MENSAGEM PARA O CAMPO APROPRIADO
            MOVE 'ADICIONE O NOME DO PRODUTO DESEJADO'
                                            TO MSGPRLO
+           MOVE 0                          TO VALDEPRLO
+           MOVE 0                          TO ATEPRLO
            PERFORM 210-ENTER
       *    PERFORM 999-TRATA-FASE2
            .
@@ -144,6 +151,13 @@
            .
       *
        210-ENTER.
+           IF VALDEPRLL NOT EQUAL 0
+              EXEC CICS BIF DEEDIT FIELD(VALDEPRLI) END-EXEC
+           END-IF
+           IF ATEPRLL NOT EQUAL 0
+               EXEC CICS BIF DEEDIT FIELD(ATEPRLI) END-EXEC
+           END-IF
+      *
            IF PRDPRLL <= 0
               MOVE SPACES                      TO WS-FILTRO
            END-IF
@@ -159,29 +173,76 @@
               IF WS-TRIM = 0
                  MOVE SPACES                     TO WS-FILTRO
               ELSE
-                 MOVE '%'                        TO WS-FILTRO
-                 ADD 1                           TO WS-TRIM
+      *           MOVE '%'                        TO WS-FILTRO
+      *           ADD 1                           TO WS-TRIM
                  MOVE WS-DESCPROD-AUX            TO WS-FILTRO(2:WS-TRIM)
-                 ADD 1                           TO WS-TRIM
-                 MOVE '%'                        TO WS-FILTRO(WS-TRIM:1)
+      *           ADD 1                           TO WS-TRIM
+      *          MOVE '%'                        TO WS-FILTRO(WS-TRIM:1)
               END-IF
            END-IF
+      *
+           IF VENDPORL <= 0
+              MOVE SPACES                      TO WS-FILTRO-V
+           END-IF
+           IF VENDPORL > 0
+              MOVE 0                             TO WS-TRIM
+              MOVE VENDPORI                     TO WS-VENDA-AUX
+              PERFORM VARYING WS-TRIM FROM LENGTH OF WS-VENDA-AUX
+              BY -1 UNTIL WS-TRIM = 0 OR WS-VENDA-AUX(WS-TRIM:1)
+              NOT = SPACES
+              END-PERFORM
+            IF WS-TRIM = 0
+              MOVE SPACES                      TO WS-FILTRO-V
+            ELSE
+      *       MOVE '%'                        TO WS-FILTRO-V
+      *       ADD 1                           TO WS-TRIM
+              MOVE WS-VENDA-AUX             TO WS-FILTRO-V(2:WS-TRIM)
+      *       ADD 1                           TO WS-TRIM
+      *       MOVE '%' TO WS-FILTRO-V(WS-TRIM:1)
+            END-IF
+           END-IF
+      *
+           IF VALDEPRLI IS  NUMERIC AND VALDEPRLI > 0
+              MOVE VALDEPRLI           TO WS-VALOR-DE
+           ELSE
+              MOVE ZERO TO WS-VALOR-DE
+           END-IF
+      *
+           IF ATEPRLI IS NUMERIC AND ATEPRLI > 0
+              MOVE ATEPRLI              TO WS-VALOR-ATE
+           ELSE
+              MOVE 9999999,99           TO WS-VALOR-ATE
+           END-IF
+      *
+           IF VENDPORI     = SPACES
+              STRING '%' DELIMITED BY SIZE
+              VENDPORI DELIMITED BY SPACES
+                     '%' DELIMITED BY SIZE
+                       INTO WS-VENDIDO-POR
+           ELSE
+               MOVE '%' TO WS-VENDIDO-POR
+           END-IF.
+      *
            EXEC SQL
               DECLARE C1 CURSOR FOR
               SELECT ID_PRODUTO, NOME_PRODUTO,VENDIDO_POR,
                  VALOR_UNITARIO
               FROM PRODUTOS
               WHERE (NOME_PRODUTO LIKE :WS-FILTRO OR
-                     :WS-FILTRO = : WS-ALL-SPACES)
+                     :WS-FILTRO = :WS-ALL-SPACES) AND
+                        (VENDIDO_POR LIKE :WS-FILTRO-V OR
+                         :WS-FILTRO-V = :WS-ALL-SPACES) AND
+                 (VALOR_UNITARIO BETWEEN :WS-VALOR-DE AND :WS-VALOR-ATE)
               ORDER BY NOME_PRODUTO
            END-EXEC
-
+      *
            EXEC SQL
               OPEN C1
            END-EXEC
 
            IF SQLCODE NOT EQUAL 0
               MOVE "ERRO AO ABRIR  CURSOR" TO WS-MSG-ERRO
+              MOVE SQLCODE                 TO WS-SQLCODE
               PERFORM 999-ENCERRA-TRANSACAO
            END-IF
 
@@ -193,7 +254,10 @@
            MOVE ZERO                       TO WS-ITEM
            SET ENDFILE-NO TO TRUE
            PERFORM 999-CARREGA-TS UNTIL ENDFILE-YES
-
+           IF WS-ITEM = 0
+           MOVE 'PRODUTO NAO LOCALIZADO'   TO MSGPRLO
+           PERFORM 999-TRATA-FASE2
+           END-IF
            EXEC SQL
                CLOSE C1
            END-EXEC
@@ -302,48 +366,26 @@
            .
       *
        999-VALIDA-CAMPOS.
-           .
+           IF EIBCPOSN <= 640 OR EIBCPOSN >= 1439
+                  MOVE 'POSICAO INVALIDA DO CURSOR'
+                                              TO MSGPRLO
+                  PERFORM 999-TRATA-FASE2
+               END-IF
 
-      *
-      *999-TRATA-LINHAS.
-      *    EXEC SQL
-      *       DECLARE C2 CURSOR FOR
-      *       SELECT NOME_PRODUTO
-      *             ,VENDIDO_POR
-      *             ,VALOR_UNITARIO
-      *       FROM PRODUTOS
-      *        WHERE DESCRICAO >= :DCLPRD-DESCRICAO
-      *       ORDER BY NOME_PRODUTO
-      *    END-EXEC
-      *
-      *    EXEC SQL
-      *       OPEN C2
-      *    END-EXEC
-      *
-      *    IF SQLCODE NOT EQUAL 0
-      *       MOVE "ERRO AO ABRIR O  CURSOR" TO MSGPRLO
-      *       MOVE SQLCODE                 TO WS-SQLCODE
-      *       GO TO 999-ERROR-DB2
-      *    END-IF
-      *
-      *    MOVE ZERO                       TO WS-ITEM
-      *    PERFORM 999-CARREGA-TS UNTIL SQLCODE = +100
-      *
-      *    EXEC SQL
-      *       CLOSE C2
-      *    END-EXEC
-      *
-      *    MOVE 1                          TO WS-PAGA
-      *
-      *    DIVIDE WS-ITEM BY 10 GIVING WS-PAGT REMAINDER WS-RESTO
-      *
-      *    IF WS-RESTO > 0
-      *       ADD 1 TO WS-PAGT
-      *    END-IF
-      *
-      *    PERFORM 999-CARREGA-DETALHES
-      *    PERFORM 999-TRATA-FASE2
-      *    .
+               COMPUTE WS-INDEX = (EIBCPOSN / 80 ) - 7
+               MOVE LIST1PRLI(WS-INDEX)        TO LD-LINDET
+
+               IF LD-NOME-PRODUTO EQUAL SPACES
+                  MOVE 'POSICAO NAO CONTEM PRODUTO'
+                                             TO MSGPRLO
+                  PERFORM 999-TRATA-FASE2
+               END-IF
+               STRING 'PRODUTO '                   DELIMITED BY SIZE
+                        LD-NOME-PRODUTO            DELIMITED BY SIZE
+                      ' SELECIONADO PARA CONSULTA' DELIMITED BY SIZE
+                                                   INTO MSGPRLO
+               PERFORM 999-TRATA-FASE2
+               .
       *
        999-ENCERRA-TRANSACAO.
            EXEC CICS SEND TEXT
@@ -456,8 +498,9 @@
            EVALUATE SQLCODE
               WHEN 0
                  ADD 1                     TO WS-ITEM
-                 MOVE DCLPRD-NOME-PRODUTO-TEXT   TO LD-NOME-PRODUTO
-                 MOVE DCLPRD-VENDIDO-POR-TEXT  TO LD-VENDIDO-POR
+                 MOVE DCLPRD-ID-PRODUTO       TO LD-ID-PRODUTO
+                 MOVE DCLPRD-NOME-PRODUTO-TEXT  TO LD-NOME-PRODUTO
+                 MOVE DCLPRD-VENDIDO-POR-TEXT TO LD-VENDIDO-POR
                  MOVE DCLPRD-VALOR-UNITARIO TO LD-VALOR-UNITARIO
 
                  EXEC CICS WRITEQ TS

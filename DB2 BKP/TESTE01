@@ -1,0 +1,7 @@
+-- CRIACAO DA TABELA TBTIPOCLI  HELLO WORLD                             00001000
+   CREATE TABLE TBTIPOCLI                                               00010004
+   (                                                                    00011004
+    CODTIPOCLI CHAR(02)     NOT NULL,                                   00020004
+    DESCTIPOCLI VARCHAR(30) NOT NULL                                    00030004
+   )                                                                    00040004
+-- DROP TABLE TBTIPOCLI                                                 00050004

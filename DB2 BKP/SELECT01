@@ -1,0 +1,3 @@
+SELECT NOMECLI, ALTURACLI                                               00010002
+FROM TBCLI                                                              00020000
+WHERE ALTURACLI < 1.70                                                  00030002

@@ -1,0 +1,17 @@
+     CREATE TABLE FUNCIONARIOS
+    (   CPF                         CHAR(11) NOT NULL
+       ,NOME                        VARCHAR(30) NOT NULL
+       ,DDD                         CHAR (02) NOT NULL
+       ,TELEFONE                    CHAR (11) NOT NULL
+       ,SALARIOBASE                 DECIMAL (10,2) NOT NULL
+                                    CHECK (SALARIOBASE > 0)
+       ,INSS                        DECIMAL (06,2)
+       ,IRRF                        DECIMAL (06,2)
+       ,DEPENDENTE                  NUMERIC (01)
+    );
+       CREATE UNIQUE INDEX IDXCPF
+       ON FUNCIONARIOS(CPF);
+
+       ALTER TABLE FUNCIONARIOS
+       ADD PRIMARY KEY(CPF);
+--     DROP TABLE FUNCIONARIOS

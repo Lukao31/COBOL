@@ -1,0 +1,6 @@
+UPDATE TBPROD                                                           00010001
+SET PRECOPROD = PRECOPROD * 0.9                                         00020000
+WHERE CODPROD IN ( SELECT CODPROD                                       00030003
+                   FROM TBVENDA                                         00040003
+                   WHERE QTDEVENDA = 0                                  00050003
+                 )                                                      00060003

@@ -1,0 +1,40 @@
+      ******************************************************************
+      * DCLGEN TABLE(PEDIDOS)                                          *
+      *        LIBRARY(FS.FSYS007.DB2LIB(PEDIDS))                      *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(DCLPED-)                                          *
+      *        STRUCTURE(DCLPED)                                       *
+      *        QUOTE                                                   *
+      *        DBCSDELIM(NO)                                           *
+      *        COLSUFFIX(YES)                                          *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE PEDIDOS TABLE
+           ( NUMERO_PEDIDO                  INTEGER NOT NULL,
+             CPF                            CHAR(11) NOT NULL,
+             NUMERO_CARTAO                  DECIMAL(16, 0) NOT NULL,
+             TIPO_CARTAO                    CHAR(1) NOT NULL,
+             DATA                           DATE NOT NULL,
+             VALOR_TOTAL                    DECIMAL(7, 2)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE PEDIDOS                            *
+      ******************************************************************
+       01  DCLPED.
+      *                       NUMERO_PEDIDO
+           10 DCLPED-NUMERO-PEDIDO
+              PIC S9(9) USAGE COMP.
+      *                       CPF
+           10 DCLPED-CPF           PIC X(11).
+      *                       NUMERO_CARTAO
+           10 DCLPED-NUMERO-CARTAO
+              PIC S9(16)V USAGE COMP-3.
+      *                       TIPO_CARTAO
+           10 DCLPED-TIPO-CARTAO   PIC X(1).
+      *                       DATA
+           10 DCLPED-DATA          PIC X(10).
+      *                       VALOR_TOTAL
+           10 DCLPED-VALOR-TOTAL   PIC S9(5)V9(2) USAGE COMP-3.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 6       *
+      ******************************************************************

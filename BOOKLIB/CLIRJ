@@ -1,0 +1,14 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - CLIENTES DE RIO DE JANEIRO               *00020003
+      * NOME DO BOOK        - CLIRJ                                    *00021003
+      * NOME DO PDS         - FS.FSYS012.BOOKLIB                       *00022001
+      * NOME DO ARQUIVO     - CLIRJ                                    *00023003
+      * TAMANHO DO REGISTRO - 94 CHARACTERS                            *00024002
+      *----------------------------------------------------------------*00030000
+       01  ::REG-CLIRJ.                                                 00040003
+           05 ::CPFCLI-RJ                  PIC X(11).                   00050003
+           05 ::NOMECLI-RJ                 PIC X(25).                   00060003
+           05 ::ENDCLI-RJ                  PIC X(30).                   00070003
+           05 ::FONECLI-RJ                 PIC X(10).                   00080003
+           05 ::TOTALCOMPRAS-RJ            PIC 9(08)V99.                00090003
+           05 ::ULTIMACOMPRA-RJ            PIC X(08).                   00100003

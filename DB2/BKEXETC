@@ -1,0 +1,36 @@
+      ******************************************************************
+      * DCLGEN TABLE(TBCLIENT)                                         *
+      *        LIBRARY(FS.FSYS007.DB2LIB(BKEXETC))                     *
+      *        LANGUAGE(COBOL)                                         *
+      *        QUOTE                                                   *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE TBCLIENT TABLE
+           ( CODCLI                         CHAR(4) NOT NULL,
+             NOMECLI                        VARCHAR(30) NOT NULL,
+             ENDCLI                         VARCHAR(40),
+             FONECLI                        CHAR(9),
+             EMAILCLI                       VARCHAR(50),
+             CPFCLI                         CHAR(11),
+             SALDOCLI                       DECIMAL(9, 2)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE TBCLIENT                           *
+      ******************************************************************
+       01  DCLTBCLIENT.
+           10 CODCLI               PIC X(4).
+           10 NOMECLI.
+              49 NOMECLI-LEN       PIC S9(4) USAGE COMP.
+              49 NOMECLI-TEXT      PIC X(30).
+           10 ENDCLI.
+              49 ENDCLI-LEN        PIC S9(4) USAGE COMP.
+              49 ENDCLI-TEXT       PIC X(40).
+           10 FONECLI              PIC X(9).
+           10 EMAILCLI.
+              49 EMAILCLI-LEN      PIC S9(4) USAGE COMP.
+              49 EMAILCLI-TEXT     PIC X(50).
+           10 CPFCLI               PIC X(11).
+           10 SALDOCLI             PIC S9(7)V9(2) USAGE COMP-3.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 7       *
+      ******************************************************************

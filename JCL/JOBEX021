@@ -1,0 +1,20 @@
+//FSYS007E JOB 'FSYS007',MSGCLASS=X,CLASS=A,NOTIFY=&SYSUID,TIME=(0,10)
+//JOBLIB   DD  DISP=SHR,DSN=FS.GERAL.LOADLIB
+//*---------------------------------------------------------------------
+//STEP001  EXEC PGM=IDCAMS
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD *
+ DELETE FS.FSYS007.VCADPRD PURGE CLUSTER
+ IF MAXCC=8 THEN SET MAXCC=0
+ DEFINE CLUSTER                                   -
+     (NAME (FS.FSYS007.VCADPRD)                   -
+      VOL (PR39X7)                                -
+      TRK (1,1)                                   -
+      RECORDSIZE (69,69)                          -
+      KEYS (4,0)                                  -
+      SHAREOPTIONS (2,3))                         -
+      DATA(NAME(FS.FSYS007.VCADPRD.DATA))         -
+      INDEX(NAME(FS.FSYS007.VCADPRD.INDEX))
+//STEP002  EXEC PGM=EX007P19
+//CADPRD   DD  DSN=FS.FSYS998.CADPRD,DISP=SHR
+//VCADPRD  DD  DSN=FS.FSYS007.VCADPRD,DISP=SHR

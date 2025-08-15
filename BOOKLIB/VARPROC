@@ -1,0 +1,39 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE VARIAVEIS   - VARPROC                                  *00020007
+      * NOME DO BOOK        - VARPROC                                  *00021006
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022007
+      *----------------------------------------------------------------*00022103
+      * VARIAVEIS DA ROTINA DE TEMPO DE PROCESSAMENTO                  *00022306
+      *----------------------------------------------------------------*00022404
+      *                                                                 00022505
+       01  WS-HORARIO-INICIAL.                                          00022606
+           05 WS-HORA-I                    PIC 9(02).                   00022706
+           05 WS-MIN-I                     PIC 9(02).                   00022806
+           05 WS-SEG-I                     PIC 9(02).                   00022906
+           05 WS-CENT-I                    PIC 9(02).                   00023006
+      *                                                                 00024006
+       01  WS-HORARIO-FINAL.                                            00025006
+           05 WS-HORA-F                    PIC 9(02).                   00026006
+           05 WS-MIN-F                     PIC 9(02).                   00027006
+           05 WS-SEG-F                     PIC 9(02).                   00028006
+           05 WS-CENT-F                    PIC 9(02).                   00029006
+      *                                                                 00030006
+       01  WS-TEMPO-PROCESSAMENTO.                                      00040006
+           05 WS-HORA-P                    PIC 9(02).                   00050006
+           05 WS-MIN-P                     PIC 9(02).                   00060006
+           05 WS-SEG-P                     PIC 9(02).                   00070006
+           05 WS-CENT-P                    PIC 9(02).                   00080006
+      *                                                                 00090006
+       01  WS-TEMPO-PROCESSAMENTO-F.                                    00100006
+           05 WS-HORA-PF                   PIC 9(02).                   00110006
+           05 FILLER                       PIC X(01)                    00120006
+                                                   VALUE ':'.           00130006
+           05 WS-MIN-PF                    PIC 9(02).                   00140006
+           05 FILLER                       PIC X(01)                    00150006
+                                                   VALUE ':'.           00160006
+           05 WS-SEG-PF                    PIC 9(02).                   00170006
+           05 FILLER                       PIC X(01)                    00180006
+                                                   VALUE ':'.           00190006
+           05 WS-CENT-PF                   PIC 9(02).                   00200006
+      *                                                                 00210006
+       77  WS-DIFERENCA                    PIC 9(07).                   00220006

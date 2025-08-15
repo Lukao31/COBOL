@@ -1,0 +1,10 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - PRODCAD                                  *00020011
+      * NOME DO BOOK        - PRODCAD                                   00021011
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - PRODCAD                                   00023011
+      * TAMANHO DO REGISTRO - 30 CHARACTERS                            *00024011
+      *----------------------------------------------------------------*00030000
+           05 CODPROD-CAD                  PIC X(04).                   00050012
+           05 DESCPROD-CAD                 PIC X(20).                   00060012
+           05 QTDESTOQUE-CAD               PIC 9(06).                   00070012

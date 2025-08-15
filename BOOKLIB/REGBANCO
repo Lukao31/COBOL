@@ -1,0 +1,12 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - REGBANCO                                * 00020015
+      * NOME DO BOOK        - REGBANCO                                  00021015
+      * NOME DO PDS         - FS.FSYS007.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - BANCO                                     00023015
+      * TAMANHO DO REGISTRO - *** BYTES                                *00024015
+      *----------------------------------------------------------------*00030000
+       01  REG-BANCO.                                                   00040021
+           05 RA-NOME                        PIC X(50).                 00050015
+           05 RA-CPF                         PIC X(11).                 00060015
+           05 RA-TIPO                        PIC X(02).                 00090015
+           05 RA-SALDO                       PIC 9(07)V99 COMP-3.       00130021

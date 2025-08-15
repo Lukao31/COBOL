@@ -1,0 +1,14 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - CLIENTES UNIFICADOS SP-RJ-MG             *00020004
+      * NOME DO BOOK        - CLIUNIF                                  *00021004
+      * NOME DO PDS         - FS.FSYS012.BOOKLIB                       *00022001
+      * NOME DO ARQUIVO     - CLIUNIF                                  *00023004
+      * TAMANHO DO REGISTRO - 94 CHARACTERS                            *00024002
+      *----------------------------------------------------------------*00030000
+       01  ::REG-CLIUNIF.                                               00040004
+           05 ::CPFCLI-UNIF                PIC X(11).                   00050004
+           05 ::NOMECLI-UNIF               PIC X(25).                   00060004
+           05 ::ENDCLI-UNIF                PIC X(30).                   00070004
+           05 ::FONECLI-UNIF               PIC X(10).                   00080004
+           05 ::TOTALCOMPRAS-UNIF          PIC 9(08)V99.                00090004
+           05 ::ULTIMACOMPRA-UNIF          PIC X(08).                   00100004
