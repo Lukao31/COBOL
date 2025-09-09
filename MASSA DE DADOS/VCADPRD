@@ -1,0 +1,18 @@
+      *----------------------------------------------------------------*00010000
+      * BOOK DE ARQUIVO     - VADPRD                                   *00020009
+      * NOME DO BOOK        - CADPRD                                   *00021009
+      * NOME DO PDS         - FS.FSYS011.BOOKLIB                       *00022004
+      * NOME DO ARQUIVO     - VCADPRD                                  *00023009
+      * TAMANHO DO REGISTRO -    CHARACTERS                            *00024007
+      *----------------------------------------------------------------*00030000
+       01  WS-REG-VCADPRD.                                              00040009
+           05  WS-CODPROD                  PIC X(04).                   00050009
+           05  WS-DESCPROD                 PIC X(20).                   00060009
+           05  WS-UNIDPROD                 PIC X(05).                   00070009
+           05  WS-LOCALPROD                PIC X(05).                   00080009
+           05  WS-QTDEST                   PIC 9(05).                   00090009
+           05  WS-QTDMAX                   PIC 9(05).                   00100009
+           05  WS-QTDMIN                   PIC 9(05).                   00110009
+           05  WS-PRECOCOMPRA              PIC 9(06)V99.                00120009
+           05  WS-PRECOVENDA               PIC 9(06)V99.                00130009
+           05  WS-PERCOMIS                 PIC 9(02)V99.                00140009

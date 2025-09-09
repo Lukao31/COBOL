@@ -1,0 +1,254 @@
+      *----------------------------------------------------------------*
+       IDENTIFICATION                      DIVISION.
+      *----------------------------------------------------------------*
+       PROGRAM-ID.                         T11PCMP.
+       AUTHOR.                             RAQUEL E LUCAS.
+      *----------------------------------------------------------------*
+       ENVIRONMENT                         DIVISION.
+      *----------------------------------------------------------------*
+       CONFIGURATION                       SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+      *----------------------------------------------------------------*
+       DATA                                DIVISION.
+      *----------------------------------------------------------------*
+       WORKING-STORAGE                     SECTION.
+      *----------------------------------------------------------------*
+       77  WS-FASE                         PIC X(01).
+       77  WS-MSG                          PIC X(80).
+       77  WS-LINHA                        PIC 9(02).
+       77  WS-COLUNA                       PIC 9(02).
+       77  WS-INDEX                        PIC 9(02).
+       77  WS-PONTOS                       PIC 9(05) VALUE 0.
+       77  WS-BOMBAS                       PIC 9(02).
+
+       01  WS-VAR-TEMPO.
+           05 WS-DATA                      PIC X(10).
+           05 WS-HORARIO                   PIC X(08).
+       01  WS-DFHCOMMAREA.
+           05 JOGADOR-NOME                 PIC X(20).
+           05 TABULEIRO.
+              10 LINHA OCCURS 8 TIMES.
+                 15 CELULA OCCURS 8 TIMES   PIC X.
+           05 VISIVEL.
+              10 LINHA-V OCCURS 8 TIMES.
+                 15 CELULA-V OCCURS 8 TIMES PIC X.
+           05 PONTUACAO                    PIC 9(05).
+           05 BOMBAS-RESTO                 PIC 9(02).
+      *
+           COPY T11MCMP.
+           COPY DFHAID.
+           COPY DFHBMSCA.
+      *
+           EXEC SQL
+              INCLUDE DCLCMP
+           END-EXEC.
+      *
+           EXEC SQL
+              INCLUDE SQLCA
+           END-EXEC.
+      *----------------------------------------------------------------*
+       LINKAGE                             SECTION.
+      *----------------------------------------------------------------*
+       01  DFHCOMMAREA.
+           05 OCCURS 0 TO 24576 TIMES DEPENDING ON EIBCALEN
+                                           PIC X(01).
+      *----------------------------------------------------------------*
+       PROCEDURE                           DIVISION.
+      *----------------------------------------------------------------*
+           EXEC CICS HANDLE CONDITION
+              MAPFAIL(999-MAPFAIL)
+              ERROR(999-ERRO-GENERICO)
+           END-EXEC
+      ******************************************************************
+      *         SELETOR DE FASE - O MENU PRINCIPAL POSSUI 2 FASES
+      *         FASE 1 - ENVIA O MAPA PARA O TERMINAL
+      *         FASE 2 - TRATA O CAMPO T2COD
+      *         FASE 3 - TRATA O CAMPO T2CONF
+      ******************************************************************
+           MOVE DFHCOMMAREA                TO WS-DFHCOMMAREA
+      *
+           IF EIBCALEN EQUAL ZERO
+              MOVE '1'                     TO WS-FASE
+           END-IF
+      *
+           EVALUATE WS-FASE
+              WHEN '1' PERFORM 100-FASE1
+              WHEN '2' PERFORM 200-FASE2
+              WHEN '3' PERFORM 300-FASE3
+              WHEN '4' PERFORM 400-FASE4
+              WHEN OTHER
+                   MOVE +80                TO WS-LENGTH
+                   MOVE 'ERRO NO NUMERO DA FASE'
+                                           TO MENCMPO
+      *
+                   PERFORM 999-ENCERRA-TRANSACAO
+           END-EVALUATE
+           .
+       100-FASE1.
+      * INICIALIZANDO O TABULEIRO
+           MOVE SPACES                      TO WS-DFHCOMMAREA-TABULEIRO
+           MOVE SPACES                      TO WS-DFHCOMMAREA-VISIVEL
+           MOVE  0                          TO WS-PONTOS
+           MOVE  6                          TO WS-BOMBAS
+      *  INICIALIZA TODAS AS CELULAS COM 'N'
+           PERFORM VARYING WS-LINHA FROM 1 BY 1 UNTIL WS-LINHA > 6
+               PERFORM VARYING WS-COLUNA FROM 1 BY 1 UNTIL WS-COLUNA > 6
+                   MOVE 'N' TO CELULA(WS-LINHA, WS-COLUNA)
+               END-PERFORM
+           END-PERFORM
+      * POSICIONA 3 BOMBAS ALEATORIMENTE
+           MOVE 0 TO WS-INDEX
+           PERFORM UNTIL WS-INDEX = WS-BOMBAS
+               COMPUTE WS-LINHA-RAND  = FUNCTION RANDOM(6) 
+               COMPUTE WS-COLUNA-RAND = FUNCTION RANDOM(6) 
+               IF CELULA(WS-LINHA-RAND, WS-COLUNA-RAND) NOT = '*'
+                   MOVE '*' TO CELULA(WS-LINHA-RAND, WS-COLUNA-RAND)
+                   ADD 1 TO WS-INDEX
+               END-IF
+           END-PERFORM
+      *  SEGUE PARA PROXIMOS PASSOS NO CODIGO
+      *     MOVE 'INFORME SEU NOME:' TO MENCMPO
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE2
+           .
+       200-FASE2.
+           EXEC CICS HANDLE AID
+               ENTER   (210-ENTER)
+               ANYKEY  (250-ANYKEY)
+           END-EXEC
+      *
+           EXEC CICS RECEIVE
+                MAP     ('MAPACMP')
+                MAPSET  ('T11MCMP')
+                INTO    (MAPACMPI)
+           END-EXEC
+           .
+       210-ENTER.
+      *    CALCULA POSICAO DA CELULA PELO EIBCPOSN(INTEIRO)
+           COMPUTE WS-LINHA  = FUNCTION INTEGER((EIBCPOSN / 80 + 1 - 4)
+                                               / 3 + 1)
+           COMPUTE WS-COLUNA = FUNCTION INTEGER((EIBCPOSN MOD 80 + 1            
+                                                - 34) / 3 + 1)
+           IF WS-LINHA < 1 OR WS-LINHA > 6 OR
+             WS-COLUNA < 1 OR WS-COLUNA > 6
+             MOVE 'POSICAO INVALIDA'         TO MENCMPO
+             PERFORM 999-TRATA-FASE2
+           ELSE
+             PERFORM 999-TRATA-FASE3
+           END-IF
+           .
+       300-FASE3.
+      *   VERIFICA SE A CELULA JA FOI REVELADA
+           IF CELULA-V(WS-LINHA,WS-COLUNA) = 'N'
+               MOVE 'S'                  TO CELULA-V(WS-LINHA,WS-COLUNA)
+      *        VERIFICA SE ACERTOU A BOMBA
+               IF CELULA(WS-LINHA,WS-COLUNA) = '*'
+      *           PERDEU
+                   MOVE 'BOOOOM! VOCE ACERTOU UMA BOMBA! FIM DE JOGO!'
+                                             TO MENCMPO
+                   PERFORM 999-TRATA-FASE2
+               ELSE 
+                   MOVE 'PARABENS! VOCE ESCAPOU DESTA VEZ...            
+      -                   'CONTINUE A JOGAR' TO MENCMPO
+                     ADD 10                  TO WS-PONTOS
+                     MOVE WS-PONTOS          TO PONTJO
+                     PERFORM 999-TRATA-FASE2
+               END-IF
+           ELSE
+                MOVE 'CELULA JA REVELADA'    TO MENCMPO
+                PERFORM 999-TRATA-FASE2
+           END-IF
+              .
+      *   400-FASE4.
+
+       230-PF3.
+           MOVE 'TERMINO NORMAL DA TRANSACAO' TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .
+       250-ANYKEY.
+           MOVE 'TECLA PRESSIONADA INVALIDA'
+                                           TO MENCMPO
+           PERFORM 999-TRATA-FASE2
+           .
+      *    
+       999-ENCERRA-TRANSACAO.
+           MOVE +80                TO WS-LENGTH
+           EXEC CICS SEND TEXT
+               FROM (WS-MSG-ERRO)
+               LENGTH(WS-LENGTH)
+               ERASE FREEKB ALARM
+           END-EXEC
+      *
+           EXEC CICS RETURN
+           END-EXEC
+           .
+       999-MANDA-TELA.
+           MOVE EIBTRMID                   TO TERMCMPO
+           MOVE EIBTRNID                   TO TRACMPO
+           MOVE EIBTASKN                   TO TASCMPO
+           MOVE WS-FASE                    TO FASCMPO
+      *
+           EXEC CICS LINK
+                PROGRAM('AUXCICS1')
+                COMMAREA(WS-VAR-TEMPO)
+                LENGTH(+15)
+           END-EXEC
+      *
+           MOVE WS-DATA                    TO DATCMPO
+           MOVE WS-HORARIO                 TO HORCMPO
+
+      *    PREPARA O MAPA PARA ENVIO
+           EXEC CICS SEND
+              MAP      ('MAPACMP')
+              MAPSET   ('T11MCMP')
+              FROM     (MAPACMPO)
+              ERASE  FREEKB ALARM CURSOR
+           END-EXEC
+           .
+      *
+       999-CHAMA-FASE1.
+           MOVE '1'                        TO WS-FASE
+      *
+           EXEC CICS XCTL
+               PROGRAM('T11PCMP')
+               COMMAREA(WS-DFHCOMMAREA)
+               LENGTH(LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+      *
+           .
+       999-CHAMA-FASE2.
+           MOVE '2'                        TO WS-FASE
+      *
+           EXEC CICS RETURN
+               TRANSID('CM11')
+               COMMAREA(WS-DFHCOMMAREA)
+               LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+       999-CHAMA-FASE3.
+           MOVE '3'                        TO WS-FASE
+      *
+           EXEC CICS RETURN
+               TRANSID('CM11')
+               COMMAREA(WS-DFHCOMMAREA)
+               LENGTH (LENGTH OF WS-DFHCOMMAREA)
+           END-EXEC
+           .
+       999-TRATA-FASE2.
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE2
+           .
+       999-TRATA-FASE3.
+
+           PERFORM 999-MANDA-TELA
+           PERFORM 999-CHAMA-FASE3
+           .
+       999-MAPFAIL.
+           MOVE 'ERRO MAPA T11MLOG'       TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .
+       999-ERRO-GENERICO.
+           MOVE 'ERRO GENERICO T11PLOG '   TO WS-MSG-ERRO
+           PERFORM 999-ENCERRA-TRANSACAO
+           .

@@ -1,0 +1,389 @@
+      *================================================================*
+       IDENTIFICATION                  DIVISION.
+      *================================================================*
+
+       PROGRAM-ID.                     CBTI9970.
+       AUTHOR.                         RAQUEL FERNANDA.
+
+      *================================================================*
+      *                 TCS - TATA CONSULTANT SERVICES                 *
+      *----------------------------------------------------------------*
+      *    PROGRAMA....: CBTI9970                                      *
+      *    PROGRAMADOR.: RAQUEL FERNANDA.                              *
+      *    ANALISTA....: RAQUEL FERNANDA.                              *
+      *    DATA........: SETEMBRO/2025                                 *
+      *----------------------------------------------------------------*
+      *    SISTEMA: CBTI - COBRANCA - TROCA DE INFORMACOES             *
+      *    OBJETIVO......: LER ARQUIVO NO FORMATO CNAB400 CONTENDO DI- *
+      *                    VERSOS LOTES E GERAR SAIDA COM UM UNICO LOTE*
+      *                    CONFORME INDICADO EM PARM DE JCL.           *
+      *----------------------------------------------------------------*
+      *    ARQUIVOS                                                    *
+      *    DDNAME    DESCRICAO                            INCLUDE/BOOK *
+      *    VARIOSLO LOTES CNAB400 DE VARIAS EMPRESAS        I#CBTICB   *
+      *    UNICOLOT LOTE CNAB400 DE UMA UNICA EMPRESA       I#CBTICB   *
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+      *    MODULO......:                                               *
+      *    DDNAME    DESCRICAO                                         *
+      *    BRAD7100  MODULO DE TRATAMENTO DE ERRO                      *
+      *    BRAD0160  OBTER NOME DO JOB                                 *
+      *    BRAD7600  OBTER DATA DO SISTEMA                             *
+      *================================================================*
+
+      *================================================================*
+       ENVIRONMENT                     DIVISION.
+      *================================================================*
+
+      *----------------------------------------------------------------*
+       CONFIGURATION                   SECTION.
+
+       SPECIAL-NAMES.
+           DECIMAL-POINT               IS COMMA.
+
+      *----------------------------------------------------------------*
+       INPUT-OUTPUT                    SECTION.
+      *----------------------------------------------------------------*
+       FILE-CONTROL.
+
+           SELECT  VARIOSLO  ASSIGN    TO  VARIOSLO
+                   FILE      STATUS    IS  WRK-FS-VARIOSLO.
+
+           SELECT  UNICOLOT  ASSIGN    TO  UNICOLOT
+                   FILE      STATUS    IS  WRK-FS-UNICOLOT.
+
+      *================================================================*
+       DATA                            DIVISION.
+      *================================================================*
+
+      *----------------------------------------------------------------*
+       FILE                            SECTION.
+      *----------------------------------------------------------------*
+       FD  VARIOSLO
+           RECORDING MODE IS F
+           LABEL RECORD   IS STANDARD
+           BLOCK CONTAINS 0 RECORDS.
+       01  FD-REG-VARIOSLO             PIC X(400).
+
+       FD  UNICOLOT
+           RECORDING MODE IS F
+           LABEL RECORD   IS STANDARD
+           BLOCK CONTAINS 0 RECORDS.
+       01  FD-REG-UNICOLOT             PIC X(400).
+
+      *================================================================*
+       WORKING-STORAGE                 SECTION.
+      *================================================================*
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(040)         VALUE
+           '* INICIO DA AREA DE WORKING *      '.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(040)         VALUE
+           '* VARIAVEIS DE FILE-STATUS *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  WRK-FS-VARIOSLO             PIC  X(002).
+           88 WRK-FS-VARIOSLO-OK                           VALUE '00'.
+           88 WRK-FS-VARIOSLO-FIM                          VALUE '10'.
+       01  WRK-FS-UNICOLOT             PIC  X(002).
+           88 WRK-FS-UNICOLO-OK                            VALUE '00'.
+       01  WRK-ABERTURA                PIC  X(013)         VALUE
+                                                          'NA ABERTURA'.
+       01  WRK-LEITURA                 PIC  X(013)         VALUE
+                                                           'NA LEITURA'.
+       01  WRK-FECHAMENTO              PIC  X(013)         VALUE
+                                                        'NO FECHAMENTO'.
+       01  WRK-BATCH                   PIC  X(008)         VALUE
+                                                                'BATCH'.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* AREA DE ACUMULADORES *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+
+       01  ACU-LIDOS-VARIOSLO          PIC  9(009) COMP-3  VALUE ZEROS.
+       01  ACU-GRAVADOS-UNICOLOT       PIC  9(009) COMP-3  VALUE ZEROS.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* AREA PARA VARIAVEIS AUXILIARES *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  WRK-FIM-VARIOSLO            PIC  X(001)         VALUE SPACES.
+       01  WRK-EDIT                    PIC  ZZZ.ZZZ.ZZ9    VALUE ZEROS.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* MENSAGENS DE ERRO *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+
+       01  WRK-MSG-FS-ERRO.
+           05 FILLER                   PIC  X(010)         VALUE SPACES.
+           05 FILLER                   PIC  X(005)         VALUE 'ERRO'.
+           05 WRK-OPERACAO             PIC  X(013)         VALUE SPACES.
+           05 FILLER                   PIC  X(012)         VALUE
+                                                           'DO ARQUIVO'.
+           05 WRK-NOME-ARQ             PIC  X(009)         VALUE SPACES.
+           05 FILLER                   PIC  X(014)         VALUE
+                                                       'FILE STATUS = '.
+           05 WRK-FILE-STATUS          PIC  X(002)         VALUE SPACES.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* AREA PARA TRATAMENTO DE ERROS *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+           COPY 'I#BRAD7C'.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* AREA DE ARQUIVOS *             '.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+
+           COPY 'I#CBTIRT'.
+
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+       01  FILLER                      PIC  X(050)         VALUE
+           '* FIM DA AREA DE WORKING *'.
+      *- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
+
+       LINKAGE                         SECTION.
+       01  LNK-PARM-CLIENTE.
+           05 LNK-TAM-PARM             PIC 9(04) COMP.
+           05 LNK-PARAMETRO            PIC X(20).
+
+      *================================================================*
+       PROCEDURE DIVISION              USING LNK-PARM-CLIENTE.
+      *================================================================*
+
+      *----------------------------------------------------------------*
+       0000-PRINCIPAL                  SECTION.
+      *----------------------------------------------------------------*
+
+           PERFORM  1000-INICIALIZAR
+
+           PERFORM  2000-PROCESSAR
+             UNTIL (CBTIRT-COD-EMPRESA-H EQUAL LNK-PARAMETRO AND
+                                 CBTIRT-TIPO-REG-H    EQUAL ZEROS)
+                                                      OR
+                                 WRK-FS-VARIOSLO-FIM
+      *      UNTIL CBTIRT-TIPO-REG-H   EQUAL 9
+
+      *    SUBTRACT 1                  FROM ACU-LIDOS-VARIOSLO
+
+           PERFORM  3000-FINALIZAR
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       1000-INICIALIZAR                SECTION.
+      *----------------------------------------------------------------*
+           MOVE SPACES                 TO ERRO-AREA
+
+           PERFORM 1100-ABRIR-ARQUIVOS
+
+           PERFORM 9000-LER-VARIOSLO
+
+           PERFORM  1200-VERIFICAR-VAZIO
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+       1100-ABRIR-ARQUIVOS             SECTION.
+      *----------------------------------------------------------------*
+           MOVE WRK-ABERTURA           TO WRK-OPERACAO
+
+           OPEN                        INPUT  VARIOSLO
+           IF   WRK-FS-VARIOSLO        NOT EQUAL  '00' AND '10'
+                MOVE  'VARIOSLO'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-VARIOSLO  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+           OPEN                        OUTPUT UNICOLOT
+           IF   WRK-FS-UNICOLOT        NOT EQUAL  '00' AND '10'
+                MOVE  'UNICOLOT'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-UNICOLOT  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       1200-VERIFICAR-VAZIO            SECTION.
+      *----------------------------------------------------------------*
+
+           IF   WRK-FS-VARIOSLO-FIM
+                DISPLAY '                                 '
+                DISPLAY '================================ '
+                DISPLAY '*** NAO FOI ENCONTRADO O CLIENTE '
+                                                      LNK-PARAMETRO
+                DISPLAY '================================ '
+                DISPLAY '                                 '
+                DISPLAY '********** VARIOSLO **********'
+                DISPLAY '*                            *'
+                DISPLAY '*   ARQUIVO VARIOSLO VAZIO   *'
+                DISPLAY '*   PROGRAMA CANCELADO       *'
+                DISPLAY '*                            *'
+                DISPLAY '********** VARIOSLO **********'
+                MOVE 'VARIOSLO'         TO WRK-NOME-ARQ
+
+
+           END-IF
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       2000-PROCESSAR                  SECTION.
+      *----------------------------------------------------------------*
+
+           PERFORM 2100-GRAVAR-UNICOLOT
+             UNTIL CBTIRT-TIPO-REG-H   EQUAL 9
+
+
+           PERFORM 2100-GRAVAR-UNICOLOT
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       2100-GRAVAR-UNICOLOT            SECTION.
+      *----------------------------------------------------------------*
+
+           WRITE  FD-REG-UNICOLOT      FROM  CBTIRT-CNAB0400
+           IF   NOT WRK-FS-UNICOLO-OK
+                MOVE  'UNICOLOT'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-UNICOLOT  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+           ADD   1                     TO    ACU-GRAVADOS-UNICOLOT
+
+           PERFORM 9000-LER-VARIOSLO
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       3000-FINALIZAR                  SECTION.
+      *----------------------------------------------------------------*
+
+           PERFORM  3100-FECHAR-ARQUIVOS
+
+           PERFORM  3200-DISPLAY-PROCESSAMENTO
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       3100-FECHAR-ARQUIVOS            SECTION.
+      *----------------------------------------------------------------*
+           MOVE WRK-FECHAMENTO         TO  WRK-OPERACAO
+
+           CLOSE VARIOSLO
+           IF   WRK-FS-VARIOSLO        NOT EQUAL  '00' AND '10'
+                MOVE  'VARIOSLO'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-VARIOSLO  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+           CLOSE UNICOLOT
+           IF   WRK-FS-UNICOLOT        NOT EQUAL  '00' AND '10'
+                MOVE  'UNICOLOT'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-UNICOLOT  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+
+           STOP RUN.
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       9000-LER-VARIOSLO               SECTION.
+      *----------------------------------------------------------------*
+
+           READ  VARIOSLO              INTO CBTIRT-CNAB0400
+           IF   WRK-FS-VARIOSLO        NOT EQUAL  '00' AND '10'
+                MOVE  'VARIOSLO'       TO WRK-NOME-ARQ
+                MOVE  WRK-FS-VARIOSLO  TO WRK-FILE-STATUS
+
+                PERFORM  9999-ROTINA-ERRO
+
+           END-IF
+
+           MOVE  WRK-LEITURA           TO WRK-OPERACAO
+
+           IF  WRK-FS-VARIOSLO         EQUAL '10'
+               MOVE  'S'               TO WRK-FIM-VARIOSLO
+
+               PERFORM 1000-INICIALIZAR
+           END-IF
+
+           ADD 1                       TO ACU-LIDOS-VARIOSLO
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       3200-DISPLAY-PROCESSAMENTO      SECTION.
+      *----------------------------------------------------------------*
+
+           DISPLAY
+           '********************** CBTI9970 **********************'
+           DISPLAY
+           '*                                                    *'
+           DISPLAY
+           '*             ESTATISTICA DE PROCESSAMENTO           *'
+           DISPLAY
+           '*                                                    *'
+
+           MOVE  ACU-LIDOS-VARIOSLO    TO  WRK-EDIT
+           DISPLAY
+           '* REGISTROS LIDOS NO VARIOSLO   .......= ' WRK-EDIT '*'
+
+           MOVE  ACU-GRAVADOS-UNICOLOT TO  WRK-EDIT
+           DISPLAY
+           '* REGISTROS GRAVADOS NO UNICOLOT.......= ' WRK-EDIT '*'
+
+           DISPLAY
+           '*                                                    *'
+           DISPLAY
+           '********************** CBTI9970 **********************'
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*
+      *----------------------------------------------------------------*
+       9999-ROTINA-ERRO                SECTION.
+      *----------------------------------------------------------------*
+
+           MOVE  'CBTI9970'            TO  ERR-PGM
+           MOVE  'APL'                 TO  ERR-TIPO-ACESSO
+
+           MOVE  WRK-MSG-FS-ERRO       TO  ERR-TEXTO
+
+           CALL  'BRAD7100'            USING  WRK-BATCH
+                                              ERRO-AREA
+
+           STOP RUN.
+
+      *----------------------------------------------------------------*
+           EXIT.
+      *----------------------------------------------------------------*

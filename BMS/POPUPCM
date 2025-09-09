@@ -1,0 +1,150 @@
+POPUPCM  DFHMSD TYPE=(MAP,DSECT),                                      X
+               MODE=INOUT,                                             X
+               LANG=COBOL,                                             X
+               STORAGE=AUTO,                                           X
+               MAPATTS=(COLOR,HILIGHT),                                X
+               DSATTS=(COLOR,HILIGHT),                                 X
+               CTRL=(FREEKB,ALARM,FRSET),                              X
+               TIOAPFX=YES
+MAPAPOP  DFHMDI SIZE=(20,60),                                          X
+               LINE=20,                                                X
+               COLUMN=40
+
+
+         DFHMDF POS=(1,22),LENGTH=20,                                  X
+               INITIAL='*** BOOM !!! ***',                             X
+               COLOR=RED,HILIGHT=BLINK
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(02,23),                                           X
+               LENGTH=16,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='$#      #     #$'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(03,11),                                           X
+               LENGTH=25,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='#######       #$   #   $#'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(04,10),                                           X
+               LENGTH=25,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='##    $###      $#  $  #$'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(05,10),                                           X
+               LENGTH=26,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='##      ###     1   1    1'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(06,07),                                           X
+               LENGTH=32,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='#######        ###        1$###$'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(07,07),                                           X
+               LENGTH=27,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='#######         ########  1'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(08,05),                                           X
+               LENGTH=32,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='###########                  O$#'
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(09,03),                                           X
+               LENGTH=36,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='###############          $  1O   1##'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(10,02),                                           X
+               LENGTH=30,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='##################       1$   '
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(11,01),                                           X
+               LENGTH=31,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='###################      #    O#'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(12,01),                                           X
+               LENGTH=26,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='####################     ##'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(13,02),                                           X
+               LENGTH=18,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='##################'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(14,03),                                           X
+               LENGTH=16,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='################'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(15,05),                                           X
+               LENGTH=12,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='############'
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(16,07),                                           X
+               LENGTH=08,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='########'
+
+         DFHMDF POS=(17,10),                                           X
+               LENGTH=36,                                              X
+               INITIAL='PRESSIONE ENTER PARA JOGAR NOVAMENTE',         X
+               COLOR=YELLOW
+
+*
+* CAMPO CONSTANTE
+*
+         DFHMDF POS=(18,07),                                           X
+               LENGTH=08,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='APERTE F3 PARA VOLTAR AO MENU'
+
+         DFHMSD TYPE=FINAL
+         END

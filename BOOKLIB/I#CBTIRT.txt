@@ -1,0 +1,278 @@
+      ***===========================================================***
+      *** NOME INC                                     LENGTH=00400 ***
+      *** I#CBTIRT                                                  ***
+      ***-----------------------------------------------------------***
+      ***                                                           ***
+      *** DESCRICAO: ARQUIVO CNAB0400 - RETORNO                     ***
+      ***                                                           ***
+FSYS19***===========================================================***
+.     *       ALTERACAO ABRIL/2019 - MARCIO MAIA - FOURSYS            *
+.     *  - ALTERACAO DOS CAMPOS MOTIVO DE NUMERICOS PARA ALFANUMERICO *
+FSYS19*---------------------------------------------------------------*
+
+       01  CBTIRT-CNAB0400.
+
+      *** REGISTRO HEADER - TIPO '0'
+         03  CBTIRT-CNAB-HEADER.
+
+      * --- 001 A 001 IDENTIFICACAO DO REGISTRO
+           05  CBTIRT-TIPO-REG-H             PIC  9(001).
+
+      * --- 002 A 002 IDENTIFICACAO DO ARQUIVO REMESSA
+           05  CBTIRT-ID-ARQUIVO-H           PIC  9(001).
+
+      * --- 003 A 009 LITERAL REMESSA
+           05  CBTIRT-LTRAL-REMSS-H          PIC  X(007).
+
+      * --- 010 A 011 CODIGO DE SERVICO
+           05  CBTIRT-COD-SERVC-H            PIC  9(002).
+
+      * --- 012 A 026 LITERAL SERVICO
+           05  CBTIRT-LTRAL-SERVC-H          PIC  X(015).
+
+      * --- 027 A 046 CODIGO DA EMPRESA
+           05  CBTIRT-COD-EMPRESA-H          PIC  X(020).
+
+      * --- 047 A 076 NOME DA EMPRESA
+           05  CBTIRT-NOME-EMPRESA-H         PIC  X(030).
+
+      * --- 077 A 079 NUMERO DO BANCO NA CAMARA DE COMPENSACAO
+           05  CBTIRT-NBSCO-COMP-H           PIC  9(003).
+
+      * --- 080 A 094 NOME DO BANCO POR EXTENSO
+           05  CBTIRT-NOME-BANCO-H           PIC  X(015).
+
+      * --- 095 A 100 DATA DA GRAVACAO DO ARQUIVO - DDMMAA
+           05  CBTIRT-DAT-GRAV-ARQ-H         PIC  9(006).
+
+      * --- 101 A 108 ZEROS
+           05  CBTIRT-ZEROS-1-H              PIC  9(008).
+
+      * --- 109 A 113 NUMERO AVISO BANCARIO
+           05  CBTIRT-NUM-AVISO-BANC-H       PIC  9(005).
+
+      * --- 114 A 379 BRANCOS
+           05  CBTIRT-BRANCOS-1-H            PIC  X(266).
+
+      * --- 380 A 385 DATA DO CREDITO - DDMMAA
+           05  CBTIRT-DAT-CRED-H             PIC  9(006).
+
+      * --- 386 A 394 BRANCOS
+           05  CBTIRT-BRANCOS-2-H            PIC  X(009).
+
+      * --- 395 A 400 N? SEQUENCIAL DO REGISTRO
+           05  CBTIRT-NRO-SEQ-REG-H          PIC  9(006).
+
+      *** REGISTRO TIPO '1'
+        03  CBTIRT-CNAB-DET  REDEFINES  CBTIRT-CNAB-HEADER.
+
+      * --- 001 A 001 IDENTIFICACAO DO REGISTRO
+           05  CBTIRT-TIPO-REG               PIC 9(001).
+
+      * --- 002 A 003 TIPO DE INSCRICAO EMPRESA
+           05  CBTIRT-TIPO-INSCR             PIC 9(002).
+
+      * --- 004 A 017 NUMERO INSCRICAO EMPRESA
+           05  CBTIRT-CNPJ-CPF               PIC 9(014).
+
+      * --- 018 A 020 ZEROS
+           05  CBTIRT-ZEROS-1                PIC 9(003).
+
+      * --- 021 A 037 IDENTIFICACAO EMPRESA CEDENTE BANCO
+           05  CBTIRT-IDENT-EMPR-CED         PIC X(017).
+
+      * --- 038 A 062 NUMERO CONTROLE PARTICIPANTE
+           05  CBTIRT-NUM-CTRL-PARTIC        PIC X(025).
+
+      * --- 063 A 070 ZEROS
+           05  CBTIRT-ZEROS-2                PIC 9(008).
+
+      * --- 071 A 082 IDENTIFICACAO TITULO BANCO
+           05  CBTIRT-IDENT-TITULO-1         PIC X(012).
+
+      * --- 083 A 092 USO DO BANCO
+           05  CBTIRT-USO-BANCO-1            PIC X(010).
+
+      * --- 093 A 104 USO DO BANCO
+           05  CBTIRT-USO-BANCO-2            PIC X(012).
+
+      * --- 105 A 105 INDICADOR RATEIO CREDITO
+           05  CBTIRT-IND-RAT-CRED           PIC X(001).
+
+      * --- 106 A 107 ZEROS
+           05  CBTIRT-ZEROS-3                PIC 9(002).
+
+      * --- 108 A 108 CARTEIRA
+           05  CBTIRT-CARTEIRA               PIC 9(001).
+
+      * --- 109 A 110 IDENTIFICACAO DE OCORRENCIA
+           05  CBTIRT-IDENT-OCORREN          PIC 9(002).
+
+      * --- 111 A 116 DATA OCORRENCIA BANCO - DDMMAA
+           05  CBTIRT-DAT-OCORREN            PIC 9(006).
+
+      * --- 117 A 126 NUMERO DO DOCUMENTO
+           05  CBTIRT-NUM-DOCUMENTO          PIC X(010).
+
+      * --- 127 A 146 IDENTIFICACAO TITULO BANCO
+           05  CBTIRT-IDENT-TITULO-2         PIC X(020).
+
+      * --- 147 A 152 DATA VENCIMENTO TITULO - DDMMAA
+           05  CBTIRT-DAT-VENC-TITULO        PIC 9(006).
+
+      * --- 153 A 165 VALOR DO TITULO
+           05  CBTIRT-VALOR-TITULO           PIC 9(013).
+
+      * --- 166 A 168 BANCO COBRADOR
+           05  CBTIRT-BANCO-COBRADOR         PIC 9(003).
+
+      * --- 169 A 173 AGENCIA-COBRADORA
+           05  CBTIRT-AGENCIA-COBRADORA      PIC 9(005).
+
+      * --- 174 A 175 ESPECIE TITULO
+           05  CBTIRT-ESPECIE-TITULO         PIC X(002).
+
+      * --- 176 A 188 CODIGOS OCORRENCIA
+           05  CBTIRT-DESPESAS-OCORREN   PIC 9(013).
+
+      * --- 186 A 201 DESPESAS CUSTAS PROTESTO
+           05  CBTIRT-DESPESA-PROTESTO       PIC 9(013).
+
+      * --- 202 A 214 JUROS OPERACAO ATRASO
+           05  CBTIRT-DESPESA-OPER-PROT      PIC 9(013).
+
+      * --- 215 A 227 IOF DEVIDO
+           05  CBTIRT-IOF-DEVIDO             PIC 9(013).
+
+      * --- 228 A 240 ABATIMENTO CONCEDIDO
+           05  CBTIRT-ABATIM-TITULO          PIC 9(013).
+
+      * --- 241 A 253 DESCONTO CONCEDIDO
+           05  CBTIRT-DESCON-TITULO          PIC 9(013).
+
+      * --- 254 A 266 VALOR PAGO
+           05  CBTIRT-VALOR-PAGO             PIC 9(013).
+
+      * --- 267 A 279 JUROS DE MORA
+           05  CBTIRT-JUROS-MORA             PIC 9(013).
+
+      * --- 280 A 292 OUTROS CREDITOS
+           05  CBTIRT-OUTROS-CREDITO         PIC 9(013).
+
+      * --- 293 A 294 BRANCOS
+           05  CBTIRT-BRANCOS-1              PIC X(002).
+
+      * --- 295 A 295 INSTR. PROTESTO
+           05  CBTIRT-CONF-INSTR-PROTESTO    PIC X(001).
+
+      * --- 296 A 301 DATA CREDITO - DDMMAA
+           05  CBTIRT-DAT-CREDITO            PIC 9(006).
+
+      * --- 302 A 318 BRANCOS
+           05  CBTIRT-BRANCOS-2              PIC X(017).
+
+      * --- 319 A 328 MOTIVOS REJEICAO
+FSYS19*    05  CBTIRT-MOTIVO-REJEICAO        PIC 9(010).
+           05  CBTIRT-MOTIVO-REJEICAO.
+               10  CBTIRT-MOTIVO-RET1        PIC X(002).
+               10  CBTIRT-MOTIVO-RET2        PIC X(002).
+               10  CBTIRT-MOTIVO-RET3        PIC X(002).
+               10  CBTIRT-MOTIVO-RET4        PIC X(002).
+               10  CBTIRT-MOTIVO-RET5        PIC X(002).
+
+      * --- 329 A 394 BRANCOS
+           05  CBTIRT-BRANCOS-3              PIC X(066).
+
+      * --- 395 A 400 N? SEQUENCIAL DO REGISTRO
+           05  CBTIRT-NRO-SEQ-REG            PIC  9(006).
+
+      *** REGISTRO TRAILLER - TIPO '9'
+        03  CBTIRT-CNAB-TRL  REDEFINES  CBTIRT-CNAB-HEADER.
+
+      * --- 001 A 001 IDENTIFICACAO DO REGISTRO
+           05  CBTIRT-TIPO-REG-T             PIC  9(001).
+
+      * --- 002 A 002 IDENTIFICACAO DO RETORNO
+           05  CBTIRT-IDENT-RETORNO-T        PIC  9(001).
+
+      * --- 003 A 004 IDENTIFICACAO TIPO RESGISTRO
+           05  CBTIRT-IDENT-TP-REGISTRO-T    PIC  9(002).
+
+      * --- 005 A 007 CODIGO BANCO
+           05  CBTIRT-CODIGO-BANCO-T         PIC  9(003).
+
+      * --- 008 A 017 BRANCOS
+           05  CBTIRT-BRANCOS-1-T            PIC  X(010).
+
+      * --- 018 A 025 QTDE TITULO COBRANCA
+           05  CBTIRT-QTDE-TITULO-T          PIC  9(008).
+
+      * --- 026 A 039 VALOR TOTAL EM COBRANCA
+           05  CBTIRT-VALOR-TOTAL-T          PIC  9(014).
+
+      * --- 040 A 047 NUMERO AVISO BANCARIO
+           05  CBTIRT-NUM-AVISO-T            PIC  9(008).
+
+      * --- 048 A 057 BRANCOS
+           05  CBTIRT-BRANCOS-2-T            PIC  X(010).
+
+      * --- 058 A 062 QTDE REGISTROS - CONFIRMACAO
+           05  CBTIRT-QTDE-REG-CONFIR-T      PIC  9(005).
+
+      * --- 063 A 074 VALOR RESGISTRO - CONFIRMACAO
+           05  CBTIRT-VALOR-REG-CONFIR-T     PIC  9(012).
+
+      * --- 075 A 086 VALOR RESGISTRO - LIQUIDADOS
+           05  CBTIRT-VALOR-REG-LIQUID-T     PIC  9(012).
+
+      * --- 087 A 091 QTDE REGISTROS - LIQUIDADOS
+           05  CBTIRT-QTDE-REG-LIQUID-T      PIC  9(005).
+
+      * --- 092 A 103 VALOR REGISTRO - BAIXADOS
+           05  CBTIRT-VALOR-REG-BAIXAD-T     PIC  9(012).
+
+      * --- 104 A 108 QTDE REGISTROS - OCORRENCIA 09/10
+           05  CBTIRT-QTDE-REG-OCO0910-T     PIC  9(005).
+
+      * --- 109 A 120 VALOR REGISTRO - OCORRENCIA 09/10
+           05  CBTIRT-VALOR-REG-OCO0910-T    PIC  9(012).
+
+      * --- 121 A 125 QTDE REGISTROS - ABATIM CANCELADO
+           05  CBTIRT-QTDE-REG-ABAT-CAN-T    PIC  9(005).
+
+      * --- 126 A 137 VALOR REGISTRO - ABATIM CANCELADO
+           05  CBTIRT-VALOR-REG-ABAT-CAN-T   PIC  9(012).
+
+      * --- 138 A 142 QTDE REGISTROS - VENC ALTERADO
+           05  CBTIRT-QTDE-REG-VENC-ALT-T    PIC  9(005).
+
+      * --- 143 A 154 VALOR REGISTRO - VENC ALTERADO
+           05  CBTIRT-VALOR-REG-VENC-ALT-T   PIC  9(012).
+
+      * --- 155 A 159 QTDE REGISTROS - ABATIM CONCEDIDO
+           05  CBTIRT-QTDE-REG-ABAT-CON-T    PIC  9(005).
+
+      * --- 160 A 171 VALOR REGISTRO - ABATIM CONCEDIDO
+           05  CBTIRT-VALOR-REG-ABAT-CON-T   PIC  9(012).
+
+      * --- 172 A 176 QTDE REGISTROS - INSTR. PROTESTO
+           05  CBTIRT-QTDE-REG-INSTR-PROT-T  PIC  9(005).
+
+      * --- 177 A 188 VALOR REGISTRO - INSTR. PROTESTO
+           05  CBTIRT-VALOR-REG-INSTR-PROT-T PIC  9(012).
+
+      * --- 189 A 362 BRANCOS
+           05  CBTIRT-BRANCOS-3-T            PIC  X(174).
+
+      * --- 363 A 377 VALOR TOTAL DOS RATEIOS
+           05  CBTIRT-VALOR-TOT-RATEIO       PIC  9(015).
+
+      * --- 378 A 385 QTDE TOTAL DOS RATEIOS
+           05  CBTIRT-QTDE-TOT-RATEIO        PIC  9(008).
+
+      * --- 386 A 394 BRANCOS
+           05  CBTIRT-BRANCOS-4-T            PIC  X(009).
+
+      * --- 395 A 400 NUMERO SEQUENCIAL DO ULTIMO REGISTRO
+           05  CBTIRT-NRO-SEQ-REG-T          PIC  9(006).
+
